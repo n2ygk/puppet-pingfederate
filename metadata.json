@@ -8,7 +8,9 @@
   "project_page": "https://github.com/n2ygk/puppet-pingfederate",
   "issues_url": "https://github.com/n2ygk/puppet-pingfederate/issues",
   "dependencies": [
-    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"}
+    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"},
+    {"name":"camptocamp-augeas","version_requirement":">= 1.5.1"},
+    {"name":"puppetlabs-inifile","version_requirement":">= 1.6.0"}
   ],
   "data_provider": null
 }

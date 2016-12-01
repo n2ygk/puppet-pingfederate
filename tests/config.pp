@@ -1,13 +1,8 @@
 # Learn more about module testing here:
 # https://docs.puppetlabs.com/guides/tests_smoke.html
 # invoke with no defaults just to see what happens to the run.properties file.
-class {'::pingfederate':
+class {'::pingfederate::config':
   install_dir                         => '/tmp/testfiles',
-  adapter_facebook                    => true,
-  adapter_google                      => true,
-  adapter_twitter                     => false,
-  adapter_linkedin                    => true,
-  adapter_windowslive                 => false,
   admin_https_port                    => 1234,
   admin_hostname                      => 'foobar',
   console_bind_address                => '0.0.0.0',

@@ -66,6 +66,9 @@ facts, along with the parameters for each. Users refer to this section (thus
 the name "Reference") to find specific details; most users don't read it per
 se.
 
+https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/changingConfigurationParameters.html
+
+
 ## Limitations
 
 This is where you list OS compatibility, version compatibility, etc. If there
@@ -75,6 +78,8 @@ are Known Issues, you might want to include them under their own heading here.
 
 Since your module is awesome, other users will want to play with it. Let them
 know what the ground rules for contributing are.
+
+https://docs.puppet.com/guides/augeas.html
 
 ## Release Notes/Contributors/Etc. **Optional**
 

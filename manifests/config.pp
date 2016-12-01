@@ -1,28 +1,24 @@
 # https://docs.puppet.com/puppet/3.8/reference/experiments_future.html#enabling-the-future-parser
-class pingfederate::config inherits pingfederate {
-  if !File['/etc/ax25'] {
-    file { '/etc/ax25':
-      ensure  => directory,
+class pingfederate::config inherits ::pingfederate {
+  # apparently the augeas-1.0 Properties.lens doesn't work with the shitty version of RHEL 6 repos.
+  #include augeas
+
+  #augeas{'run.properties':
+    #       lens    => 'Properties.lns',
+    #       incl    => $::pingfederate::install_dir,
+    #       changes => ['set "abc.def" "2345"']
+    #}
+
+  # so use inifile for this and augeas for the XML files
+
+  $defaults = { 'path' => "${::pingfederate::install_dir}/pingfederate/bin/run.properties" }
+  # this Java properties file has no sections so the section name is '.'
+  $settings = {
+    '.' => {
+      'pf.admin.https.port'  => $::pingfederate::admin_https_port,
+      'pf.console.title' => $::pingfederate::console_title,
     }
   }
-  # build up the pingfederate options to look something like this:
-  # --kill_dupes --kill_loops --logfile /var/log/pingfederate.log --trace WIDE --trace TRACE --subst_mycall --x1j4_xlate --interface ax25:sm0:RELAY,WIDE,TRACE
+  create_ini_settings($settings, $defaults)
 
-  $okd = if $kill_dupes { "--kill_dupes" }
-  $okl = if $kill_loops { "--kill_loops" }
-  $osm = if $subst_mycall { "--subst_mycall" }
-  $oxx = if $x1j4_xlate { " --x1j4_xlate" }
-  $olf = if $logfile { "--logfile ${logfile}" }
-  $otr = $traces.reduce("") |$t,$i| { "${t} --trace ${i}" }
-  $oal = $aliases.reduce("") |$a,$i| { "${a}${i}," }  # stupid extra comma at end of oal
-
-  $pingfederate_opts = "${okd} ${okl} ${osm} ${oxx} ${olf} ${otr} --interface ax25:${intf}:${oal}"
-  $beacon_text = "!${lat}/${lon}#PHG${phg}/${txt}"
-  file { '/etc/ax25/pingfederate.conf':
-    ensure  => file,
-    owner   => 0,
-    group   => 0,
-    mode    => '0644',
-    content => template('pingfederate/pingfederate.conf.erb'),
-  }
 }
