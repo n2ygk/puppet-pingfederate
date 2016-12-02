@@ -4,11 +4,11 @@
 # invoke with no defaults just to see what happens to the run.properties file.
 class {'::pingfederate':
   install_dir                         => '/tmp/testfiles/pingfederate',
-  adapter_facebook                    => true,
-  adapter_google                      => true,
-  adapter_twitter                     => false,
-  adapter_linkedin                    => true,
-  adapter_windowslive                 => false,
+  facebook_adapter                    => true,
+  google_adapter                      => true,
+  twitter_adapter                     => false,
+  linkedin_adapter                    => true,
+  windowslive_adapter                 => false,
   admin_https_port                    => 1234,
   admin_hostname                      => 'foobar',
   console_bind_address                => '0.0.0.0',

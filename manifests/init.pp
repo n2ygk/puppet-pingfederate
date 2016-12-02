@@ -8,7 +8,7 @@
 # === Examples
 #
 #  class { 'pingfederate':
-#    mode => "clustered_console",
+#    operational_mode   => "clustered_console",
 #    cluster_node_index => 2,
 #  }
 #
@@ -22,11 +22,29 @@
 #
 class pingfederate (
   $install_dir                         = $::pingfederate::params::install_dir,
-  $adapter_facebook                    = $::pingfederate::params::adapter_facebook,
-  $adapter_google                      = $::pingfederate::params::adapter_google,
-  $adapter_linkedin                    = $::pingfederate::params::adapter_linkedin,
-  $adapter_twitter                     = $::pingfederate::params::adapter_twitter,
-  $adapter_windowslive                 = $::pingfederate::params::adapter_windowslive,
+  # main server package
+  $package_list                        = $::pingfederate::params::package_list,
+  $package_ensure                      = $::pingfederate::params::package_ensure,
+  # add-on packages: social media oauth adapters
+  $facebook_adapter                    = $::pingfederate::params::facebook_adapter,
+  $facebook_package_list               = $::pingfederate::params::facebook_package_list,
+  $facebook_package_ensure             = $::pingfederate::params::facebook_package_ensure,
+  $google_adapter                      = $::pingfederate::params::google_adapter,
+  $google_package_list                 = $::pingfederate::params::google_package_list,
+  $google_package_ensure               = $::pingfederate::params::google_package_ensure,
+  $linkedin_adapter                    = $::pingfederate::params::linkedin_adapter,
+  $linkedin_package_list               = $::pingfederate::params::linkedin_package_list,
+  $linkedin_package_ensure             = $::pingfederate::params::linkedin_package_ensure,
+  $twitter_adapter                     = $::pingfederate::params::twitter_adapter,
+  $twitter_package_list                = $::pingfederate::params::twitter_package_list,
+  $twitter_package_ensure              = $::pingfederate::params::twitter_package_ensure,
+  $windowslive_adapter                 = $::pingfederate::params::windowslive_adapter,
+  $windowslive_package_list            = $::pingfederate::params::windowslive_package_list,
+  $windowslive_package_ensure          = $::pingfederate::params::windowslive_package_ensure,
+  # ensure the service is up
+  $service_name                        = $::pingfederate::params::service_name,
+  $service_ensure                      = $::pingfederate::params::service_ensure,
+  # various run.properties (there are a few more; add them as you need them):
   $admin_https_port                    = $::pingfederate::params::admin_https_port,
   $admin_hostname                      = $::pingfederate::params::admin_hostname,
   $console_bind_address                = $::pingfederate::params::console_bind_address,
@@ -76,6 +94,8 @@ class pingfederate (
   validate_integer($http_port,65535,-1)
   validate_integer($https_port,65535,-1)
   validate_integer($secondary_https_port,65535,-1)
+
+  # need to do more validation
 
   anchor { 'pingfederate::begin': } ->
   class { '::pingfederate::install': } ->

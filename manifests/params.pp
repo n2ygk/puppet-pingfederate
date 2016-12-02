@@ -1,15 +1,28 @@
-# run.properties defaults
-# see https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/changingConfigurationParameters.html
-# and /opt/pingfederate-$PF_VERSION/pingfederate/bin/run.properties
+# default values
 class pingfederate::params {
   $install_dir                         = '/opt/pingfederate'
-  # add-on packages: social media oauth adapters
-  $adapter_facebook                    = false
-  $adapter_google                      = false
-  $adapter_linkedin                    = false
-  $adapter_twitter                     = false
-  $adapter_windowslive                 = false
-  # various run.properties (there are a few more; add them as you need them):
+  $package_list                        = 'pingfederate-server'
+  $package_ensure                      = 'installed'
+  $facebook_adapter                    = false
+  $facebook_package_list               = 'pingfederate-facebook-adapter'
+  $facebook_package_ensure             = 'installed'
+  $google_adapter                      = false
+  $google_package_list                 = 'pingfederate-google-adapter'
+  $google_package_ensure               = 'installed'
+  $linkedin_adapter                    = false
+  $linkedin_package_list               = 'pingfederate-linkedin-adapter'
+  $linkedin_package_ensure             = 'installed'
+  $twitter_adapter                     = false
+  $twitter_package_list                = 'pingfederate-twitter-adapter'
+  $twitter_package_ensure              = 'installed'
+  $windowslive_adapter                 = false
+  $windowslive_package_list            = 'pingfederate-windowslive-adapter'
+  $windowslive_package_ensure          = 'installed'
+  $service_name                        = 'pingfederate'
+  $service_ensure                      = true
+  # run.properties defaults
+  # see https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/changingConfigurationParameters.html
+  # and /opt/pingfederate-$PF_VERSION/pingfederate/bin/run.properties
   $admin_https_port                    = 9999
   $admin_hostname                      = undef
   $console_bind_address                = '0.0.0.0'

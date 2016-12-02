@@ -4,8 +4,6 @@
 
 1. [Description](#description)
 1. [Setup - The basics of getting started with pingfederate](#setup)
-    * [What pingfederate affects](#what-pingfederate-affects)
-    * [Setup requirements](#setup-requirements)
     * [Beginning with pingfederate](#beginning-with-pingfederate)
 1. [Usage - Configuration options and additional functionality](#usage)
 1. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
@@ -14,75 +12,169 @@
 
 ## Description
 
-Start with a one- or two-sentence summary of what the module does and/or what
-problem it solves. This is your 30-second elevator pitch for your module.
-Consider including OS/Puppet version it works with.
-
-You can give more descriptive information in a second paragraph. This paragraph
-should answer the questions: "What does this module *do*?" and "Why would I use
-it?" If your module has a range of functionality (installation, configuration,
-management, etc.), this is the time to mention it.
+This module installs and configures the
+[PingFederate](https://www.pingidentity.com/en/products/pingfederate.html) server using
+Puppet instead of the more typical interactive shell-script approach.
 
 ## Setup
 
-### What pingfederate affects **OPTIONAL**
-
-If it's obvious what your module touches, you can skip this section. For
-example, folks can probably figure out that your mysql_instance module affects
-their MySQL instances.
-
-If there's more that they should know about, though, this is the place to mention:
-
-* A list of files, packages, services, or operations that the module will alter,
-  impact, or execute.
-* Dependencies that your module automatically installs.
-* Warnings or other important notices.
-
-### Setup Requirements **OPTIONAL**
-
-If your module requires anything extra before setting up (pluginsync enabled,
-etc.), mention it here.
-
-If your most recent release breaks compatibility or requires particular steps
-for upgrading, you might want to include an additional "Upgrading" section
-here.
-
 ### Beginning with pingfederate
 
-The very basic steps needed for a user to get the module up and running. This
-can include setup steps, if necessary, or it can be an example of the most
-basic use of the module.
+PingFederate is a big, hairy package with lots of configuration. The intent of this Puppet module is to
+make it easier to automate installing and configuring the server, elimiate what are otheriwse a number of
+manual steps.
 
 ## Usage
 
-This section is where you describe how to customize, configure, and do the
-fancy stuff with your module here. It's especially helpful if you include usage
-examples and code samples for doing things with your module.
+At this point, the module only installs PingFederate and performs basic configuraiton of the
+`run.properties`. Future updates will include more advanced configuraton.
+If you have access to the RPMs (custom-built; not distributed by PingIdentity),
+it will install them, if not, install it the usual way by downloading and unzipping; you can still
+use this module to manager the configuration.
+
+### Basic Usage with RPMS available
+```
+include pingfederate
+```
+
+### Basic Usage without RPMS
+Install PingFederate per the [installation manual](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#gettingStartedGuide/concept/gettingStarted.html) and disable RPM installation:
+```
+  class {'pingfederate':
+    install_dir    => '/usr/local/pingfederte-1',
+	package_ensure => false,
+  }
+```
 
 ## Reference
 
-Here, include a complete list of your module's classes, types, providers,
-facts, along with the parameters for each. Users refer to this section (thus
-the name "Reference") to find specific details; most users don't read it per
-se.
+### Parameters
+Using most of the defaults will just work with the exception of adding some social identity providers.
 
-https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/changingConfigurationParameters.html
+### Packaging
+[*install_dir*]
+  Path to installation directory of PingFederate server.
+
+[*package_list*]
+  Name of package(s) that contains the PingFederate server.
+
+[*package_ensure*]
+  Ensure that the package is installed.
+
+[*facebook_adapter*]
+  Set to true to enable the Facebook CIC adapter. Default: false.
+
+[*facebook_package_list*]
+  Name of package(s) that contains the Facebook adapter.
+
+[*facebook_package_ensure*]
+  Ensure that the package is installed.
+
+*And likewise for the following:
+[*google_adapter*]
+
+[*google_package_list*]
+
+[*google_package_ensure*]
+
+[*linkedin_adapter*]
+
+[*linkedin_package_list*]
+
+[*linkedin_package_ensure*]
+
+[*twitter_adapter*]
+
+[*twitter_package_list*]
+
+[*twitter_package_ensure*]
+
+[*windowslive_adapter*]
+
+[*windowslive_package_list*]
+
+[*windowslive_package_ensure*]
+
+#### Run PingFederate as a service
+[*service_name*]
+  Service name.
+
+[*service_ensure*]
+  Ensure it is running.
+
+#### Runtime properties.
+
+The following are used to configure `run.properties`. See the
+[PingFederate documentation](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/changingConfigurationParameters.html)
+for an explanation.
+
+[*admin_https_port*]
+
+[*admin_hostname*]
+
+[*console_bind_address*]
+
+[*console_title*]
+
+[*console_session_timeout*]
+
+[*console_login_mode*]
+
+[*console_authentication*]
+
+[*admin_api_authentication*]
+
+[*http_port*]
+
+[*https_port*]
+
+[*secondary_https_port*]
+
+[*engine_bind_address*]
+
+[*monitor_bind_address*]
+
+[*log_event_detail*]
+
+[*heartbeat_system_monitoring*]
+
+[*operational_mode*]
+
+[*cluster_node_index*]
+
+[*cluster_auth_pwd*]
+
+[*cluster_encrypt*]
+
+[*cluster_bind_address*]
+
+[*cluster_bind_port*]
+
+[*cluster_failure_detection_bind_port*]
+
+[*cluster_transport_protocol*]
+
+[*cluster_mcast_group_address*]
+
+[*cluster_mcast_group_port*]
+
+[*cluster_tcp_discovery_initial_hosts*]
+
+[*cluster_diagnostics_enabled*]
+
+[*cluster_diagnostics_addr*]
+
+[*cluster_diagnostics_port*]
 
 
 ## Limitations
 
-This is where you list OS compatibility, version compatibility, etc. If there
-are Known Issues, you might want to include them under their own heading here.
+This has only been tested on EL 6 with Java 1.8. It might works elsewhere. Let me know!
 
 ## Development
 
 Since your module is awesome, other users will want to play with it. Let them
 know what the ground rules for contributing are.
 
-https://docs.puppet.com/guides/augeas.html
+Please fork and submit PRs on [github](https://github.com/n2ygk/puppet-pingfederate)!
 
-## Release Notes/Contributors/Etc. **Optional**
-
-If you aren't using changelog, put your release notes here (though you should
-consider using changelog). You can also add any additional sections you feel
-are necessary or important to include here. Please use the `## ` header.
