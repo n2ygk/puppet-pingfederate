@@ -3,6 +3,10 @@ class pingfederate::params {
   $install_dir                         = '/opt/pingfederate'
   $package_list                        = 'pingfederate-server'
   $package_ensure                      = 'installed'
+  $package_java_list                   = undef
+  $package_java_ensure                 = 'installed'
+  $package_java_redhat                 = 'java-1.8.0-oracle'
+  $package_java_centos                 = 'jre1.8.0_111'
   $facebook_adapter                    = false
   $facebook_package_list               = 'pingfederate-facebook-adapter'
   $facebook_package_ensure             = 'installed'

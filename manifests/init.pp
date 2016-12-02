@@ -25,6 +25,10 @@ class pingfederate (
   # main server package
   $package_list                        = $::pingfederate::params::package_list,
   $package_ensure                      = $::pingfederate::params::package_ensure,
+  $package_java_list                   = $::pingfederate::params::package_java_list,
+  $package_java_ensure                 = $::pingfederate::params::package_java_ensure,
+  $package_java_redhat                 = $::pingfederate::params::package_java_redhat,
+  $package_java_centos                 = $::pingfederate::params::package_java_centos,
   # add-on packages: social media oauth adapters
   $facebook_adapter                    = $::pingfederate::params::facebook_adapter,
   $facebook_package_list               = $::pingfederate::params::facebook_package_list,

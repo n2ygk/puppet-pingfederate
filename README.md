@@ -61,6 +61,15 @@ Using most of the defaults will just work with the exception of adding some soci
 [*package_ensure*]
   Ensure that the package is installed.
 
+[*package_java_ensure*]
+  Ensure that the Java JRE package is installed.
+
+[*package_java_redhat*]
+  Name of the preferred Java JRE package under RHEL
+
+[*package_java_centos*]
+  Name of the preferred Java JRE package under CentOS
+
 [*facebook_adapter*]
   Set to true to enable the Facebook CIC adapter. Default: false.
 
