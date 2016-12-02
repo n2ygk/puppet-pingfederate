@@ -1,8 +1,9 @@
+# test module with no defaults
 # Learn more about module testing here:
 # https://docs.puppetlabs.com/guides/tests_smoke.html
 # invoke with no defaults just to see what happens to the run.properties file.
 class {'::pingfederate':
-  install_dir                         => '/tmp/testfiles',
+  install_dir                         => '/tmp/testfiles/pingfederate',
   adapter_facebook                    => true,
   adapter_google                      => true,
   adapter_twitter                     => false,
@@ -37,4 +38,4 @@ class {'::pingfederate':
   pf_cluster_diagnostics_enabled      => true,
   pf_cluster_diagnostics_addr         => '224.0.75.99',
   pf_cluster_diagnostics_port         => 8500
-  }
+}
