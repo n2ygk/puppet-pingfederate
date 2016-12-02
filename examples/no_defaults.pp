@@ -35,7 +35,7 @@ class {'::pingfederate':
   cluster_mcast_group_address         => '239.16.96.99',
   cluster_mcast_group_port            => 8601,
   cluster_tcp_discovery_initial_hosts => 'hosta[7777], hostb[9999]',
-  pf_cluster_diagnostics_enabled      => true,
-  pf_cluster_diagnostics_addr         => '224.0.75.99',
-  pf_cluster_diagnostics_port         => 8500
+  cluster_diagnostics_enabled         => true,
+  cluster_diagnostics_addr            => '224.0.75.99',
+  cluster_diagnostics_port            => 8500
 }
