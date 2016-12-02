@@ -53,9 +53,9 @@ class pingfederate (
   $cluster_mcast_group_address         = $::pingfederate::params::cluster_mcast_group_address,
   $cluster_mcast_group_port            = $::pingfederate::params::cluster_mcast_group_port,
   $cluster_tcp_discovery_initial_hosts = $::pingfederate::params::cluster_tcp_discovery_initial_hosts,
-  $pf_cluster_diagnostics_enabled      = $::pingfederate::params::pf_cluster_diagnostics_enabled,
-  $pf_cluster_diagnostics_addr         = $::pingfederate::params::pf_cluster_diagnostics_addr,
-  $pf_cluster_diagnostics_port         = $::pingfederate::params::pf_cluster_diagnostics_port,
+  $cluster_diagnostics_enabled         = $::pingfederate::params::cluster_diagnostics_enabled,
+  $cluster_diagnostics_addr            = $::pingfederate::params::cluster_diagnostics_addr,
+  $cluster_diagnostics_port            = $::pingfederate::params::cluster_diagnostics_port,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])
