@@ -4,6 +4,7 @@
 #
 # === Parameters
 #
+# See README.md
 #
 # === Examples
 #
@@ -48,6 +49,11 @@ class pingfederate (
   # ensure the service is up
   $service_name                        = $::pingfederate::params::service_name,
   $service_ensure                      = $::pingfederate::params::service_ensure,
+  # license key file: provide either the content or source file URL
+  $license_content                     = $::pingfederate::params::license_content,
+  $license_file                        = $::pingfederate::params::license_file,
+  $owner                               = $::pingfederate::params::owner,
+  $group                               = $::pingfederate::params::group,
   # various run.properties (there are a few more; add them as you need them):
   $admin_https_port                    = $::pingfederate::params::admin_https_port,
   $admin_hostname                      = $::pingfederate::params::admin_hostname,
@@ -62,7 +68,7 @@ class pingfederate (
   $secondary_https_port                = $::pingfederate::params::secondary_https_port,
   $engine_bind_address                 = $::pingfederate::params::engine_bind_address,
   $monitor_bind_address                = $::pingfederate::params::monitor_bind_address,
-  $log_event_detail                    = $::pingfederate::params::log_event_detail,
+  $log_eventdetail                     = $::pingfederate::params::log_eventdetail,
   $heartbeat_system_monitoring         = $::pingfederate::params::heartbeat_system_monitoring,
   $operational_mode                    = $::pingfederate::params::operational_mode,
   $cluster_node_index                  = $::pingfederate::params::cluster_node_index,
@@ -78,6 +84,9 @@ class pingfederate (
   $cluster_diagnostics_enabled         = $::pingfederate::params::cluster_diagnostics_enabled,
   $cluster_diagnostics_addr            = $::pingfederate::params::cluster_diagnostics_addr,
   $cluster_diagnostics_port            = $::pingfederate::params::cluster_diagnostics_port,
+  # administration
+  $adm_user                            = $::pingfederate::params::adm_user,
+  $adm_hash                            = $::pingfederate::params::adm_hash,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])

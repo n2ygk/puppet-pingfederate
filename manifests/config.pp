@@ -1,14 +1,17 @@
-# https://docs.puppet.com/puppet/3.8/reference/experiments_future.html#enabling-the-future-parser
+# Class pingfederate::config
+# Static configuration of the server.
+# Edits run.properties, various XML config files, license acceptance,
+# license key, etc. that can be installed prior to starting the server.
 class pingfederate::config inherits ::pingfederate {
   # apparently the augeas-1.4 Properties.lens doesn't work!
+  # this throws a parser error:
   # augeas{'run.properties':
   #   lens    => 'Properties.lns',
   #   incl    => "$::pingfederate::install_dir/bin/run.properties",
   #   changes => ['set "abc.def" "2345"']
   #}
 
-  # so use inifile for this and augeas for the XML files
-
+  # use inifile for this and augeas for the XML files
   $defaults = {'path' => "${::pingfederate::install_dir}/bin/run.properties"}
   # this Java properties file has no sections so the section name is ''
   $settings = {
@@ -26,7 +29,7 @@ class pingfederate::config inherits ::pingfederate {
       'pf.secondary.https.port'                => $::pingfederate::secondary_https_port,
       'pf.engine.bind.address'                 => $::pingfederate::engine_bind_address,
       'pf.monitor.bind.address'                => $::pingfederate::monitor_bind_address,
-      'pf.log.event.detail'                    => $::pingfederate::log_event_detail,
+      'pf.log.eventdetail'                     => $::pingfederate::log_eventdetail,
       'pf.heartbeat.system.monitoring'         => $::pingfederate::heartbeat_system_monitoring,
       'pf.operational.mode'                    => $::pingfederate::operational_mode,
       'pf.cluster.node.index'                  => $::pingfederate::cluster_node_index,
@@ -46,4 +49,58 @@ class pingfederate::config inherits ::pingfederate {
   }
   create_ini_settings($settings, $defaults)
 
+  # install license acceptance file
+  $license_accept =  @("ACCEPT")
+                     <?xml version="1.0" encoding="UTF-8"?>
+                     <con:config xmlns:con="http://www.sourceid.org/2004/05/config">
+                         <con:map name="license-map">
+                             <con:item name="license-agreement-accepted">true</con:item>
+                         </con:map>
+                     </con:config>
+                     | ACCEPT
+  file {"${::pingfederate::install_dir}/server/default/data/config-store/com.pingidentity.page.Login.xml":
+    ensure  => 'present',
+    content => $license_accept,
+  }
+  # install license file
+  $lic_file = "${::pingfederate::install_dir}/server/default/conf/pingfederate.lic"
+  if $::pingfederate::license_file {
+    file {$lic_file:
+      ensure => 'present',
+      source => $::pingfederate::license_file,
+      owner  => 'pingfederate',
+      group  => 'pingfederate',
+    }
+  } elsif $::pingfederate::license_content {
+    file {$lic_file:
+      ensure  => 'present',
+      content => $::pingfederate::license_content,
+      owner   => $::pingfederate::owner,
+      group   => $::pingfederate::group,
+    }
+  }
+  # create initial administrator user so that we can invoke the rest APIs
+  $adm_file = "$::pingfederate::install_dir/server/default/data/pingfederate-admin-user.xml"
+  augeas{$adm_file:
+    lens    => 'Xml.lns',
+    incl    => $adm_file,
+    context => "/files/${adm_file}",
+    changes => ['set adm:administrative-users/#attribute/xmlns:adm "http://pingidentity.com/2006/01/admin-users"',
+                'set adm:administrative-users/#attribute/multi-admin "true"',
+                "set adm:administrative-users/adm:user/adm:user-name/#text \"${::pingfederate::adm_user}\"",
+                'clear adm:administrative-users/adm:user/adm:salt',
+                "set adm:administrative-users/adm:user/adm:hash/#text \"${::pingfederate::adm_hash}\"",
+                'set adm:administrative-users/adm:user/adm:phone-number/#attribute/xsi:nil "true"',
+                'set adm:administrative-users/adm:user/adm:phone-number/#attribute/xmlns:xsi "http://www.w3.org/2001/XMLSchema-instance"',
+                'set adm:administrative-users/adm:user/adm:email-address/#attribute/xsi:nil "true"',
+                'set adm:administrative-users/adm:user/adm:email-address/#attribute/xmlns:xsi "http://www.w3.org/2001/XMLSchema-instance"',
+                'set adm:administrative-users/adm:user/adm:phone-number/#attribute/xsi:nil "true"',
+                'set adm:administrative-users/adm:user/adm:phone-number/#attribute/xmlns:xsi "http://www.w3.org/2001/XMLSchema-instance"',
+                'set adm:administrative-users/adm:user/adm:description/#text "Initial administrator user"',
+                'set adm:administrative-users/adm:user/adm:admin-manager/#text "true"',
+                'set adm:administrative-users/adm:user/adm:crypto-manager/#text "true"',
+                'set adm:administrative-users/adm:user/adm:auditor/#text "false"',
+                'set adm:administrative-users/adm:user/adm:active/#text "true"',
+                'set adm:administrative-users/adm:user/adm:password-change-required/#text "false"']
+  }
 }

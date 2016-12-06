@@ -20,14 +20,18 @@ Puppet instead of the more typical interactive shell-script approach.
 
 ### Beginning with pingfederate
 
-PingFederate is a big, hairy package with lots of configuration. The intent of this Puppet module is to
-make it easier to automate installing and configuring the server, elimiate what are otheriwse a number of
+PingFederate is a big, complex package with lots of configuration. The intent of this Puppet module is to
+make it easier to automate installing and configuring the server, eliminating what are otheriwse a number of
 manual steps.
 
 ## Usage
 
-At this point, the module only installs PingFederate and performs basic configuraiton of the
-`run.properties`. Future updates will include more advanced configuraton.
+At this point, the module only installs PingFederate and performs basic static configuration of the
+server, that is, things that are changed prior to starting it up. These include the 
+`run.properties` and various configuration XML files, and installation of the license key.
+Future versions will include more advanced administrative configuraton, that is, things that
+you configure once the basic system is up and running.
+
 If you have access to the RPMs (custom-built; not distributed by PingIdentity),
 it will install them, if not, install it the usual way by downloading and unzipping; you can still
 use this module to manager the configuration.
@@ -41,19 +45,55 @@ include pingfederate
 Install PingFederate per the [installation manual](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#gettingStartedGuide/concept/gettingStarted.html) and disable RPM installation:
 ```
   class {'pingfederate':
-    install_dir    => '/usr/local/pingfederte-1',
+    install_dir    => '/usr/local/pingfederate-1',
 	package_ensure => false,
   }
+```
+
+### Providing the License Key
+PingFederate is commercial licensed software and will not operate without a license key.
+Provide this either in your invocation of the module or, preferably, via Hiera. Here's an example
+of providing it inline as a here document:
+```
+$lic = @(LICENSE)
+	   ID=12345
+	   Organization=Columbia University
+	   Product=PingFederate
+	   Version=8.2
+	   IssueDate=2016-11-3
+	   EnforcementType=3
+	   ExpirationDate=2016-12-3
+	   Tier=Free
+	   SaasProvisioning=true
+	   WSTrustSTS=true
+	   OAuth=true
+	   SignCode=FF07
+	   Signature=302C02141B733A755996FB354FAEDC5211E14E3BC2B4964602144EFBD282F20EF2B77AA8A87DCB17BE533A539720
+	   | LICENSE
+
+class {'pingfederate':
+  license_content => $lic,
+}
+
 ```
 
 ## Reference
 
 ### Parameters
-Using most of the defaults will just work with the exception of adding some social identity providers.
+Using most of the defaults will just work to get the basic server installed and running. You will have to supply
+the license key file via a secure manner (e.g. via hiera).
 
-### Packaging
+You will need to explicitly enable and configure the various social identity plugins.
+
+#### Packaging
 [*install_dir*]
   Path to installation directory of PingFederate server.
+
+[*owner*]
+  Filesystem owner. Make sure this matches whatever the packaging system uses.
+
+[*group*]
+  Filesystem group. Make sure this matches whatever the packaging system uses.
 
 [*package_list*]
   Name of package(s) that contains the PingFederate server.
@@ -104,18 +144,27 @@ Using most of the defaults will just work with the exception of adding some soci
 
 [*windowslive_package_ensure*]
 
-#### Run PingFederate as a service
+#### Service
 [*service_name*]
   Service name.
 
 [*service_ensure*]
   Ensure it is running.
 
-#### Runtime properties.
+#### License File
+Provider either a license file or the content. 
+
+[*license_content*]
+  String containing the content of the pflicense.lic file
+
+[*license_file*]
+  Path to the pflicense.lic file
+
+#### Run.properties
 
 The following are used to configure `run.properties`. See the
 [PingFederate documentation](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/changingConfigurationParameters.html)
-for an explanation.
+for an explanation. The defaults are as distributed by PingIdentity.
 
 [*admin_https_port*]
 
@@ -175,6 +224,13 @@ for an explanation.
 
 [*cluster_diagnostics_port*]
 
+#### Administration
+
+[*adm_user*]
+  Initial administrator user.
+
+[*adm_hash*]
+  Hash of administrator user's password.
 
 ## Limitations
 
@@ -182,8 +238,91 @@ This has only been tested on EL 6 with Java 1.8. It might works elsewhere. Let m
 
 ## Development
 
-Since your module is awesome, other users will want to play with it. Let them
-know what the ground rules for contributing are.
+The package was built to use PingFederate as an OAuth2 Server with SAML and social identity federation for the
+autorization code flow. PingFederate has many other features which are not yet configured here. 
 
-Please fork and submit PRs on [github](https://github.com/n2ygk/puppet-pingfederate)!
+Please fork and submit PRs on [github](https://github.com/n2ygk/puppet-pingfederate) as you add features.
+
+### Next Steps
+
+Planned next development steps are to:
+
+1. Configure the various static XML files for a JDBC database connector, CORS support, etc.
+
+1. Configure the database server (schema initialization, etc.).
+
+1. Configure administrative settings via the pf-admin-api once the server is up and running.
+
+### Using Augeas to edit XML configuration files
+
+See [this Augeas blog post](http://elatov.github.io/2014/09/using-augeas-to-modify-configuration-files/)
+for a great introduction, Use the `augtool` command to test Augeas parsing before wasting too much
+time with using it with Puppet.
+
+Of note, the Properties lens appears to be broken for Java Properties files like run.properties. At least that's
+been my experience with the (out-of-date) version of the augeas-libs on CentOS 6. I ended up using puppetlabs-inifile
+for that.
+
+However, it appears to work well for XML files. Here's an example of looking at the admin-user password
+file which will help write the puppet augeas expression:
+
+```bash
+[vagrant@localhost opt]$ augtool -A
+augtool> set /augeas/load/Xml/lens Xml.lns
+augtool> set /augeas/load/Xml/incl /opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml
+augtool> load
+augtool> ls /files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml/
+#declaration/ = (none)
+adm:administrative-users/ = (none)
+augtool> print /files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml/
+/files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml
+/files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml/#declaration
+/files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml/#declaration/#attribute
+/files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml/#declaration/#attribute/version = "1.0"
+/files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml/#declaration/#attribute/encoding = "UTF-8"
+/files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml/adm:administrative-users
+/files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml/adm:administrative-users/#attribute
+/files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml/adm:administrative-users/#attribute/multi-admin = "true"
+/files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml/adm:administrative-users/#attribute/xmlns:adm = "http://pingidentity.com/2006/01/admin-users"
+...
+augtool> ls /files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml/adm:administrative-users/
+#attribute/ = (none)
+#text =
+
+adm:user/ = (none)
+augtool> ls /files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml/adm:administrative-users/adm:user/
+adm:active/                    adm:description/               adm:user-name/                 #text[14]                      #text[7]
+adm:admin/                     adm:email-address/             #text[1]                       #text[2]                       #text[8]
+adm:admin-manager/             adm:hash/                      #text[10]                      #text[3]                       #text[9]
+adm:auditor/                   adm:password-change-required/  #text[11]                      #text[4]
+adm:crypto-manager/            adm:phone-number/              #text[12]                      #text[5]
+adm:department/                adm:salt                       #text[13]                      #text[6]
+augtool> ls /files/opt/pingfederate-8.2.2/pingfederate/server/default/data/pingfederate-admin-user.xml/adm:administrative-users/adm:user/adm:active/
+#text = true
+augtool>
+```
+
+Here's the corresponding password file (with the hash hosed-up just a little):
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<adm:administrative-users multi-admin="true" xmlns:adm="http://pingidentity.com/2006/01/admin-users">
+    <adm:user>
+        <adm:user-name>Administrator</adm:user-name>
+        <adm:salt/>
+        <adm:hash>k1H1o2jc66xxxDjJKq85Sr22QNk143S20oR2Yyt2kqo.5Cu-mnqB.2</adm:hash>
+        <adm:phone-number xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <adm:email-address xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <adm:department xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <adm:description>Initial administrator user.</adm:description>
+        <adm:admin-manager>true</adm:admin-manager>
+        <adm:admin>true</adm:admin>
+        <adm:crypto-manager>true</adm:crypto-manager>
+        <adm:auditor>false</adm:auditor>
+        <adm:active>true</adm:active>
+        <adm:password-change-required>false</adm:password-change-required>
+    </adm:user>
+</adm:administrative-users>
+```
+
+
 

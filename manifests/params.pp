@@ -24,6 +24,10 @@ class pingfederate::params {
   $windowslive_package_ensure          = 'installed'
   $service_name                        = 'pingfederate'
   $service_ensure                      = true
+  $license_content                     = undef
+  $license_file                        = undef
+  $owner                               = 'pingfederate'
+  $group                               = 'pingfederate'
   # run.properties defaults
   # see https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/changingConfigurationParameters.html
   # and /opt/pingfederate-$PF_VERSION/pingfederate/bin/run.properties
@@ -40,7 +44,7 @@ class pingfederate::params {
   $secondary_https_port                = -1
   $engine_bind_address                 = '0.0.0.0'
   $monitor_bind_address                = '0.0.0.0'
-  $log_event_detail                    = false
+  $log_eventdetail                     = false
   $heartbeat_system_monitoring         = false
   $operational_mode                    = 'STANDALONE'
   $cluster_node_index                  = 0
@@ -56,4 +60,6 @@ class pingfederate::params {
   $cluster_diagnostics_enabled         = false
   $cluster_diagnostics_addr            = '224.0.75.75'
   $cluster_diagnostics_port            = 7500
+  $adm_user                            = 'administrator'
+  $adm_hash                            = 'k1H1o2jc66sgkDjJKq85Sr22QNk143S20oR2Yyt2kqo.5Cu-mnqB.2'
 }
