@@ -61,6 +61,9 @@ class pingfederate::config inherits ::pingfederate {
   file {"${::pingfederate::install_dir}/server/default/data/config-store/com.pingidentity.page.Login.xml":
     ensure  => 'present',
     content => $license_accept,
+    owner   => $::pingfederate::owner,
+    group   => $::pingfederate::group,
+    
   }
   # install license file
   $lic_file = "${::pingfederate::install_dir}/server/default/conf/pingfederate.lic"
@@ -68,8 +71,8 @@ class pingfederate::config inherits ::pingfederate {
     file {$lic_file:
       ensure => 'present',
       source => $::pingfederate::license_file,
-      owner  => 'pingfederate',
-      group  => 'pingfederate',
+      owner  => $::pingfederate::owner,
+      group  => $::pingfederate::group,
     }
   } elsif $::pingfederate::license_content {
     file {$lic_file:
@@ -96,6 +99,8 @@ class pingfederate::config inherits ::pingfederate {
                 'set adm:administrative-users/adm:user/adm:email-address/#attribute/xmlns:xsi "http://www.w3.org/2001/XMLSchema-instance"',
                 'set adm:administrative-users/adm:user/adm:phone-number/#attribute/xsi:nil "true"',
                 'set adm:administrative-users/adm:user/adm:phone-number/#attribute/xmlns:xsi "http://www.w3.org/2001/XMLSchema-instance"',
+                'set adm:administrative-users/adm:user/adm:department/#attribute/xsi:nil "true"',
+                'set adm:administrative-users/adm:user/adm:department/#attribute/xmlns:xsi "http://www.w3.org/2001/XMLSchema-instance"',
                 'set adm:administrative-users/adm:user/adm:description/#text "Initial administrator user"',
                 'set adm:administrative-users/adm:user/adm:admin-manager/#text "true"',
                 'set adm:administrative-users/adm:user/adm:crypto-manager/#text "true"',
