@@ -103,6 +103,7 @@ class pingfederate::config inherits ::pingfederate {
                 'set adm:administrative-users/adm:user/adm:department/#attribute/xmlns:xsi "http://www.w3.org/2001/XMLSchema-instance"',
                 'set adm:administrative-users/adm:user/adm:description/#text "Initial administrator user"',
                 'set adm:administrative-users/adm:user/adm:admin-manager/#text "true"',
+                'set adm:administrative-users/adm:user/adm:admin/#text "true"',
                 'set adm:administrative-users/adm:user/adm:crypto-manager/#text "true"',
                 'set adm:administrative-users/adm:user/adm:auditor/#text "false"',
                 'set adm:administrative-users/adm:user/adm:active/#text "true"',
