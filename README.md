@@ -240,14 +240,29 @@ for an explanation. The defaults are as distributed by PingIdentity.
 [*saml2_local_baseURL*]
   URL for the local SAML 2 entity.
 
+#### Cross-Origin Resource Sharing (CORS)
+[*cors_allowedOrigins*]
+  Allowed origins for CORS. Default `*`
+
+[*cors_allowedMethods*]
+  Allowed HTTP methods for CORS. Default `GET,OPTIONS,POST`
+  
+[*cors_filter_mapping*]
+  Allowed URL filter mappings for CORS. Default `/*`
+
+#### OGNL expressions
+[*ognl_expressions_enable*]
+  Enable OGNL scripting. Default `true`
+
+
 ## Limitations
 
-This has only been tested on EL 6 with Java 1.8. It might works elsewhere. Let me know!
+This has only been tested on EL 6 with Java 1.8. It might work elsewhere. Let me know!
 
 ## Development
 
 The package was built to use PingFederate as an OAuth2 Server with SAML and social identity federation for the
-autorization code flow. PingFederate has many other features which are not yet configured here. 
+authorization code flow. PingFederate has many other features which are not yet configured here. 
 
 Please fork and submit PRs on [github](https://github.com/n2ygk/puppet-pingfederate) as you add features.
 
@@ -332,5 +347,8 @@ Here's the corresponding password file (with the hash hosed-up just a little):
 </adm:administrative-users>
 ```
 
+N.B. If the XML file is not pre-existing, the Augeas XML lens will not "pretty-print" the XML;
+it will all be run together with no indentation. Do not fear as this is still valid XML.
 
-
+See [these additional notes](notes.md) for more background on how to
+develop configuration puppet modules based on diffs of XML config files.

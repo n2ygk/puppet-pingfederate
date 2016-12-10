@@ -2,6 +2,7 @@
 # Static configuration of the server.
 # Edits run.properties, various XML config files, license acceptance,
 # license key, etc. that can be installed prior to starting the server.
+# Additional configuration happens after the server is running. See pingfederarte::admin.
 class pingfederate::config inherits ::pingfederate {
   # apparently the augeas-1.4 Properties.lens doesn't work!
   # this throws a parser error:
@@ -166,4 +167,34 @@ class pingfederate::config inherits ::pingfederate {
      'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/sid:CommonDomainService/#attribute/CookieLifeDays "365"',
      'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:ErrPageMsg/#text "errorDetail.idpSsoFailure"']
   }
+
+  # enable OGNL expressions
+  $ognl_file = "$::pingfederate::install_dir/server/default/data/config-store/org.sourceid.common.ExpressionManager.xml"
+  augeas{$ognl_file:
+    lens    => 'Xml.lns',
+    incl    => $ognl_file,
+    context => "/files/${ognl_file}",
+    changes => ['set config/item/#attribute/name/ "evaluateExpressions"',
+                "set config/item/#text \"${::pingfederate::ognl_expressions_enable}\""]
+  }
+
+  # enable CORS
+  if $::pingfederate::cors_allowedOrigins {
+      $cors_file = "$::pingfederate::install_dir/etc/webdefault.xml"
+      augeas{$cors_file:
+        lens    => 'Xml.lns',
+        incl    => $cors_file,
+        context => "/files/${cors_file}",
+        changes => ['set web-app/filter/filter-name/#text "cross-origin"',
+                    'set web-app/filter/filter-class/#text "org.eclipse.jetty.servlets.CrossOriginFilter"',
+                    'set web-app/filter/init-param/param-name/#text "allowedOrigins"',
+                    "set web-app/filter/init-param/param-value/#text \"${::pingfederate::cors_allowedOrigins}\"",
+                    'set web-app/filter/init-param/param-name/#text "allowedMethods"',
+                    "set web-app/filter/init-param/param-value/#text \"${::pingfederate::cors_allowedMethods}\"",
+                    'set web-app/filter-mapping/filter-name/#text "cross-origin"',
+                    "set web-app/filter-mapping/url-pattern/#text \"${::pingfederate::cors_filter_mapping}\""]
+      }
+  }
+
+                
 }

@@ -90,6 +90,12 @@ class pingfederate (
   # local SAML IdP configuration: sourceid-saml2-local-metadata.xml
   $saml2_local_entityID                = $::pingfederate::params::saml2_local_entityID,
   $saml2_local_baseURL                 = $::pingfederate::params::saml2_local_baseURL,
+  # Enable Cross-Origin Resource Sharing (CORS)
+  $cors_allowedOrigins                 = $::pingfederate::params::cors_allowedOrigins,
+  $cors_allowedMethods                 = $::pingfederate::params::cors_allowedMethods,
+  $cors_filter_mapping                 = $::pingfederate::params::cors_filter_mapping,
+  # OGNL expressions
+  $ognl_expressions_enable             = $::pingfederate::params::ognl_expressions_enable,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])
