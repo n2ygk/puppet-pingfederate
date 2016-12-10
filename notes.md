@@ -51,8 +51,6 @@ diff -rb pingfederate-conf1/pingfederate/server/default/data/pingfederate-admin-
 diff -rb pingfederate-conf1/pingfederate/server/default/data/sourceid-saml2-local-metadata.xml pingfederate-conf2/pingfederate/server/default/data/sourceid-saml2-local-metadata.xml
 ```
 
-
-
 ## Accepting the PingIdentity agreement
 _com.pingidentity.page.Login.xml_
 ```xml
@@ -75,14 +73,20 @@ just dropping the file in `/opt/pingfederate/server/default/conf/pingfederate.li
 will do the same thing.
 See the [docs](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/task/toIinstallReplacementLicenseKeyUsingAdministrativeConsole.html).
 
-## Initial settings
+## Initial runtime settings
+This is set after clicking `Next` through PingOne Account, License, Basic Information,
+Enable Roles, Administrator Account. These credentials are required in order to do HTTP
+Basic Auth for the pf-admin REST API. I _think (hope)_ the rest can be done from the API
+once this is configured. Might also need to use this for setting up the external (Shibboleth)
+IdP.
+
+### Native login setup
 _pingfederate/server/default/data/sourceid-saml2-local-metadata.xml_
+
+For `pf.console.authentication=native`, the built-in "local" SAML2 IdP is definied.
 
 ## Initial administrator user credentials
 _pingfederate/server/default/data/pingfederate-admin-user.xml_
-
-This is set after clicking `Next` through PingOne Account, License, Basic Information, Enable Roles, Administrator Account. These credentials
-are required in order to do HTTP Basic Auth for the pf-admin REST API:
 
 ## Commandline/API tools
 ### Configcopy commandline tools

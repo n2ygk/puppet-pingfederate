@@ -232,6 +232,14 @@ for an explanation. The defaults are as distributed by PingIdentity.
 [*adm_hash*]
   Hash of administrator user's password.
 
+#### Built-in SAML2 IdP
+
+[*saml2_local_entityID*]
+  SAML 2 EntityID for the built-in local IdP (that provides the *adm_user* authentication).
+
+[*saml2_local_baseURL*]
+  URL for the local SAML 2 entity.
+
 ## Limitations
 
 This has only been tested on EL 6 with Java 1.8. It might works elsewhere. Let me know!

@@ -87,6 +87,9 @@ class pingfederate (
   # administration
   $adm_user                            = $::pingfederate::params::adm_user,
   $adm_hash                            = $::pingfederate::params::adm_hash,
+  # local SAML IdP configuration: sourceid-saml2-local-metadata.xml
+  $saml2_local_entityID                = $::pingfederate::params::saml2_local_entityID,
+  $saml2_local_baseURL                 = $::pingfederate::params::saml2_local_baseURL,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])

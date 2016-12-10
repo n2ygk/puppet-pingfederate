@@ -62,4 +62,6 @@ class pingfederate::params {
   $cluster_diagnostics_port            = 7500
   $adm_user                            = 'Administrator'
   $adm_hash                            = 'k1H1o2jc66sgkDjJKq85Sr22QNk143S20oR2Yyt2kqo.5Cu-mnqB.2'
+  $saml2_local_entityID                = "${facts['hostname']}-ping:urn:saml1"
+  $saml2_local_baseURL                 = "https://${facts['fqdn']}:${https_port}"
 }
