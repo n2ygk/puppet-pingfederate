@@ -1,5 +1,18 @@
 # Class pingfederate::admin
-# Administrative configuration tasks that are performed once the server is running.
+# Runtime configuration of the server.
+# Invokes pf-admin-api and edits various related XML config files.
+# Needs to wait for the service to be running
+# And may need to cause it to restart -- which is circular!
 class pingfederate::admin inherits ::pingfederate {
-  # TBD
+  include wait_for
+  wait_for {'pf-admin-api':
+    query => "/usr/bin/wget -q -4 -O - --auth-no-challenge --user ${::pingfederate::adm_user} --password ${::pingfederate::adm_pass} --tries 10 --retry-connrefused --no-check-certificate --header X-XSRF-Header:1 ${::pingfederate::adm_api_baseURL}/version",
+    regex => '.*version.*',
+    polling_frequency => 10,
+    max_retries => 5,
+    exit_code => 0,
+  }
+  # just testing how to use external facts (see facts.d/hello_world)
+  notify{"admin ${facts['hello']}":}
 }
+

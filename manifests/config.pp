@@ -195,6 +195,5 @@ class pingfederate::config inherits ::pingfederate {
                     "set web-app/filter-mapping/url-pattern/#text \"${::pingfederate::cors_filter_mapping}\""]
       }
   }
-
                 
 }

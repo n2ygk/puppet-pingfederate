@@ -50,4 +50,12 @@ class pingfederate::install inherits ::pingfederate {
       ensure => $pingfederate::windowslive_package_ensure,
     }
   }
+  # wget is used to wait_for the REST api
+  package {'wget':
+    ensure => 'installed'
+  }
+  # mysql is used to wait_for the mysql database
+  package {'mysql':
+    ensure => 'installed'
+  }
 }

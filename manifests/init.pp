@@ -86,7 +86,9 @@ class pingfederate (
   $cluster_diagnostics_port            = $::pingfederate::params::cluster_diagnostics_port,
   # administration
   $adm_user                            = $::pingfederate::params::adm_user,
+  $adm_pass                            = $::pingfederate::params::adm_pass,
   $adm_hash                            = $::pingfederate::params::adm_hash,
+  $adm_api_baseURL                     = $::pingfederate::params::adm_api_baseURL,
   # local SAML IdP configuration: sourceid-saml2-local-metadata.xml
   $saml2_local_entityID                = $::pingfederate::params::saml2_local_entityID,
   $saml2_local_baseURL                 = $::pingfederate::params::saml2_local_baseURL,
@@ -123,5 +125,6 @@ class pingfederate (
   class { '::pingfederate::install': } ->
   class { '::pingfederate::config': } ~>
   class { '::pingfederate::service': } ->
+  class { '::pingfederate::admin': } ->
   anchor { 'pingfederate::end': }
 }
