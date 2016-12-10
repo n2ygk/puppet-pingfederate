@@ -92,7 +92,7 @@ _pingfederate/server/default/data/pingfederate-admin-user.xml_
 ### Configcopy commandline tools
 _pingfederate/bin/configcopy_templates/README.txt_
 
-See [configcopy](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/automatingConfigurationMigration.html) in
+See [configcopy](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/automatingConfigurationMigration.html)
 
 
 ### pf admin api
