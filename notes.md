@@ -127,7 +127,7 @@ in order to rewrite, for example, data returned from a SAML IdP that is passed a
 part of token validation.
 
 ### Allowing CORS
-_etc/webdefault.xml_
+_/pingfederate/etc/webdefault.xml_
 See the [W3C CORS](https://www.w3.org/TR/cors/) recommendation.
 
 I found that [this approach](http://community.unboundid.com/t5/Data-Broker/Configuring-CORS-in-Ping-Federate-so-that-Data-Broker-s-Sample/ta-p/324)

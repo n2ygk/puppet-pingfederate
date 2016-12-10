@@ -187,10 +187,10 @@ class pingfederate::config inherits ::pingfederate {
         context => "/files/${cors_file}",
         changes => ['set web-app/filter/filter-name/#text "cross-origin"',
                     'set web-app/filter/filter-class/#text "org.eclipse.jetty.servlets.CrossOriginFilter"',
-                    'set web-app/filter/init-param/param-name/#text "allowedOrigins"',
-                    "set web-app/filter/init-param/param-value/#text \"${::pingfederate::cors_allowedOrigins}\"",
-                    'set web-app/filter/init-param/param-name/#text "allowedMethods"',
-                    "set web-app/filter/init-param/param-value/#text \"${::pingfederate::cors_allowedMethods}\"",
+                    'set web-app/filter/init-param[1]/param-name/#text "allowedOrigins"',
+                    "set web-app/filter/init-param[1]/param-value/#text \"${::pingfederate::cors_allowedOrigins}\"",
+                    'set web-app/filter/init-param[2]/param-name/#text "allowedMethods"',
+                    "set web-app/filter/init-param[2]/param-value/#text \"${::pingfederate::cors_allowedMethods}\"",
                     'set web-app/filter-mapping/filter-name/#text "cross-origin"',
                     "set web-app/filter-mapping/url-pattern/#text \"${::pingfederate::cors_filter_mapping}\""]
       }
