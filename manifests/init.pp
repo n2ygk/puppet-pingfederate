@@ -98,6 +98,9 @@ class pingfederate (
   $cors_filter_mapping                 = $::pingfederate::params::cors_filter_mapping,
   # OGNL expressions
   $ognl_expressions_enable             = $::pingfederate::params::ognl_expressions_enable,
+  # OAuth JDBC database
+  $oauth_jdbc_url                      = $::pingfederate::params::oauth_jdbc_url,
+
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])

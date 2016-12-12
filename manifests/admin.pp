@@ -12,7 +12,7 @@ class pingfederate::admin inherits ::pingfederate {
     max_retries => 5,
     exit_code => 0,
   }
-  # just testing how to use external facts (see facts.d/hello_world)
-  notify{"admin ${facts['hello']}":}
+  # just testing how to use external facts (see facts.d/)
+  notify{"here's the JNDI: ${facts[$::pingfederate::oauth_jdbc_url]}":}
 }
 

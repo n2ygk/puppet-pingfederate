@@ -70,4 +70,5 @@ class pingfederate::params {
   $cors_allowedMethods                 = 'GET,OPTIONS,POST'
   $cors_filter_mapping                 = '/*'
   $ognl_expressions_enable             = true
+  $oauth_jdbc_url                      = undef
 }
