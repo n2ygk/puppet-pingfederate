@@ -124,10 +124,20 @@ class pingfederate (
 
   # need to do more validation
 
-  anchor { 'pingfederate::begin': } ->
-  class { '::pingfederate::install': } ->
-  class { '::pingfederate::config': } ~>
-  class { '::pingfederate::service': } ->
-  class { '::pingfederate::admin': } ->
-  anchor { 'pingfederate::end': }
+  # anchor { 'pingfederate::begin': } ->
+  # class { '::pingfederate::install': } ->
+  # class { '::pingfederate::config': } ~>
+  # class { '::pingfederate::service': } ->
+  # class { '::pingfederate::admin': } ->
+  # anchor { 'pingfederate::end': }
+
+  class { '::pingfederate::install': }
+  class { '::pingfederate::config': }
+  class { '::pingfederate::service': }
+  class { '::pingfederate::admin': }
+
+  Class['::pingfederate::install'] -> Class['::pingfederate::config']
+  Class['::pingfederate::config'] ~> Class['::pingfederate::service']
+  Class['::pingfederate::config'] -> Class['::pingfederate::admin']
+  Class['::pingfederate::admin'] ~> Class['::pingfederate::service']
 }
