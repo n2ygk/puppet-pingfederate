@@ -124,20 +124,22 @@ class pingfederate (
 
   # need to do more validation
 
-  # anchor { 'pingfederate::begin': } ->
-  # class { '::pingfederate::install': } ->
-  # class { '::pingfederate::config': } ~>
-  # class { '::pingfederate::service': } ->
-  # class { '::pingfederate::admin': } ->
-  # anchor { 'pingfederate::end': }
+  anchor { 'pingfederate::begin': } ->
+  class { '::pingfederate::install': } ->
+  class { '::pingfederate::config': } ~>
+  class { '::pingfederate::service': } ->
+  class { '::pingfederate::admin': } ->
+  anchor { 'pingfederate::end': }
 
-  class { '::pingfederate::install': }
-  class { '::pingfederate::config': }
-  class { '::pingfederate::service': }
-  class { '::pingfederate::admin': }
+  # contain ::pingfederate::install
+  # contain ::pingfederate::config
+  # contain ::pingfederate::service
+  # contain ::pingfederate::admin
 
-  Class['::pingfederate::install'] -> Class['::pingfederate::config']
-  Class['::pingfederate::config'] ~> Class['::pingfederate::service']
-  Class['::pingfederate::config'] -> Class['::pingfederate::admin']
-  Class['::pingfederate::admin'] ~> Class['::pingfederate::service']
+  # Class['::pingfederate::install'] -> Class['::pingfederate::config']
+  # Class['::pingfederate::config'] ~> Class['::pingfederate::service']
+  # # I want the service to be running before admin but admin also needs to notify the service!
+  # # That creates a loop. This means the service may not be started before admin:
+  # Class['::pingfederate::service'] -> Class['::pingfederate::admin']
+  # #Class['::pingfederate::admin'] ~> Class['::pingfederate::service']
 }

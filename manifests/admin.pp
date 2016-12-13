@@ -36,5 +36,7 @@ class pingfederate::admin inherits ::pingfederate {
       #notify  => Service[$::pingfederate::service_name]
     }
   }
+  # ugh
+  exec {'/sbin/service pingfederate restart':}
 }
 
