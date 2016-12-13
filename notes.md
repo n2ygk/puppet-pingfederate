@@ -170,8 +170,8 @@ the pf-admin-api. See sample setup (also to be puppetized):
 ```bash
 sudo yum install -y mysql-utilities mysql-server mysql mysql-connector-java
 sudo mysqld start
-/usr/bin/mysqladmin -u root -h localhost.localdomain password 'new-password'
-/usr/bin/mysqladmin -u root -p -h localhost.localdomain create pingfed
+/usr/bin/mysqladmin --user=root -h localhost.localdomain password 'new-password'
+/usr/bin/mysqladmin --user=root --password=new-password -h localhost.localdomain create pingfed
 mysql -u root -p pingfed
 mysql> create user 'pingfed' identified by 'foobar';
 mysql> grant all on pingfed.* to 'pingfed';

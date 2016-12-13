@@ -2,19 +2,16 @@
 # As delivered by the vendor, there are no packages, but I've RPMed them.
 class pingfederate::install inherits ::pingfederate {
   # not sure if this java thing belongs here... looks like puppetlabs-java only works for Oracle on CentOS.
-  # use ensure_packages() instead?
   if $pingfederate::package_java_ensure {
     if $pingfederate::package_java_list {
-      package { $pingfederate::package_java_list:
-        ensure => $pingfederate::package_java_ensure
-      }
+      ensure_packages($pingfederate::package_java_list, {'ensure' => 'present'})
     } else {
       case $facts['os']['name'] {
         'redhat': { $pkg = $pingfederate::package_java_redhat }
         'centos': { $pkg = $pingfederate::package_java_centos }
         default: { fail("Don't know how to install java on ${facts['os']['name']}") }
       }
-      package { $pkg:
+      ensure_package { $pkg:
         ensure => $pingfederate::package_java_ensure
       }
     }

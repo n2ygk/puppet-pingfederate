@@ -229,8 +229,14 @@ for an explanation. The defaults are as distributed by PingIdentity.
 [*adm_user*]
   Initial administrator user.
 
+[*adm_pass*]
+  Administrator user's password.
+
 [*adm_hash*]
   Hash of administrator user's password.
+
+[*adm_api_baseURL*]
+  Base URL of the pf-admin-api.
 
 #### Built-in SAML2 IdP
 
@@ -253,6 +259,11 @@ for an explanation. The defaults are as distributed by PingIdentity.
 #### OGNL expressions
 [*ognl_expressions_enable*]
   Enable OGNL scripting. Default `true`
+
+#### OAuth configuration
+[*oauth_jdbc_url*]
+  URL for
+  [OAuth Client Datastore](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#concept_definingOauthClientDataStore.html)
 
 
 ## Limitations
@@ -352,3 +363,11 @@ it will all be run together with no indentation. Do not fear as this is still va
 
 See [these additional notes](notes.md) for more background on how to
 develop configuration puppet modules based on diffs of XML config files.
+
+### Custom Facts
+Custom external facts are defined in [facts.d/](facts.d/).
+
+[*${::facts[$::pingfederate::oauth_jdbc_url]}*]
+  A custom [external fact](facts.d/pingxmlfacts.py) is named the same as the
+  oauth_jdbc_url and with value of the JNDI-name that the server assigned when the
+  datastore was added (via the pf-admin-api).
