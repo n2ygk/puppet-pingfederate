@@ -263,11 +263,34 @@ for an explanation. The defaults are as distributed by PingIdentity.
 [*ognl_expressions_enable*]
   Enable OGNL scripting. Default `true`
 
-#### OAuth configuration
+#### OAuth JDBC configuration
 [*oauth_jdbc_url*]
   URL for
   [OAuth Client Datastore](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#concept_definingOauthClientDataStore.html)
 
+[*oauth_jdbc_driver*]
+  Name of the JDBC driver class. Default `com.mysql.jdbc.Driver`
+
+[*oauth_jdbc_package_list*]
+  JDBC connector pacakge(s). Default `mysql-connector-java`
+
+[*oauth_jdbc_package_ensure*]
+  Ensure that the package is installed.
+
+[*oauth_jdbc_jar_dir*]
+  Directory where the JDCB jar file can be found. Default `/usr/share/java`
+
+[*oauth_jdbc_jar*]
+  Name of the jar file. Default `mysql-connector-java.jar`
+
+[*oauth_jdbc_user*]
+  JDBC user name.
+
+[*oauth_jdbc_pass*]
+  JDBC password
+
+[*oauth_jdbc_validate*]
+  JDBC validation test. Default `SELECT 1 from dual`
 
 ## Limitations
 

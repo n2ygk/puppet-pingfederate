@@ -71,4 +71,13 @@ class pingfederate::params {
   $cors_filter_mapping                 = '/*'
   $ognl_expressions_enable             = true
   $oauth_jdbc_url                      = undef
+  $oauth_jdbc_driver                   = 'com.mysql.jdbc.Driver'
+  $oauth_jdbc_package_list             = 'mysql-connector-java'
+  $oauth_jdbc_package_ensure           = 'installed'
+  $oauth_jdbc_jar_dir                  = '/usr/share/java'
+  $oauth_jdbc_jar                      = 'mysql-connector-java.jar'
+  $oauth_jdbc_user                     = undef
+  $oauth_jdbc_pass                     = undef
+  $oauth_jdbc_validate                 = 'SELECT 1 from dual'
+
 }

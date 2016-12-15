@@ -100,7 +100,14 @@ class pingfederate (
   $ognl_expressions_enable             = $::pingfederate::params::ognl_expressions_enable,
   # OAuth JDBC database
   $oauth_jdbc_url                      = $::pingfederate::params::oauth_jdbc_url,
-
+  $oauth_jdbc_driver                   = $::pingfederate::params::oauth_jdbc_driver,
+  $oauth_jdbc_package_list             = $::pingfederate::params::oauth_jdbc_package_list,
+  $oauth_jdbc_package_ensure           = $::pingfederate::params::oauth_jdbc_package_ensure,
+  $oauth_jdbc_jar_dir                  = $::pingfederate::params::oauth_jdbc_jar_dir,
+  $oauth_jdbc_jar                      = $::pingfederate::params::oauth_jdbc_jar,
+  $oauth_jdbc_user                     = $::pingfederate::params::oauth_jdbc_user,
+  $oauth_jdbc_pass                     = $::pingfederate::params::oauth_jdbc_pass,
+  $oauth_jdbc_validate                 = $::pingfederate::params::oauth_jdbc_validate,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])

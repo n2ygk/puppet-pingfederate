@@ -10,6 +10,7 @@ import json
 from optparse import OptionParser
 import time
 import sys
+import io
 
 adm_user = '<%= @adm_user -%>'
 adm_pass = '<%= @adm_pass -%>'
@@ -20,6 +21,10 @@ parser.add_option('-m','--method',
                   type='string',
                   default='GET',
                   help='HTTP method, one of GET,PUT,POST,PATCH,DELETE [default: %default]')
+parser.add_option('-j','--json',
+                  type='string',
+                  default=None,
+                  help='JSON file to POST')
 parser.add_option('-t','--timeout',
                   type='int',
                   default=10,
@@ -42,17 +47,28 @@ if len(arg) < 1 or opt.method not in ['GET','PUT','POST','PATCH','DELETE']:
 resource = arg[0]
 header = {'X-XSRF-Header': '1'}
 
+if opt.json:
+  data = json.dumps(json.load(io.open(opt.json,'rb')))
+  header.update({'Content-Type': 'application/json'})
+else:
+  data = None
+
 if not opt.verify:
   requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
   
 emsg='unknown error'
 for n in range(opt.retries):
   try:
-    response = requests.request(opt.method, base_URL+resource, 
+    response = requests.request(opt.method,
+                                base_URL+resource, 
                                 auth=requests.auth.HTTPBasicAuth(adm_user,adm_pass),
-                                headers=header, timeout=opt.timeout, verify=opt.verify)
-    print(response.content)
-    exit(response.status_code)
+                                data=data,
+                                headers=header,
+                                timeout=opt.timeout,
+                                verify=opt.verify)
+    print((response.status_code,response.reason),file=sys.stderr)
+    print(response.text)
+    exit(0) if (response.status_code) < 400 else exit(1)
   except requests.exceptions.ConnectionError as e:
     emsg = e
     time.sleep(opt.timeout)

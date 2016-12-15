@@ -1,0 +1,10 @@
+{
+  "type": "JDBC",
+  "maskAttributeValues": "false",
+  "connectionUrl": "<%= @oauth_jdbc_url -%>?autoReconnect=true",
+  "driverClass": "<%= @oauth_jdbc_driver -%>",
+  "userName": "<%= @oauth_jdbc_user -%>",
+  "password": "<%= @oauth_jdbc_pass -%>",
+  "validateConnectionSql": "<%= @oauth_jdbc_validate -%>",
+  "allowMultiValueAttributes": "true"
+}

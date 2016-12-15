@@ -38,7 +38,7 @@ class pingfederate::install inherits ::pingfederate {
   }
   # wget is used to wait_for the REST api
   # mysql is used to wait_for the mysql database
-  ensure_packages(['wget','mysql','python','python-requests','python-libs'],{'ensure' => 'installed'})
+  ensure_packages(['wget','python','python-requests','python-libs'],{'ensure' => 'installed'})
 
   # Also install some local configuration tools
   file { "${::pingfederate::install_dir}/local":
@@ -66,6 +66,16 @@ class pingfederate::install inherits ::pingfederate {
   }
   file { "${::pingfederate::install_dir}/local/etc":
     ensure => 'directory',
+    owner  => $::pingfederate::owner,
+    group  => $::pingfederate::group,
+  }
+  if $::pingfederate::oauth_jdbc_package_ensure {
+    ensure_packages($::pingfederate::oauth_jdbc_package_list,{'ensure' => $::pingfederate::oauth_jdbc_package_ensure})
+  }
+  file { "${::pingfederate::install_dir}/server/default/lib/${::pingfederate::oauth_jdbc_jar}":
+    ensure => 'present',
+    source => "${::pingfederate::oauth_jdbc_jar_dir}/${::pingfederate::oauth_jdbc_jar}",
+    links  => 'follow',
     owner  => $::pingfederate::owner,
     group  => $::pingfederate::group,
   }
