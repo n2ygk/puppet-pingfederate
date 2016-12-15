@@ -395,3 +395,32 @@ Custom external facts are defined in [facts.d/](facts.d/).
   A custom [external fact](facts.d/pingxmlfacts.py) is named the same as the
   oauth_jdbc_url and with value of the JNDI-name that the server assigned when the
   datastore was added (via the pf-admin-api).
+
+### Invoking the administrative REST API (pf-admin-api)
+Some configuration is done via the
+[PingFederate Administrative API](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/pingFederateAdministrativeApi.html).
+Unfortunately, some related configuration is done by editing XML files, using data returned from the API call. For example,
+the process for adding a mysql data store for oauth client management consists of:
+
+1. Install the appropriate JDBC connector jar file in `<pf-install>/server/default/lib`.
+
+1. `POST https://localhost:9999/pf-admin-api/v1/dataStores` with a JSON map to configure the JDBC connector.
+
+1. Edit `<pf-install>/server/default/conf/META-INF/hivemodule.xml` to enable the JDBC implementation.
+
+1. Edit `<pf-install>server/default/data/config-store/org.sourceid.oauth20.domain.ClientManagerJdbcImpl.xml` to include the JNDI-name that was
+returned by the POST.
+
+#### pf-admin-api script
+Find [pf-admin-api.erb](templates/pf-admin-api.erb), a templated Python script which invokes the API.
+The script is templated to embed the administrative user and password. Data for POSTs done by the
+script are also templated. Installing the JSON file is the trigger to Exec'ing the pf-admin-api script.
+
+#### Current problem: Getting the JNDI-name
+The JNDI-name is written into a `.json.out` file and is also available in one of the XML configuration files.
+This is currently retrieved via a custom external fact but the problem is that this fact is not available
+until the next Puppet run after the REST API invocation.
+
+Next step is to edit the XML files in the same Exec as the API call rather than having Puppet manage them.
+Ugly but the only way to make it happen in one unit of work. (It's really the fault of the app for not
+having a clean set of APIs that do everything.)
