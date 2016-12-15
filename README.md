@@ -99,7 +99,10 @@ You will need to explicitly enable and configure the various social identity plu
   Name of package(s) that contains the PingFederate server.
 
 [*package_ensure*]
-  Ensure that the package is installed.
+  Ensure that the package is installed. Values are the same as those used by the
+  [Package type](https://docs.puppet.com/puppet/latest/types/package.html)
+  such as present (also called installed), absent, purged, held, latest or a
+  specfic version string.
 
 [*package_java_ensure*]
   Ensure that the Java JRE package is installed.
@@ -281,11 +284,9 @@ Please fork and submit PRs on [github](https://github.com/n2ygk/puppet-pingfeder
 
 Planned next development steps are to:
 
-1. Configure the various static XML files for a JDBC database connector, CORS support, etc.
-
 1. Configure the database server (schema initialization, etc.).
 
-1. Configure administrative settings via the pf-admin-api once the server is up and running.
+1. Configure additional settings via the pf-admin-api once the server is up and running.
 
 ### Using Augeas to edit XML configuration files
 
