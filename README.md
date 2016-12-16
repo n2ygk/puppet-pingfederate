@@ -409,7 +409,7 @@ The script is templated to embed the administrative user and password. Data for 
 script are also templated. Installing the JSON file is the trigger to Exec'ing the pf-admin-api script.
 
 #### oauth_jdbc_augeas script
-This script edits the XML files in an Exec notified by the API call rather than having Puppet manage them.
+[This](templates/oauth_jdbc_augeas.erb) script edits the XML files in an Exec notified by the API call rather than having Puppet manage them.
 This is ugly but the only way to make it happen in one unit of work. (It's really the fault of the app for not
 having a clean set of APIs that do everything.) It's kinda ugly, using augeas three times: Once to pull the
 jndi-name out of the API result file created by pf-admin-api and then twice to edit two XML files, one of which
