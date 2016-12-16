@@ -21,6 +21,26 @@ adm_user = '<%= @adm_user -%>'
 adm_pass = '<%= @adm_pass -%>'
 base_URL = '<%= @adm_api_baseURL -%>/'
 
+def do_req(retries,method,url,**kwargs):
+  """
+  do_req: invoke requests.request, handling connection retries.
+  """
+  timeout = kwargs['timeout'] if 'timeout' in kwargs else 10
+  for n in range(retries):
+    try:
+      response = requests.request(method,url,**kwargs)
+      return response
+    except requests.exceptions.ConnectionError as e:
+      emsg = e
+      time.sleep(timeout)
+
+  # only get here if retries is exceeded
+  response.status_code = '408'
+  response.reason = 'Request Timeout'
+  response.text = jsons.dumps({'error': 'timed out', 'error_description': 'the API did not respond'})
+  return response
+
+
 parser = OptionParser()
 parser.add_option('-m','--method',
                   type='string',
@@ -57,38 +77,55 @@ resource = arg[0]
 header = {'X-XSRF-Header': '1'}
 
 if opt.json:
-  data = json.dumps(json.load(io.open(opt.json,'rb')))
+  data = json.load(io.open(opt.json,'rb'))
+  dataString = json.dumps(data)
   header.update({'Content-Type': 'application/json'})
 else:
-  data = None
+  data = dataString = None
 
 if not opt.verify:
   requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
   
-emsg='unknown error'
-for n in range(opt.retries):
-  try:
-    response = requests.request(opt.method,
-                                base_URL+resource, 
-                                auth=requests.auth.HTTPBasicAuth(adm_user,adm_pass),
-                                data=data,
-                                headers=header,
-                                timeout=opt.timeout,
-                                verify=opt.verify)
-    print((response.status_code,response.reason),file=sys.stderr)
-    resp = json.dumps(json.loads(response.text),indent=2) # pretty-print it
-    if response.status_code < 400:
-      output = sys.stdout if opt.response == '-' else open(opt.response,'wb')
-      print(resp,file=output)
-      exit(0)
-    else:
-      print(resp,file=sys.stderr)
-      exit(1)
-  except requests.exceptions.ConnectionError as e:
-    emsg = e
-    time.sleep(opt.timeout)
+url = base_URL+resource
 
-# only get here if retries is exceeded
-print(emsg,file=sys.stderr)
-exit(1)
+# try and make POST idempotent. A prior response file must already exist as that's the source of the 'id'.
+# if it exists, add the 'id' to the JSON doc and change the POST to a PUT.
+if opt.method == 'POST' and opt.response != '-' and data:
+  try:
+    rfile = io.open(opt.response,'rb')
+  except:
+    rfile = None
+  resp = json.load(rfile) if rfile else None
+  if rfile:
+    rfile.close() 
+
+  if resp and 'id' in resp:
+    existing = do_req(opt.retries,'GET',
+                      url+'/'+resp['id'],
+                      auth=requests.auth.HTTPBasicAuth(adm_user,adm_pass),
+                      headers=header,
+                      timeout=opt.timeout,
+                      verify=opt.verify)
+    if existing:
+      data.update({'id': resp['id']})
+      opt.method = 'PUT'
+      url = url + '/' + resp['id']
+      print('Resource exists. Changing POST to PUT.',file=sys.stderr)
+
+response = do_req(opt.retries,opt.method,
+                  url, 
+                  auth=requests.auth.HTTPBasicAuth(adm_user,adm_pass),
+                  data=dataString,
+                  headers=header,
+                  timeout=opt.timeout,
+                  verify=opt.verify)
+print((response.status_code,response.reason),file=sys.stderr)
+resp = json.dumps(json.loads(response.text),indent=2) # pretty-print it
+if response.status_code < 400:
+  output = sys.stdout if opt.response == '-' else open(opt.response,'wb')
+  print(resp,file=output)
+  exit(0)
+else:
+  print(resp,file=sys.stderr)
+  exit(1)
 
