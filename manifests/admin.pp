@@ -3,6 +3,8 @@
 # Invokes pf-admin-api and edits various related XML config files.
 # And may need to cause it to restart -- which is circular!
 class pingfederate::admin inherits ::pingfederate {
+  $restart ="/sbin/service ${::pingfederate::service_name} restart"
+
   # This may take 30 seconds or so upon server startup. 
   # Waiting happens in bin/pf-admin-api (it retries on EConnRefused).
   exec {'pf-admin-api version':
@@ -11,10 +13,10 @@ class pingfederate::admin inherits ::pingfederate {
     logoutput   => true,
   }
   if $::pingfederate::oauth_jdbc_url {
-    class {'::pingfederate::oauth_jdbc':}
-  } ~>
+    class {'::pingfederate::oauth_jdbc':} ~> Exec[$restart]
+  } 
   # ugh. This is what happens when trying to notify the service class causes a dependency loop.
-  exec {'/sbin/service pingfederate restart':
+  exec {$restart:
     refreshonly => true,
   }
 }
