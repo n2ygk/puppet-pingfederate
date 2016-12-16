@@ -267,16 +267,16 @@ for an explanation. The defaults are as distributed by PingIdentity.
   Enable OGNL scripting. Default `true`
 
 #### OAuth JDBC configuration
-[*oauth_jdbc_url*]
-  URL for
+[*oauth_jdbc_enable*]
+  True if you want to enable a JDBC
   [OAuth Client Datastore](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#concept_definingOauthClientDataStore.html).
-  If undefined, the default built-in XML file-based datastore will be used.
+  If false, the default built-in XML file-based datastore will be used.
 
 [*oauth_jdbc_driver*]
   Name of the JDBC driver class. Default `com.mysql.jdbc.Driver`
 
 [*oauth_jdbc_package_list*]
-  JDBC connector pacakge(s). Default `mysql-connector-java`
+  JDBC connector and command-line interface (CLI) pacakge(s). Default `['mysql','mysql-connector-java']`
 
 [*oauth_jdbc_package_ensure*]
   Ensure that the package is installed.
@@ -293,8 +293,26 @@ for an explanation. The defaults are as distributed by PingIdentity.
 [*oauth_jdbc_pass*]
   JDBC password
 
+[*oauth_jdbc_db*]
+  JDBC database name (also found in `oauth_jdbc_url`)
+
+[*oauth_jdbc_host*]
+  JDBC database host. Default `localhost`
+
+[*oauth_jdbc_port*]
+  JDBC database port Default: `3306`.
+
+[*oauth_jdbc_url*]
+  jdbc URL for. Default: `jdbc:mysql://<host>:<port>/<database>`
+
 [*oauth_jdbc_validate*]
   JDBC validation test. Default `SELECT 1 from dual`
+
+[*oauth_jdbc_cli*]
+  Database CLI used to run the initial ddl setup script. Default `/usr/bin/mysql ...`
+
+[*oauth_jdbc_ddl*]
+  DDL setup script filename. Default `<pf-install>/server/default/conf/oauth-client-management/sql-scripts/oauth-client-management-mysql.sql`
 
 ## Limitations
 

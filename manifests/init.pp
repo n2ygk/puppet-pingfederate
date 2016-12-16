@@ -99,15 +99,21 @@ class pingfederate (
   # OGNL expressions
   $ognl_expressions_enable             = $::pingfederate::params::ognl_expressions_enable,
   # OAuth JDBC database
+  $oauth_jdbc_enable                   = $::pingfederate::params::oauth_jdbc_enable,
+  $oauth_jdbc_host                     = $::pingfederate::params::oauth_jdbc_host,
+  $oauth_jdbc_port                     = $::pingfederate::params::oauth_jdbc_port,
+  $oauth_jdbc_db                       = $::pingfederate::params::oauth_jdbc_db,
   $oauth_jdbc_url                      = $::pingfederate::params::oauth_jdbc_url,
+  $oauth_jdbc_user                     = $::pingfederate::params::oauth_jdbc_user,
+  $oauth_jdbc_pass                     = $::pingfederate::params::oauth_jdbc_pass,
   $oauth_jdbc_driver                   = $::pingfederate::params::oauth_jdbc_driver,
   $oauth_jdbc_package_list             = $::pingfederate::params::oauth_jdbc_package_list,
   $oauth_jdbc_package_ensure           = $::pingfederate::params::oauth_jdbc_package_ensure,
   $oauth_jdbc_jar_dir                  = $::pingfederate::params::oauth_jdbc_jar_dir,
   $oauth_jdbc_jar                      = $::pingfederate::params::oauth_jdbc_jar,
-  $oauth_jdbc_user                     = $::pingfederate::params::oauth_jdbc_user,
-  $oauth_jdbc_pass                     = $::pingfederate::params::oauth_jdbc_pass,
   $oauth_jdbc_validate                 = $::pingfederate::params::oauth_jdbc_validate,
+  $oauth_jdbc_cli                      = $::pingfederate::params::oauth_jdbc_cli,
+  $oauth_jdbc_ddl                      = $::pingfederate::params::oauth_jdbc_ddl,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])

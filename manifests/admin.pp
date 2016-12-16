@@ -13,7 +13,7 @@ class pingfederate::admin inherits ::pingfederate {
     user        =>  $::pingfederate::owner,
     logoutput   => true,
   }
-  if $::pingfederate::oauth_jdbc_url {
+  if $::pingfederate::oauth_jdbc_enable {
     class {'::pingfederate::oauth_jdbc':} ~> Exec[$restart]
   } 
   # ugh. This is what happens when trying to notify the service class causes a dependency loop:

@@ -70,14 +70,19 @@ class pingfederate::params {
   $cors_allowedMethods                 = 'GET,OPTIONS,POST'
   $cors_filter_mapping                 = '/*'
   $ognl_expressions_enable             = true
-  $oauth_jdbc_url                      = undef
+  $oauth_jdbc_enable                   = false
+  $oauth_jdbc_host                     = 'localhost'
+  $oauth_jdbc_port                     = 3306
+  $oauth_jdbc_db                       = 'pingfed'
+  $oauth_jdbc_user                     = undef
+  $oauth_jdbc_pass                     = undef
+  $oauth_jdbc_url                      = "jdbc:mysql://${oauth_jdbc_host}:${oauth_jdbc_port}/${oauth_jdbc_db}"
   $oauth_jdbc_driver                   = 'com.mysql.jdbc.Driver'
-  $oauth_jdbc_package_list             = 'mysql-connector-java'
+  $oauth_jdbc_package_list             = ['mysql','mysql-connector-java']
   $oauth_jdbc_package_ensure           = 'installed'
   $oauth_jdbc_jar_dir                  = '/usr/share/java'
   $oauth_jdbc_jar                      = 'mysql-connector-java.jar'
-  $oauth_jdbc_user                     = undef
-  $oauth_jdbc_pass                     = undef
   $oauth_jdbc_validate                 = 'SELECT 1 from dual'
-
+  $oauth_jdbc_cli                      = "/usr/bin/mysql --wait --connect_timeout=30 --host=${oauth_jdbc_host} --port=${oauth_jdbc_port} --user=${oauth_jdbc_user} --password=${oauth_jdbc_pass} --database=${oauth_jdbc_db}"
+  $oauth_jdbc_ddl                      = "${install_dir}/server/default/conf/oauth-client-management/sql-scripts/oauth-client-management-mysql.sql"
 }
