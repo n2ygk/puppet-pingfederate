@@ -3,6 +3,11 @@
 # Usage: pf-admin-api [--method <method>] <resource>
 # Invokes PingFederate admin REST API
 # Retries on connection refused so can be used right after the service starts (before it is listening).
+# Always prints HTTP status and reason to stderr
+# If HTTP status is succesful, prints response to --response file or to stderr if unsuccesful.
+#
+# TODO: Add an idempotent POST which tries a POST and, if the resource already exists,
+# does a PUT instead. Use the --response file to find the resource/{id}.
 from __future__ import print_function
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -25,15 +30,19 @@ parser.add_option('-j','--json',
                   type='string',
                   default=None,
                   help='JSON file to POST')
-parser.add_option('-t','--timeout',
+parser.add_option('-r','--response',
+                  type='string',
+                  default='-',
+                  help='write succesful JSON response to file [default: %default]')
+parser.add_option('--timeout',
                   type='int',
                   default=10,
                   help='Seconds before timeout [default: %default]')
-parser.add_option('-r','--retries',
+parser.add_option('--retries',
                   type='int',
                   default=5,
                   help='Number of retries [default: %default]')
-parser.add_option('-V','--verify',
+parser.add_option('--verify',
                   action="store_true",
                   default=False,
                   help='verify SSL/TLS server certificate [default: %default]')
@@ -67,8 +76,14 @@ for n in range(opt.retries):
                                 timeout=opt.timeout,
                                 verify=opt.verify)
     print((response.status_code,response.reason),file=sys.stderr)
-    print(response.text)
-    exit(0) if (response.status_code) < 400 else exit(1)
+    resp = json.dumps(json.loads(response.text),indent=2) # pretty-print it
+    if response.status_code < 400:
+      output = sys.stdout if opt.response == '-' else open(opt.response,'wb')
+      print(resp,file=output)
+      exit(0)
+    else:
+      print(resp,file=sys.stderr)
+      exit(1)
   except requests.exceptions.ConnectionError as e:
     emsg = e
     time.sleep(opt.timeout)

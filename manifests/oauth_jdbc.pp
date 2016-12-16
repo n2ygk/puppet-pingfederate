@@ -20,9 +20,9 @@ class pingfederate::oauth_jdbc inherits ::pingfederate {
     group    => $::pingfederate::group,
     content  => template('pingfederate/dataStores.json.erb')
   } ~> 
-  exec {'pf-admin-api POST dataStores':
-    command     => "${::pingfederate::install_dir}/local/bin/pf-admin-api -m POST -j ${ds} dataStores | tee ${ds}.out",
-    #creates     => "${ds}.out",
+  exec {'pf-admin-api POST dataStores': # TODO: make idempotent (e.g. do a GET before POST, PUT or something)
+    command     => "${::pingfederate::install_dir}/local/bin/pf-admin-api -m POST -j ${ds} -r ${ds}.out dataStores",
+    creates     => "${ds}.out",
     refreshonly => true,
     user        =>  $::pingfederate::owner,
     logoutput   => true,
