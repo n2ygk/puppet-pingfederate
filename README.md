@@ -26,15 +26,18 @@ manual steps.
 
 ## Usage
 
-At this point, the module only installs PingFederate and performs basic static configuration of the
+The module installs PingFederate and performs basic static configuration of the
 server, that is, things that are changed prior to starting it up. These include the 
 `run.properties` and various configuration XML files, and installation of the license key.
 Future versions will include more advanced administrative configuraton, that is, things that
 you configure once the basic system is up and running.
 
+In addition, the beginnings of support for configuring post-startup features via the administrative
+REST API are in place, specifically for configuring JDBC datastores.
+
 If you have access to the RPMs (custom-built; not distributed by PingIdentity),
-it will install them, if not, install it the usual way by downloading and unzipping; you can still
-use this module to manager the configuration.
+this module will install them, if not, install it the usual way by downloading and unzipping; you can still
+use this module to manage the configuration.
 
 ### Basic Usage with RPMS available
 ```
@@ -266,7 +269,8 @@ for an explanation. The defaults are as distributed by PingIdentity.
 #### OAuth JDBC configuration
 [*oauth_jdbc_url*]
   URL for
-  [OAuth Client Datastore](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#concept_definingOauthClientDataStore.html)
+  [OAuth Client Datastore](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#concept_definingOauthClientDataStore.html).
+  If undefined, the default built-in XML file-based datastore will be used.
 
 [*oauth_jdbc_driver*]
   Name of the JDBC driver class. Default `com.mysql.jdbc.Driver`
