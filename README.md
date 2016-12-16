@@ -388,14 +388,6 @@ it will all be run together with no indentation. Do not fear as this is still va
 See [these additional notes](notes.md) for more background on how to
 develop configuration puppet modules based on diffs of XML config files.
 
-### Custom Facts
-Custom external facts are defined in [facts.d/](facts.d/).
-
-[*${::facts[$::pingfederate::oauth_jdbc_url]}*]
-  A custom [external fact](facts.d/pingxmlfacts.py) is named the same as the
-  oauth_jdbc_url and with value of the JNDI-name that the server assigned when the
-  datastore was added (via the pf-admin-api).
-
 ### Invoking the administrative REST API (pf-admin-api)
 Some configuration is done via the
 [PingFederate Administrative API](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/pingFederateAdministrativeApi.html).
@@ -416,11 +408,9 @@ Find [pf-admin-api.erb](templates/pf-admin-api.erb), a templated Python script w
 The script is templated to embed the administrative user and password. Data for POSTs done by the
 script are also templated. Installing the JSON file is the trigger to Exec'ing the pf-admin-api script.
 
-#### Current problem: Getting the JNDI-name
-The JNDI-name is written into a `.json.out` file and is also available in one of the XML configuration files.
-This is currently retrieved via a custom external fact but the problem is that this fact is not available
-until the next Puppet run after the REST API invocation.
-
-Next step is to edit the XML files in the same Exec as the API call rather than having Puppet manage them.
-Ugly but the only way to make it happen in one unit of work. (It's really the fault of the app for not
-having a clean set of APIs that do everything.)
+#### oauth_jdbc_augeas script
+This script edits the XML files in an Exec notified by the API call rather than having Puppet manage them.
+This is ugly but the only way to make it happen in one unit of work. (It's really the fault of the app for not
+having a clean set of APIs that do everything.) It's kinda ugly, using augeas three times: Once to pull the
+jndi-name out of the API result file created by pf-admin-api and then twice to edit two XML files, one of which
+gets the jndi-name stuffed in.

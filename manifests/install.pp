@@ -64,6 +64,13 @@ class pingfederate::install inherits ::pingfederate {
     group    => $::pingfederate::group,
     content  => template('pingfederate/pf-admin-api.erb')
   }
+  file { "${::pingfederate::install_dir}/local/bin/oauth_jdbc_augeas":
+    ensure   => 'present',
+    mode     => 'a=rx',
+    owner    => $::pingfederate::owner,
+    group    => $::pingfederate::group,
+    content  => template('pingfederate/oauth_jdbc_augeas.erb')
+  }
   file { "${::pingfederate::install_dir}/local/etc":
     ensure => 'directory',
     owner  => $::pingfederate::owner,

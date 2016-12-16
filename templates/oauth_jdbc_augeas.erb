@@ -1,0 +1,36 @@
+#!/bin/sh
+# -*- mode: shell-script -*-
+# get the jndi-name and stuff it in to the XML file
+#
+# Augtool's output looks like this:
+#   /files/dataStores.json.out/dict/entry[2]/string = "JDBC-C68E4B20031257E836CD34ABD28520310D4F7C45"
+# Grab the 3rd word and then eval it to remove the quotes.
+
+if [ ! -f <%= @install_dir -%>/local/etc/dataStores.json.out ]; then
+    exit 1
+fi
+
+jndi=`augtool -A -r <%= @install_dir -%>/local/etc <<EoF | awk '{print $3}'
+set /augeas/load/Json/lens Json.lns
+set /augeas/load/Json/incl dataStores.json.out
+load
+print /files/dataStores.json.out/dict/entry[.="id"]/string
+EoF`
+eval jndi=$jndi
+
+augtool -A -r <%= @install_dir -%>/server/default/conf/META-INF <<EoF
+set /augeas/load/Xml/lens Xml.lns
+set /augeas/load/Xml/incl hivemodule.xml
+load
+set /files/hivemodule.xml/module/service-point[#attribute/id="ClientManager"][#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]/invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerJdbcImpl"
+save
+EoF
+
+augtool -A -r <%= @install_dir -%>/server/default/data/config-store <<EoF
+set /augeas/load/Xml/lens Xml.lns
+set /augeas/load/Xml/incl org.sourceid.oauth20.domain.ClientManagerJdbcImpl.xml
+load
+set /files/org.sourceid.oauth20.domain.ClientManagerJdbcImpl.xml/c:config/c:item[#attribute/name="PingFederateDSJNDIName"]/#text "$jndi"
+save
+EoF
+
