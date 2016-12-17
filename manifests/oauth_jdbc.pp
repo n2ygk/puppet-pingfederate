@@ -19,7 +19,6 @@
 #
 class pingfederate::oauth_jdbc inherits ::pingfederate {
   if $::pingfederate::oauth_jdbc_type {
-    $ds = "${::pingfederate::install_dir}/local/etc/dataStores.json"
     if $::pingfederate::oauth_jdbc_package_ensure {
       ensure_packages($::pingfederate::o_pkgs,{'ensure' => $::pingfederate::oauth_jdbc_package_ensure})
     }
@@ -35,7 +34,14 @@ class pingfederate::oauth_jdbc inherits ::pingfederate {
       command     => "/sbin/service ${::pingfederate::service_name} restart",
       refreshonly => true,
     } ~>
-    Exec['pf-admin-api version'] ~> # wait for server restart
+    exec {'pf-admin-api wait after jar install':
+      command => "${::pingfederate::install_dir}/local/bin/pf-admin-api version | grep version",
+      user        =>  $::pingfederate::owner,
+      refreshonly => true,
+      logoutput   => true,
+    }
+
+    $ds = "${::pingfederate::install_dir}/local/etc/dataStores.json"
     file {$ds:
       ensure   => 'present',
       mode     => 'u=r,go=',
@@ -43,24 +49,29 @@ class pingfederate::oauth_jdbc inherits ::pingfederate {
       group    => $::pingfederate::group,
       content  => template('pingfederate/dataStores.json.erb'),
     } ~> 
-    if $::pingfederate::o_cmd {
-      exec {"oauth_jdbc DDL ${::pingfederate::o_url}":
-        command => $::pingfederate::o_cmd,
-        refreshonly => true,
-        user        => $::pingfederate::owner,
-        logoutput   => true,
-      }
-    } ~>
     exec {'pf-admin-api POST dataStores':
-      command     => "${::pingfederate::install_dir}/local/bin/pf-admin-api -m POST -j ${ds} -r ${ds}.out dataStores || rm -f ${ds}",
+      command     => "${::pingfederate::install_dir}/local/bin/pf-admin-api -m POST -j ${ds} -r ${ds}.out dataStores", #  || rm -f ${ds}
       refreshonly => true,
-      user        =>  $::pingfederate::owner,
+      user        => $::pingfederate::owner,
       logoutput   => true,
     } ~>
     exec {'oauth_jdbc_augeas':
       command     => "${::pingfederate::install_dir}/local/bin/oauth_jdbc_augeas",
       refreshonly => true,
-      user        =>  $::pingfederate::owner,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    } ~>
+    exec {"oauth_jdbc DDL ${::pingfederate::o_url}":
+      command => $::pingfederate::o_cmd,
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+  } else { # make sure datastore configs get reverted if the oauth_jdbc_type is (becomes) undef.
+    exec {'oauth_jdbc_revert_augeas': # this executes every puppet run. Need to add a notifier.
+      command     => "${::pingfederate::install_dir}/local/bin/oauth_jdbc_revert_augeas",
+      #refreshonly => true,
+      user        => $::pingfederate::owner,
       logoutput   => true,
     }
   }

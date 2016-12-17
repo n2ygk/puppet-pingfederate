@@ -12,12 +12,9 @@ class pingfederate::admin inherits ::pingfederate {
     command => "${::pingfederate::install_dir}/local/bin/pf-admin-api version | grep version",
     user        =>  $::pingfederate::owner,
     logoutput   => true,
-  }
-  class {'::pingfederate::oauth_jdbc':} ~> Exec[$restart]
-  
-  # ugh. This is what happens when trying to notify the service class causes a dependency loop:
-  # You can't notify the service, instead having to go behind its back.
-  exec {$restart:
+  } ->
+  class {'::pingfederate::oauth_jdbc':} ~> 
+  exec {$restart:               # ugh
     refreshonly => true,
   }
 }
