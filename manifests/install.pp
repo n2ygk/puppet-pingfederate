@@ -38,19 +38,7 @@ class pingfederate::install inherits ::pingfederate {
   }
   # python scripts are in templates/
   ensure_packages(['python','python-requests','python-libs'],{'ensure' => 'installed'})
-  # oauth jdbc datastore if ...type is defined
-  if $::pingfederate::oauth_jdbc_type {
-    if $::pingfederate::oauth_jdbc_package_ensure {
-      ensure_packages($::pingfederate::o_pkgs,{'ensure' => $::pingfederate::oauth_jdbc_package_ensure})
-    }
-    file { "${::pingfederate::install_dir}/server/default/lib/${::pingfederate::o_jar}":
-      ensure => 'present',
-      source => "${::pingfederate::o_jar_dir}/${::pingfederate::o_jar}",
-      links  => 'follow',
-      owner  => $::pingfederate::owner,
-      group  => $::pingfederate::group,
-    }
-  }
+
   # Also install some local configuration tools
   file { "${::pingfederate::install_dir}/local":
     ensure => 'directory',
