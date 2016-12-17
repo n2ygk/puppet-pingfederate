@@ -1,6 +1,6 @@
 # Class pingfederate::oauth_jdbc
 #
-# Configure the oauth JDBC service.
+# Configure the oauth JDBC service only if oauth_jdbc_type is set.
 #
 # Unfortunately the 'clean' way to do this is to invoke the pf-admin-api to add the database connector
 # and then edit two XML files, adding the JNDI-NAME to one of them, which requires restarting the service.
@@ -13,23 +13,23 @@
 # It is also used on subsequent invocations to get the 'id' in order to do a GET/PUT
 # to update the existing resource (e.g. for a password change).
 #
-# TODO: initialize an empty database using scripts at server/default/conf/oauth-client-management/sql-scripts/
-#
 class pingfederate::oauth_jdbc inherits ::pingfederate {
+  # the jar file has to be on the classpath so it's installed in pingfederate::install.
   $ds = "${::pingfederate::install_dir}/local/etc/dataStores.json"
   file {$ds:
     ensure   => 'present',
     mode     => 'u=r,go=',
     owner    => $::pingfederate::owner,
     group    => $::pingfederate::group,
-    content  => template('pingfederate/dataStores.json.erb')
+    content  => template('pingfederate/dataStores.json.erb'),
   } ~> 
-  exec {"oauth_jdbc DDL ${::pingfederate::oauth_jdbc_url}":
-    command => "${::pingfederate::oauth_jdbc_cli} < ${::pingfederate::oauth_jdbc_ddl}",
-    refreshonly => true,
-    user        =>  $::pingfederate::owner,
-    returns     => [0,1],       # allow an error like "ERROR 1050 (42S01) at line 1: Table 'pingfederate_oauth_clients' already exists"
-    logoutput   => true,
+  if $::pingfederate::o_cmd {
+    exec {"oauth_jdbc DDL ${::pingfederate::o_url}":
+      command => $::pingfederate::o_cmd,
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
   } ~>
   exec {'pf-admin-api POST dataStores':
     command     => "${::pingfederate::install_dir}/local/bin/pf-admin-api -m POST -j ${ds} -r ${ds}.out dataStores",
@@ -44,3 +44,4 @@ class pingfederate::oauth_jdbc inherits ::pingfederate {
     logoutput   => true,
   }
 }
+

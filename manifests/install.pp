@@ -36,10 +36,21 @@ class pingfederate::install inherits ::pingfederate {
   if $pingfederate::windowslive_adapter {
     ensure_packages($pingfederate::windowslive_adapter_list,{'ensure' => $pingfederate::windowslive_package_ensure})
   }
-  # wget is used to wait_for the REST api
-  # mysql is used to wait_for the mysql database
-  ensure_packages(['wget','python','python-requests','python-libs'],{'ensure' => 'installed'})
-
+  # python scripts are in templates/
+  ensure_packages(['python','python-requests','python-libs'],{'ensure' => 'installed'})
+  # oauth jdbc datastore if ...type is defined
+  if $::pingfederate::oauth_jdbc_type {
+    if $::pingfederate::oauth_jdbc_package_ensure {
+      ensure_packages($::pingfederate::o_pkgs,{'ensure' => $::pingfederate::oauth_jdbc_package_ensure})
+    }
+    file { "${::pingfederate::install_dir}/server/default/lib/${::pingfederate::o_jar}":
+      ensure => 'present',
+      source => "${::pingfederate::o_jar_dir}/${::pingfederate::o_jar}",
+      links  => 'follow',
+      owner  => $::pingfederate::owner,
+      group  => $::pingfederate::group,
+    }
+  }
   # Also install some local configuration tools
   file { "${::pingfederate::install_dir}/local":
     ensure => 'directory',
@@ -73,16 +84,6 @@ class pingfederate::install inherits ::pingfederate {
   }
   file { "${::pingfederate::install_dir}/local/etc":
     ensure => 'directory',
-    owner  => $::pingfederate::owner,
-    group  => $::pingfederate::group,
-  }
-  if $::pingfederate::oauth_jdbc_package_ensure {
-    ensure_packages($::pingfederate::oauth_jdbc_package_list,{'ensure' => $::pingfederate::oauth_jdbc_package_ensure})
-  }
-  file { "${::pingfederate::install_dir}/server/default/lib/${::pingfederate::oauth_jdbc_jar}":
-    ensure => 'present',
-    source => "${::pingfederate::oauth_jdbc_jar_dir}/${::pingfederate::oauth_jdbc_jar}",
-    links  => 'follow',
     owner  => $::pingfederate::owner,
     group  => $::pingfederate::group,
   }

@@ -8,10 +8,7 @@
 #
 # === Examples
 #
-#  class { 'pingfederate':
-#    operational_mode   => "clustered_console",
-#    cluster_node_index => 2,
-#  }
+# See README.md
 #
 # === Authors
 #
@@ -19,7 +16,7 @@
 #
 # === Copyright
 #
-# Copyright 2016 The Trustees of Columbia University in the City of New York
+# Copyright (c) 2016 The Trustees of Columbia University in the City of New York
 #
 class pingfederate (
   $install_dir                         = $::pingfederate::params::install_dir,
@@ -98,8 +95,8 @@ class pingfederate (
   $cors_filter_mapping                 = $::pingfederate::params::cors_filter_mapping,
   # OGNL expressions
   $ognl_expressions_enable             = $::pingfederate::params::ognl_expressions_enable,
-  # OAuth JDBC database
-  $oauth_jdbc_enable                   = $::pingfederate::params::oauth_jdbc_enable,
+  # OAuth JDBC database (configured iff oauth_jdbc_type is defined)
+  $oauth_jdbc_type                     = $::pingfederate::params::oauth_jdbc_type,
   $oauth_jdbc_host                     = $::pingfederate::params::oauth_jdbc_host,
   $oauth_jdbc_port                     = $::pingfederate::params::oauth_jdbc_port,
   $oauth_jdbc_db                       = $::pingfederate::params::oauth_jdbc_db,
@@ -112,8 +109,7 @@ class pingfederate (
   $oauth_jdbc_jar_dir                  = $::pingfederate::params::oauth_jdbc_jar_dir,
   $oauth_jdbc_jar                      = $::pingfederate::params::oauth_jdbc_jar,
   $oauth_jdbc_validate                 = $::pingfederate::params::oauth_jdbc_validate,
-  $oauth_jdbc_cli                      = $::pingfederate::params::oauth_jdbc_cli,
-  $oauth_jdbc_ddl                      = $::pingfederate::params::oauth_jdbc_ddl,
+  $oauth_jdbc_ddl_cmd                  = $::pingfederate::params::oauth_jdbc_ddl_cmd,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])
@@ -135,8 +131,64 @@ class pingfederate (
   validate_integer($https_port,65535,-1)
   validate_integer($secondary_https_port,65535,-1)
 
-  # need to do more validation
+  # Setup the OAuth JDBC settings, if requested (oauth_jdbc_type is defined)
+  # If overriding settings are not provided, the defaults are filled in based on the type.
+  if $::pingfederate::oauth_jdbc_type {
+    validate_re($oauth_jdbc_type,['^mysql$','^sqlserver$','^oracle$','^other$'])
+    # The following defaults based on database type (mysql, mssql, oracle) can still be overidden.
+    $script_dir = "${::pingfederate::install_dir}/server/default/conf/oauth-client-management/sql-scripts/"
+    case $::pingfederate::oauth_jdbc_type {
+      'mysql': {
+        $def_pkgs     = ['mysql','mysql-connector-java']
+        $def_jar_dir  = '/usr/share/java'
+        $def_jar      = 'mysql-connector-java.jar'
+        $def_validate = 'SELECT 1 from dual'
+        $def_driver   = 'com.mysql.jdbc.Driver'
+        $portstr      = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
+        $def_url      = "jdbc:mysql://${oauth_jdbc_host}${portstr}/${oauth_jdbc_db}"
+        $script       = 'oauth-client-management-mysql.sql'
+        $def_cmd      = "/usr/bin/mysql --wait --connect_timeout=30    \
+                         --host=${::pingfederate::oauth_jdbc_host}     \
+                         --port=${::pingfederate::oauth_jdbc_port}     \
+                         --user=${::pingfederate::oauth_jdbc_user}     \
+                         --password=${::pingfederate::oauth_jdbc_pass} \
+                         --database=${::pingfederate::oauth_jdbc_db}   \
+                         < ${script_dir}/${script}                     \
+                         | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'  " # allow 1050 (table already exists) or no output
+      }
+      'sqlserver': {
+        # TBD
+        fail("Config code for database type ${::pingfederate::oauth_jdbc_type} incomplete.")
+      }
+      'oracle': {
+        # TBD
+        fail("Config code for database type ${::pingfederate::oauth_jdbc_type} incomplete.")
+      }
+      'other': {                # everything must be set in $::pingfederate::oauth_jdbc_*
+        $def_pkgs     = undef
+        $def_jar_dir  = undef
+        $def_jar      = undef
+        $def_validate = undef
+        $def_driver   = undef
+        $def_url      = undef
+        $def_cmd      = undef
+      }
+      default: { fail("Don't know to configure for database type ${::pingfederate::oauth_jdbc_type}.") }
+    }
 
+    # (optionally) override defaults from above
+    $o_pkgs     = if $::pingfederate::oauth_jdbc_package_list { $::pingfederate::oauth_jdbc_package_list } else { $def_pkgs }
+    $o_jar_dir  = if $::pingfederate::oauth_jdbc_jar_dir { $::pingfederate::oauth_jdbc_jar_dir } else { $def_jar_dir }
+    $o_jar      = if $::pingfederate::oauth_jdbc_jar { $::pingfederate::oauth_jdbc_jar } else { $def_jar }
+    $o_validate = if $::pingfederate::oauth_jdbc_validate { $::pingfederate::oauth_jdbc_validate } else { $def_validate }
+    $o_driver   = if $::pingfederate::oauth_jdbc_driver { $::pingfederate::oauth_jdbc_driver } else { $def_driver }
+    $o_url      = if $::pingfederate::oauth_jdbc_url { $::pingfederate::oauth_jdbc_url } else { $def_url }
+    $o_cmd      = if $::pingfederate::oauth_jdbc_ddl_cmd { $::pingfederate::oauth_jdbc_ddl_cmd } else { $def_cmd }
+  }
+
+  # need to do more validation...
+
+  # Install the package(s), configure the pre-runtime settings, start the service, and administer the post-startup settings.
   anchor { 'pingfederate::begin': } ->
   class { '::pingfederate::install': } ->
   class { '::pingfederate::config': } ~>
@@ -144,15 +196,4 @@ class pingfederate (
   class { '::pingfederate::admin': } ->
   anchor { 'pingfederate::end': }
 
-  # contain ::pingfederate::install
-  # contain ::pingfederate::config
-  # contain ::pingfederate::service
-  # contain ::pingfederate::admin
-
-  # Class['::pingfederate::install'] -> Class['::pingfederate::config']
-  # Class['::pingfederate::config'] ~> Class['::pingfederate::service']
-  # # I want the service to be running before admin but admin also needs to notify the service!
-  # # That creates a loop. This means the service may not be started before admin:
-  # Class['::pingfederate::service'] -> Class['::pingfederate::admin']
-  # #Class['::pingfederate::admin'] ~> Class['::pingfederate::service']
 }
