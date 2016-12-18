@@ -195,14 +195,13 @@ This one is set from the pf-admin-api with a
 ```JSON
 {
   "type": "JDBC",
-  "id": "myOauth2JDBC", # this is ignored
   "maskAttributeValues": "false",
   "connectionUrl": "jdbc:mysql://localhost/pingfed?autoReconnect=true",
   "driverClass": "com.mysql.jdbc.Driver",
   "userName": "pingfed",
   "password": "foobar",
   "validateConnectionSql": "SELECT 1 from dual",
-  "allowMultiValueAttributes": "true"  
+  "allowMultiValueAttributes": "true"
 }```			 
 
 REPONSE:

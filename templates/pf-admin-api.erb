@@ -41,7 +41,7 @@ def do_req(retries,method,url,**kwargs):
   return response
 
 
-parser = OptionParser()
+parser = OptionParser(usage='%prog [options] resource')
 parser.add_option('-m','--method',
                   type='string',
                   default='GET',

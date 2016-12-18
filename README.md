@@ -330,8 +330,6 @@ Please fork and submit PRs on [github](https://github.com/n2ygk/puppet-pingfeder
 
 Planned next development steps are to:
 
-1. Configure the database server (schema initialization, etc.).
-
 1. Configure additional settings via the pf-admin-api once the server is up and running.
 
 ### Using Augeas to edit XML configuration files
@@ -426,14 +424,99 @@ the process for adding a mysql data store for oauth client management consists o
 1. Edit `<pf-install>server/default/data/config-store/org.sourceid.oauth20.domain.ClientManagerJdbcImpl.xml` to include the JNDI-name that was
 returned by the POST.
 
-#### pf-admin-api script
-Find [pf-admin-api.erb](templates/pf-admin-api.erb), a templated Python script which invokes the API.
-The script is templated to embed the administrative user and password. Data for POSTs done by the
-script are also templated. Installing the JSON file is the trigger to Exec'ing the pf-admin-api script.
+#### pf-admin-api idempotent REST API client
+[pf-admin-api.erb](templates/pf-admin-api.erb) is a templated Python script which invokes the REST API.
+The script is templated to embed the administrative user and password. There's probably a more elegant way
+to do this, like putting them in a setting file.
 
+Input data for POSTs done by pf-admin-api are also templated. Installing the JSON file is the trigger 
+to Execing the pf-admin-api script. The script waits for the server to come up so can be used as 'waiter'
+when the service has to be restarted, which unfortunately is necessary at multiple points in the 
+configuration process (e.g. after adding a new JAR to the classpath, after editing some XML configuration
+files, and so on).
+
+```
+Usage: pf-admin-api [options] resource
+
+Options:
+  -h, --help            show this help message and exit
+  -m METHOD, --method=METHOD
+                        HTTP method, one of GET,PUT,POST,PATCH,DELETE
+                        [default: GET]
+  -j JSON, --json=JSON  JSON file to POST
+  -r RESPONSE, --response=RESPONSE
+                        write succesful JSON response to file [default: -]
+  --timeout=TIMEOUT     Seconds before timeout [default: 10]
+  --retries=RETRIES     Number of retries [default: 5]
+  --verify              verify SSL/TLS server certificate [default: False]
+```
+
+Here's an example of GET of the server version:
+
+```bash
+$ sudo /opt/pingfederate/local/bin/pf-admin-api version
+(200, 'OK')
+{
+  "version": "8.2.2.0"
+}
+```
+
+This shows up in the Puppet log as:
+
+```
+Notice: /Stage[main]/Pingfederate::Admin/Exec[pf-admin-api version]/returns: (200, 'OK')
+Notice: /Stage[main]/Pingfederate::Admin/Exec[pf-admin-api version]/returns:   "version": "8.2.2.0"
+Notice: /Stage[main]/Pingfederate::Admin/Exec[pf-admin-api version]/returns: executed successfully
+```
+
+And here's an idempotent POST. In this example, the POST had previously happened so it gets changed to a PUT
+just in case there are some changed values in `dataStores.json`. This presupposes that `dataStores.json.out`
+is present since it contains the *id* that was assigned by the initial POST. (A future improvement might be
+to GET the collection and find the right *id*.)
+
+```bash
+$ sudo /opt/pingfederate/local/bin/pf-admin-api -m POST -j /opt/pingfederate/local/etc/dataStores.json -r /opt/pingfederate/local/etc/dataStores.json.out dataStores
+Resource exists. Changing POST to PUT.
+(200, 'OK')
+```
+
+This is just an example of GET of the dataStores collection:
+```bash
+$ sudo /opt/pingfederate/local/bin/pf-admin-api dataStores 
+(200, 'OK')
+{
+  "items": [
+    {
+      "userName": "sa", 
+      "encryptedPassword": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2Iiwia2lkIjoia2RDODV1YnZhRyIsInZlcnNpb24iOiI4LjIuMi4wIn0..9PlaJ2A0UNIA-j2_k_e3yA.KgxQfRAnMxxxAiFKUrf-2Q.6DtxtZP15T_0fjVozcxNRw", 
+      "connectionUrl": "jdbc:hsqldb:${pf.server.data.dir}${/}hypersonic${/}ProvisionerDefaultDB;hsqldb.lock_file=false", 
+      "allowMultiValueAttributes": false, 
+      "driverClass": "org.hsqldb.jdbcDriver", 
+      "maskAttributeValues": false, 
+      "type": "JDBC", 
+      "id": "ProvisionerDS"
+    }, 
+    {
+      "userName": "pingfed", 
+      "encryptedPassword": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2Iiwia2lkIjoia2RDODV1YnZhRyIsInZlcnNpb24iOiI4LjIuMi4wIn0..wsr556B1qLMDo5s7g_3oTw.OPGaQh0bsC6zzzCQBicVvQ.HHqz9Ad7mswBRE3J1IEFyg", 
+      "connectionUrl": "jdbc:mysql://localhost/pingfed?autoReconnect=true", 
+      "allowMultiValueAttributes": true, 
+      "driverClass": "com.mysql.jdbc.Driver", 
+      "maskAttributeValues": false, 
+      "type": "JDBC", 
+      "id": "JDBC-282B7303FBE88768437753B22951A424E7F12068", 
+      "validateConnectionSql": "SELECT 1 from dual"
+    }
+  ]
+}
+
+```
 #### oauth_jdbc_augeas script
-[This](templates/oauth_jdbc_augeas.erb) script edits the XML files in an Exec notified by the API call rather than having Puppet manage them.
-This is ugly but the only way to make it happen in one unit of work. (It's really the fault of the app for not
-having a clean set of APIs that do everything.) It's kinda ugly, using augeas three times: Once to pull the
-jndi-name out of the API result file created by pf-admin-api and then twice to edit two XML files, one of which
-gets the jndi-name stuffed in.
+[This](templates/oauth_jdbc_augeas.erb) script edits the XML files in an Exec notified by the API call rather
+than having Puppet manage them. This is ugly but the only way to make it happen in one unit of work. (It's really the
+fault of the app for not having a clean set of APIs that do everything.) It's kinda ugly, using augeas three times:
+1. pulls the jndi-name out of the API result file created by pf-admin-api.
+2. Edits hivemodule.xml to switch from using built-in XML datastore to JDBC.
+3. Edits and org.sourceid.oauth20.domain.ClientManagerJdbcImpl.xml to stuf fin the jndi-name.
+
+There's also an `oauth_jdbc_revert_augeas` script that reverts back to the built-in non-JDBC datastore.
