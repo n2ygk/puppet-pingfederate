@@ -13,6 +13,7 @@ class pingfederate::admin inherits ::pingfederate {
     user        =>  $::pingfederate::owner,
     logoutput   => true,
   } ->
+  class {'::pingfederate::server_settings':} ->
   class {'::pingfederate::oauth_jdbc':} ~> 
   exec {$restart:               # ugh
     refreshonly => true,

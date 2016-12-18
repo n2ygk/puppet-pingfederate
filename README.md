@@ -252,6 +252,10 @@ for an explanation. The defaults are as distributed by PingIdentity.
 [*saml2_local_baseURL*]
   URL for the local SAML 2 entity.
 
+[*saml1_local_issuerID*]
+
+[*wsfed_local_realm*]
+
 #### Cross-Origin Resource Sharing (CORS)
 [*cors_allowedOrigins*]
   Allowed origins for CORS. Default `*`

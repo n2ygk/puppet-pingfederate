@@ -64,7 +64,9 @@ class pingfederate::params {
   $adm_pass                            = 'p@Ssw0rd'
   $adm_hash                            = 'k1H1o2jc66sgkDjJKq85Sr22QNk143S20oR2Yyt2kqo.5Cu-mnqB.2'
   $adm_api_baseURL                     = "https://${facts['fqdn']}:${admin_https_port}/pf-admin-api/v1"
-  $saml2_local_entityID                = "${facts['hostname']}-ping:urn:saml1"
+  $saml2_local_entityID                = "${facts['hostname']}-ping:urn:saml2"
+  $saml1_local_issuerID                = "${facts['hostname']}-ping:urn:saml1"
+  $wsfed_local_realm                   = "${facts['hostname']}-ping:urn:wsfed"
   $saml2_local_baseURL                 = "https://${facts['fqdn']}:${https_port}"
   $cors_allowedOrigins                 = '*'
   $cors_allowedMethods                 = 'GET,OPTIONS,POST'

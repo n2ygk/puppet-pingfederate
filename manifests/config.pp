@@ -120,7 +120,7 @@ class pingfederate::config inherits ::pingfederate {
     context => "/files/${saml_file}",
     changes =>
     [
-     "set EntityDescriptor/#attribute/entityID \"${::pingfederate::saml2_local_entityID}\"",
+     "set EntityDescriptor/#attribute/entityID \"${::pingfederate::saml1_local_entityID}\"", # don't know why this is saml1 and not saml2
      'set EntityDescriptor/#attribute/cacheDuration "PT1440M"',
      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/BaseURL \"${::pingfederate::saml2_local_baseURL}\"",
      'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/DynaFedID ""',

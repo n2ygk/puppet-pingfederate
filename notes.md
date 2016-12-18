@@ -96,6 +96,7 @@ _pingfederate/server/default/data/pingfederate-admin-user.xml_
 _pingfederate/bin/configcopy_templates/README.txt_
 
 See [configcopy](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/automatingConfigurationMigration.html)
+a these might be useful. I have not used them though.
 
 
 ### pf admin api
@@ -269,6 +270,49 @@ The JNDIName from above needs to be inserted here.
     <c:item name="PingFederateDSJNDIName">JDBC-77D1C677602129964A4EB33124AF3CFB8D9E2475</c:item>
 </c:config>
 ```
+
+## Figuring out which admin API resources need to be updated
+
+Starting with a known working manually-configured server 'A' (e.g. configured via clicking
+through the web UI), compare it to our current Puppetized server 'B' by walking through all the
+resources using [this script](a-b.sh) which just does a GET of each resource. The resource list
+is heuristically arranged in order of what needs to be fixed first (e.g. serverSettings goes first)
+and the script only outputs resources that differ. Some of those differences are just normal things
+based on the hostname and so on, while others are real differences that need to be addressed.
+
+```bash
+$ sh a-b.sh >a-b.diff
+$ head -20 a-b.diff
+*** /tmp/A-serverSettings	2016-12-18 17:34:27.740007996 +0000
+--- /tmp/B-serverSettings	2016-12-18 17:34:27.871007996 +0000
+***************
+*** 4,5 ****
+!       "enableOauth": true, 
+!       "enableOpenIdConnect": true
+--- 4,5 ----
+!       "enableOauth": false, 
+!       "enableOpenIdConnect": false
+***************
+*** 9,12 ****
+!       "enableSaml11": true, 
+!       "enableSaml10": true, 
+!       "enable": true, 
+!       "enableWsTrust": true, 
+--- 9,12 ----
+!       "enableSaml11": false, 
+!       "enableSaml10": false, 
+!       "enable": false, 
+!       "enableWsTrust": false, 
+
+
+```
+
+Then, resource at a time, template a new JSON file:
+
+```bash
+$ /opt/pingfederate/local/bin/pf-admin-api -c a.json serverSettings >templates/serverSettings.json.erb
+```
+
 
 
 

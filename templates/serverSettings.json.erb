@@ -1,0 +1,45 @@
+{
+  "rolesAndProtocols": {
+    "oauthRole": {
+      "enableOauth": true, 
+      "enableOpenIdConnect": true
+    }, 
+    "enableIdpDiscovery": false, 
+    "spRole": {
+      "enableSaml11": true, 
+      "enableSaml10": true, 
+      "enable": true, 
+      "enableWsTrust": true, 
+      "saml20Profile": {
+        "enableXASP": false, 
+        "enable": true, 
+        "enableAutoConnect": true
+      }, 
+      "enableWsFed": true, 
+      "enableInboundProvisioning": false
+    }, 
+    "idpRole": {
+      "enableSaml11": false, 
+      "enableSaml10": false, 
+      "enable": true, 
+      "enableWsTrust": false, 
+      "saml20Profile": {
+        "enable": true, 
+        "enableAutoConnect": true
+      }, 
+      "enableWsFed": false
+    }
+  }, 
+  "federationInfo": {
+    "baseUrl": "<%= @saml2_local_baseURL -%>",
+    "autoConnectEntityId": "<%= @saml2_local_baseURL -%>",
+    "wsfedRealm": "<%= @wsfed_local_realm -%>",
+    "saml2EntityId": "<%= @saml2_local_entityID -%>",
+    "saml1xIssuerId": "<%= @saml1_local_issuerID -%>",
+    "saml1xSourceId": ""
+  }, 
+  "contactInfo": {}, 
+  "notifications": {
+    "notifyAdminUserPasswordChanges": false
+  }
+}

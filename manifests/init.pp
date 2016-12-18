@@ -88,6 +88,8 @@ class pingfederate (
   $adm_api_baseURL                     = $::pingfederate::params::adm_api_baseURL,
   # local SAML IdP configuration: sourceid-saml2-local-metadata.xml
   $saml2_local_entityID                = $::pingfederate::params::saml2_local_entityID,
+  $saml1_local_issuerID                = $::pingfederate::params::saml1_local_issuerID,
+  $wsfed_local_realm                   = $::pingfederate::params::wsfed_local_realm,
   $saml2_local_baseURL                 = $::pingfederate::params::saml2_local_baseURL,
   # Enable Cross-Origin Resource Sharing (CORS)
   $cors_allowedOrigins                 = $::pingfederate::params::cors_allowedOrigins,
