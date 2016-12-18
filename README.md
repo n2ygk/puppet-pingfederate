@@ -426,8 +426,7 @@ returned by the POST.
 
 #### pf-admin-api idempotent REST API client
 [pf-admin-api.erb](templates/pf-admin-api.erb) is a templated Python script which invokes the REST API.
-The script is templated to embed the administrative user and password. There's probably a more elegant way
-to do this, like putting them in a setting file.
+The script is templated to embed the default name of "this" server's configuration file.
 
 Input data for POSTs done by pf-admin-api are also templated. Installing the JSON file is the trigger 
 to Execing the pf-admin-api script. The script waits for the server to come up so can be used as 'waiter'
@@ -440,6 +439,9 @@ Usage: pf-admin-api [options] resource
 
 Options:
   -h, --help            show this help message and exit
+  -c CONFIG, --config=CONFIG
+                        Name of configuration file [default:
+                        /opt/pingfederate/local/etc/pf-admin-cfg.json]
   -m METHOD, --method=METHOD
                         HTTP method, one of GET,PUT,POST,PATCH,DELETE
                         [default: GET]
@@ -509,8 +511,25 @@ $ sudo /opt/pingfederate/local/bin/pf-admin-api dataStores
     }
   ]
 }
-
 ```
+
+And, if you want to use the script to use the admin API of a different PingFederate server, simply
+create a configuration file:
+```
+$ cat pf.json
+{
+  "description": "configuration file for /opt/pingfederate/local/bin/pf-admin-api",
+  "baseURL": "https://oauth.example.com:9999/pf-admin-api/v1",
+  "user": "Administrator",
+  "pass": "password123"
+}
+$ /opt/pingfederate/local/bin/pf-admin-api -c pf.json version
+(200, 'OK')
+{
+  "version": "8.2.2.0"
+}
+```
+
 #### oauth_jdbc_augeas script
 [This](templates/oauth_jdbc_augeas.erb) script edits the XML files in an Exec notified by the API call rather
 than having Puppet manage them. This is ugly but the only way to make it happen in one unit of work. (It's really the

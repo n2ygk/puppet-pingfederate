@@ -58,7 +58,7 @@ class pingfederate::install inherits ::pingfederate {
   }
   file { "${::pingfederate::install_dir}/local/bin/pf-admin-api":
     ensure   => 'present',
-    mode     => 'u=rx,go=',
+    mode     => 'a=rx',
     owner    => $::pingfederate::owner,
     group    => $::pingfederate::group,
     content  => template('pingfederate/pf-admin-api.erb')
@@ -81,5 +81,12 @@ class pingfederate::install inherits ::pingfederate {
     ensure => 'directory',
     owner  => $::pingfederate::owner,
     group  => $::pingfederate::group,
+  }
+  file { "${::pingfederate::install_dir}/local/etc/pf-admin-cfg.json":
+    ensure   => 'present',
+    mode     => 'u=rx,go=',
+    owner    => $::pingfederate::owner,
+    group    => $::pingfederate::group,
+    content  => template('pingfederate/pf-admin-cfg.json.erb')
   }
 }

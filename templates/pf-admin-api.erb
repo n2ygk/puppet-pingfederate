@@ -17,9 +17,6 @@ import time
 import sys
 import io
 
-adm_user = '<%= @adm_user -%>'
-adm_pass = '<%= @adm_pass -%>'
-base_URL = '<%= @adm_api_baseURL -%>/'
 
 def do_req(retries,method,url,**kwargs):
   """
@@ -42,6 +39,10 @@ def do_req(retries,method,url,**kwargs):
 
 
 parser = OptionParser(usage='%prog [options] resource')
+parser.add_option('-c','--config',
+                  type='string',
+                  default='<%= @install_dir -%>/local/etc/pf-admin-cfg.json',
+                  help='Name of configuration file [default: %default]')
 parser.add_option('-m','--method',
                   type='string',
                   default='GET',
@@ -74,6 +75,12 @@ if len(arg) < 1 or opt.method not in ['GET','PUT','POST','PATCH','DELETE']:
   exit(1)
   
 resource = arg[0]
+
+cfile = io.open(opt.config,'rb')
+cfg = json.load(cfile)
+if 'user' not in cfg or 'pass' not in cfg or 'baseURL' not in cfg:
+  print("configuration file %s must contain 'user', 'pass', 'baseURL'"%opt.config,file=sys.stderr)
+
 header = {'X-XSRF-Header': '1'}
 
 if opt.json:
@@ -86,7 +93,7 @@ else:
 if not opt.verify:
   requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
   
-url = base_URL+resource
+url = cfg['baseURL']+'/'+resource
 
 # try and make POST idempotent. A prior response file must already exist as that's the source of the 'id'.
 # if it exists, add the 'id' to the JSON doc and change the POST to a PUT.
@@ -102,7 +109,7 @@ if opt.method == 'POST' and opt.response != '-' and data:
   if resp and 'id' in resp:
     existing = do_req(opt.retries,'GET',
                       url+'/'+resp['id'],
-                      auth=requests.auth.HTTPBasicAuth(adm_user,adm_pass),
+                      auth=requests.auth.HTTPBasicAuth(cfg['user'],cfg['pass']),
                       headers=header,
                       timeout=opt.timeout,
                       verify=opt.verify)
@@ -114,7 +121,7 @@ if opt.method == 'POST' and opt.response != '-' and data:
 
 response = do_req(opt.retries,opt.method,
                   url, 
-                  auth=requests.auth.HTTPBasicAuth(adm_user,adm_pass),
+                  auth=requests.auth.HTTPBasicAuth(cfg['user'],cfg['pass']),
                   data=dataString,
                   headers=header,
                   timeout=opt.timeout,
