@@ -314,6 +314,10 @@ $ /opt/pingfederate/local/bin/pf-admin-api -c a.json serverSettings >templates/s
 ```
 
 ### To-do list of templated json settings
+Note that adding some API calls changed settings in /opt/pingfederate/server/default/data/sourceid-saml2-local-metadata.xml
+which Puppet then restored via the augeas type. It turns out I was setting attributes that I don't care about. Those then later
+got changed as a side-effect of the API calls. The fix was to have augeas only touch what it needs to change.
+
 - serverSettings [done]
 - dataStores [done]
   See above.
@@ -322,9 +326,8 @@ $ /opt/pingfederate/local/bin/pf-admin-api -c a.json serverSettings >templates/s
   management. They use the deprecated pf-ws API `https://localhost:9031/pf-ws/rest/oauth/clients` which needs
   its own
   [simple password credential store](https://documentation.pingidentity.com/display/PF610/Configuring+the+Simple+Credential+Validator#ConfiguringtheSimpleCredentialValidator-1046710).
-  Note that adding this via the API changed some initial settings in /opt/pingfederate/server/default/data/sourceid-saml2-local-metadata.xml
-  which Puppet then trashes from the erb template. Need to fix the template.
-- authenticationPolicyContracts
+- authenticationPolicyContracts [done]
+  See this erb template for an example of using a multivalued array.
 - sp/idpConnections
   This PF server is an SP peering with the Shibboleth SAML2 IdP.
 - idp/adapters
