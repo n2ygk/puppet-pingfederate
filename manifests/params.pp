@@ -68,6 +68,9 @@ class pingfederate::params {
   $saml1_local_issuerID                = "${facts['hostname']}-ping:urn:saml1"
   $wsfed_local_realm                   = "${facts['hostname']}-ping:urn:wsfed"
   $saml2_local_baseURL                 = "https://${facts['fqdn']}:${https_port}"
+  $saml2_sp_auth_policy_name           = undef
+  $saml2_sp_auth_policy_core_attrs     = ['subject']
+  $saml2_sp_auth_policy_extd_attrs     = undef
   $cors_allowedOrigins                 = '*'
   $cors_allowedMethods                 = 'GET,OPTIONS,POST'
   $cors_filter_mapping                 = '/*'
@@ -86,4 +89,6 @@ class pingfederate::params {
   $oauth_jdbc_jar                      = undef
   $oauth_jdbc_validate                 = undef
   $oauth_jdbc_ddl_cmd                  = undef
+  $oauth_client_mgr_user               = 'clientmgr'
+  $oauth_client_mgr_pass               = 'ProviderP@55'
 }

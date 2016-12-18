@@ -1,0 +1,144 @@
+{
+  "errorPageMsgId": "", 
+  "name": "Columbia University", 
+  "loggingMode": "STANDARD", 
+  "virtualEntityIds": [], 
+  "licenseConnectionGroup": "", 
+  "idpBrowserSso": {
+    "idpIdentityMapping": "ACCOUNT_MAPPING", 
+    "defaultTargetUrl": "", 
+    "protocol": "SAML20", 
+    "decryptionPolicy": {
+      "sloEncryptSubjectNameID": false, 
+      "sloSubjectNameIDEncrypted": false, 
+      "subjectNameIdEncrypted": false, 
+      "attributesEncrypted": false, 
+      "assertionEncrypted": false
+    }, 
+    "ssoServiceEndpoints": [
+      {
+        "url": "https://shibboleth-dev.cc.columbia.edu/idp/profile/SAML2/POST/SSO", 
+        "binding": "POST"
+      }, 
+      {
+        "url": "https://shibboleth-dev.cc.columbia.edu/idp/profile/SAML2/Redirect/SSO", 
+        "binding": "REDIRECT"
+      }
+    ], 
+    "adapterMappings": [], 
+    "enabledProfiles": [
+      "SP_INITIATED_SSO"
+    ], 
+    "assertionsSigned": false, 
+    "signAuthnRequests": false, 
+    "ssoOAuthMapping": {
+      "attributeContractFulfillment": {
+        "USER_KEY": {
+          "source": {
+            "type": "ASSERTION"
+          }, 
+          "value": "SAML_SUBJECT"
+        }, 
+        "USER_NAME": {
+          "source": {
+            "type": "ASSERTION"
+          }, 
+          "value": "SAML_SUBJECT"
+        }, 
+        "group": {
+          "source": {
+            "type": "EXPRESSION"
+          }, 
+          "value": "#result=#this.get(\"urn:oid:1.3.6.1.4.1.5923.1.1.1.1.9\").toString(),  #result=#result.replace(\"[\", \"[\\\"\"), #result=#result.replace(\"]\", \"\\\"]\"),  #result=#result.replace(\",\", \"\\\",\\\"\"), #result=#result.replace(\" \", \"\")"
+        }
+      }, 
+      "issuanceCriteria": {
+        "conditionalCriteria": []
+      }, 
+      "attributeSources": []
+    }, 
+    "attributeContract": {
+      "coreAttributes": [
+        {
+          "name": "SAML_SUBJECT", 
+          "masked": false
+        }
+      ], 
+      "extendedAttributes": [
+        {
+          "name": "urn:oid:1.3.6.1.4.1.5923.1.1.1.1.9", 
+          "masked": false
+        }
+      ]
+    }, 
+    "authenticationPolicyContractMappings": [
+      {
+        "attributeSources": [], 
+        "attributeContractFulfillment": {
+          "pingAffiliation": {
+            "source": {
+              "type": "EXPRESSION"
+            }, 
+            "value": "#result=#this.get(\"urn:oid:1.3.6.1.4.1.5923.1.1.1.1.9\").toString(), #result=#result.replace(\"[\", \"[\\\"\"), #result=#result.replace(\"]\", \"\\\"]\"), #result=#result.replace(\",\", \"\\\",\\\"\"), #result=#result.replace(\" \", \"\") "
+          }, 
+          "subject": {
+            "source": {
+              "type": "ASSERTION"
+            }, 
+            "value": "SAML_SUBJECT"
+          }
+        }, 
+        "authenticationPolicyContractRef": {
+          "id": "yqUZpWvzr3NmJPej", 
+          "location": "https://ac45devapp01.cc.columbia.edu:9999/pf-admin-api/v1/authenticationPolicyContracts/yqUZpWvzr3NmJPej"
+        }, 
+        "restrictVirtualServerIds": false, 
+        "restrictedVirtualServerIds": [], 
+        "issuanceCriteria": {
+          "conditionalCriteria": []
+        }
+      }
+    ], 
+    "incomingBindings": [
+      "REDIRECT", 
+      "POST"
+    ]
+  }, 
+  "active": true, 
+  "credentials": {
+    "certs": [
+      {
+        "secondaryVerificationCert": false, 
+        "certView": {
+          "status": "VALID", 
+          "serialNumber": "867315226722407216585592144558928562819725383542", 
+          "version": 3, 
+          "sha1Fingerprint": "A2EF19931EFAF63ED7BF12CC9F9717454CFC396B", 
+          "sha256Fingerprint": "C85F756D2F5BAE30CEC6476C9284A692799878FF42BF0DD069278C1204104EA0", 
+          "issuerDN": "CN=shibboleth-dev.cc.columbia.edu", 
+          "expires": "2033-05-17T15:04:28.000Z", 
+          "subjectDN": "CN=shibboleth-dev.cc.columbia.edu", 
+          "keySize": 2048, 
+          "md5Fingerprint": "FE38C3C0A430512C6663333301B6BC08", 
+          "keyAlgorithm": "RSA", 
+          "validFrom": "2013-05-17T15:04:28.000Z", 
+          "id": "i8hlbnmdsrokse4d3e6qh0ldx", 
+          "signatureAlgorithm": "SHA1withRSA"
+        }, 
+        "primaryVerificationCert": true, 
+        "encryptionCert": false, 
+        "x509File": {
+          "fileData": "-----BEGIN CERTIFICATE-----\nMIIDZjCCAk6gAwIBAgIVAJfrwoV8YNvMXzQxy/P+tTmLVdd2MA0GCSqGSIb3DQEBBQUAMCkxJzAl\nBgNVBAMTHnNoaWJib2xldGgtZGV2LmNjLmNvbHVtYmlhLmVkdTAeFw0xMzA1MTcxNTA0MjhaFw0z\nMzA1MTcxNTA0MjhaMCkxJzAlBgNVBAMTHnNoaWJib2xldGgtZGV2LmNjLmNvbHVtYmlhLmVkdTCC\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJ0C0taW9a9Ifp5quu28ogl7In9uu5CXgoDV\n8MKcE7WtbW8dCh98h17SIsbZKvFxJqj4xTskGefW7qli6m7aa8sxR47RXrPmkFxUEndg01eQE0Oa\nYl6E6E7OfN2f8yL6PO0/rFA3FF9wImpTuUo2jcMk0LEES1sjKc4CjOpOhNmf//x20LmNn5h8yPYh\nGxjUcT4pDXQlKPaGuPY+lheOKW4AukyjBWkRvCzpxbohC8DlRtsUUznmmVhlaIsQNcjx7GsjbL7B\nPAjomyWEgOU6GLaS8XIRe5tER8o2cj4pPttmQ8BhNY3VZSUqVinszbuL+m1+LctfN5mWgvmSzYLK\nL6ECAwEAAaOBhDCBgTBgBgNVHREEWTBXgh5zaGliYm9sZXRoLWRldi5jYy5jb2x1bWJpYS5lZHWG\nNWh0dHBzOi8vc2hpYmJvbGV0aC1kZXYuY2MuY29sdW1iaWEuZWR1L2lkcC9zaGliYm9sZXRoMB0G\nA1UdDgQWBBQrL3ArXajqiuTyb0y8+/0voOBA3zANBgkqhkiG9w0BAQUFAAOCAQEAUiOmFYXrIdxq\nrTpOe9QgkFd2fSb+6h14gecI7iL/wHJVPeN+VO84+7eRBUkDdTJbikmA8BySCBKkMChGxTeNLkRe\nJat7XaKs8AkK7fm7aliuTliR/nqd/ccY2NCPlySg/uFH/tzZ8OYF08Id2Zl8iPBOmIo9yG1XPNus\nLYlSepQcQRceGMz3bHYK0QJz9puBoY2sgTU116eKuP4Qihb94t+wojt+7GWQ2c5LU6gzuIiZPyXg\n+S8QGma0M7/0tx6diJwR5kLUAK8pgiKg6MLZLa4NU04EGK39M2kH31UrAo2J12U/jYwyS8iRI5c+\nJqaqVlKMyT94KnBx39pwbQzyaw==\n-----END CERTIFICATE-----\n"
+        }
+      }
+    ]
+  }, 
+  "entityId": "https://shibboleth-dev.cc.columbia.edu/idp/shibboleth", 
+  "contactInfo": {
+    "lastName": "IDM", 
+    "email": "cuit-idm-tech@columbia.edu", 
+    "firstName": "CUIT"
+  }, 
+  "type": "IDP", 
+  "id": "_-TER2o9AE2WuQQBiBWgApAzQKR"
+}

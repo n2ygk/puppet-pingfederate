@@ -313,6 +313,33 @@ Then, resource at a time, template a new JSON file:
 $ /opt/pingfederate/local/bin/pf-admin-api -c a.json serverSettings >templates/serverSettings.json.erb
 ```
 
-
-
-
+### To-do list of templated json settings
+- serverSettings [done]
+- dataStores [done]
+  See above.
+- passwordCredentialValidators [done]
+  My purpose for setting up this PingFederate server is to use it with MuleSoft's AnyPoint Platform for client
+  management. They use the deprecated pf-ws API `https://localhost:9031/pf-ws/rest/oauth/clients` which needs
+  its own
+  [simple password credential store](https://documentation.pingidentity.com/display/PF610/Configuring+the+Simple+Credential+Validator#ConfiguringtheSimpleCredentialValidator-1046710).
+  Note that adding this via the API changed some initial settings in /opt/pingfederate/server/default/data/sourceid-saml2-local-metadata.xml
+  which Puppet then trashes from the erb template. Need to fix the template.
+- authenticationPolicyContracts
+- sp/idpConnections
+  This PF server is an SP peering with the Shibboleth SAML2 IdP.
+- idp/adapters
+  Facebook, etc. social login.
+- oauth/accessTokenManagers
+- oauth/acccesTokenMappings
+- oauth/authenticationPolicyContractMappings
+- oauth/authServerSettings
+  scope descriptions might not be needed...
+- oauth/clients
+  these will be dynamically added by the pf-ws/rest/oauth/clients API.
+- oauth/idpAdapterMappings
+- oauth/openIdConnect/settings
+- oauth/openIdConnect/policies
+- authenticationSelectors/descriptors
+  Seems connected to the scopes in oauth/authServerSettings
+- keyPairs
+  Probably don't need to tweak these.

@@ -113,59 +113,75 @@ class pingfederate::config inherits ::pingfederate {
   }
 
   # create local built-in SAML2 IdP so the adm_user can login
+  # N.B. This stuff gets changed when pf-admin-api calls are used to configured SPs and IdPs.
+  # Make sure you sync up all the attributes.
   $saml_file = "$::pingfederate::install_dir/server/default/data/sourceid-saml2-local-metadata.xml"
+  # XXX or, just don't manage these fields via Augeas!
+  # $EnableWsFedSP = 'true' if ${::pingfederate::wsfed_local_realm} else 'false'
+  # if $::pingfederate::saml2_local_entityID {
+  #   $EnableSaml20IdP = 'true'
+  #   $EnableSaml20Sp = 'true'
+  # }
+  # if $::pingfederate::saml1_local_issuerID {  
+  #   $EnableSaml11Rp = "true"
+  #   $EnableSaml10Rp = 'true'
+  #   $EnableSpWsTrustSts = 'true'
+  #   $EnableIdpDynaFed = 'true'
+  # }
   augeas{$saml_file:
     lens    => 'Xml.lns',
     incl    => $saml_file,
     context => "/files/${saml_file}",
     changes =>
     [
-     "set EntityDescriptor/#attribute/entityID \"${::pingfederate::saml1_local_entityID}\"", # don't know why this is saml1 and not saml2
+     "set EntityDescriptor/#attribute/entityID \"${::pingfederate::saml2_local_entityID}\"",
      'set EntityDescriptor/#attribute/cacheDuration "PT1440M"',
      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/BaseURL \"${::pingfederate::saml2_local_baseURL}\"",
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/DynaFedID ""',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/Saml1xId ""',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/WsFedID ""',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/Saml1xSrcId ""',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableWsFedIdP "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableWsFedSp "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml20IdP "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml20Sp "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml11Rp "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml11Ap "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml10Rp "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml10Ap "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSpWsTrustSts "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableInboundProvisioning "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableIdpWsTrustSts "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableX509Discovery "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableIdpDiscovery "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableIdpDynaFed "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSpDynaFed "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/DisableAutomaticConnectionValidation "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/DataStoreValidationInterval "300"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/CustomGlobalHttpHeaderName ""',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ClientIpHeaderIndex "last"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ForwardedHostHeaderName ""',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ForwardedHostHeaderIndex "last"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ProxyTerminatesHttpsConns "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/MetadataSigningKeyAlias ""',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/MetadataSigningAlgorithm ""',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/MetadataSigningKeyMD5Fingerprint ""',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ConfirmIdpSlo "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ClientCertSSLHeaderName ""',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ClientCertChainSSLHeaderName ""',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableOIDCSp "false"',
-     'clear EntityDescriptor/Extensions/sid:SourceIDExtension/sid:ApplicationURLs',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/CommonDomainServer "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/IdPCommonDomainClient "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/SPCommonDomainClient "false"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/WriteCookiePath "/writecookie.cdc"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/ReadCookiePath "/readcookie.cdc"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/sid:CommonDomainClient/#attribute/CommonDomainServiceBaseUrl ""',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/sid:CommonDomainService/#attribute/CommonDomain ""',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/sid:CommonDomainService/#attribute/CookieLifeDays "365"',
-     'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:ErrPageMsg/#text "errorDetail.idpSsoFailure"']
+     "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/DynaFedID \"${::pingfederate::saml2_local_baseURL}\"",
+     "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/Saml1xId \"${::pingfederate::saml1_local_issuerID}\"",
+     "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/WsFedID \"${::pingfederate::wsfed_local_realm}\"",
+     ]
+    # XXX don't set things that get changed from elsewhere and the defaults are fine.
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/Saml1xSrcId ""',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableWsFedIdP "false"',
+     # "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableWsFedSp \"${EnableWsFedSP}\"",
+     # "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml20IdP \"${EnableSaml20IdP}\"",
+     # "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml20Sp  \"${EnableSaml20Sp}\"",
+     # "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml11Rp \"${EnableSaml11Rp}\"",
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml11Ap "false"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml10Rp "false"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml10Ap "false"',
+     # "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSpWsTrustSts \"${EnableSpWsTrustSts}\"",
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableInboundProvisioning "false"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableIdpWsTrustSts "false"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableX509Discovery "false"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableIdpDiscovery "false"',
+     # "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableIdpDynaFed \"${EnableIdpDynaFed\"",
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSpDynaFed "false"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/DisableAutomaticConnectionValidation "false"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/DataStoreValidationInterval "300"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/CustomGlobalHttpHeaderName ""',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ClientIpHeaderIndex "last"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ForwardedHostHeaderName ""',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ForwardedHostHeaderIndex "last"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ProxyTerminatesHttpsConns "false"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/MetadataSigningKeyAlias ""',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/MetadataSigningAlgorithm ""',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/MetadataSigningKeyMD5Fingerprint ""',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ConfirmIdpSlo "false"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ClientCertSSLHeaderName ""',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ClientCertChainSSLHeaderName ""',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableOIDCSp "false"',
+     # 'clear EntityDescriptor/Extensions/sid:SourceIDExtension/sid:ApplicationURLs',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/CommonDomainServer "false"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/IdPCommonDomainClient "false"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/SPCommonDomainClient "false"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/WriteCookiePath "/writecookie.cdc"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/ReadCookiePath "/readcookie.cdc"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/sid:CommonDomainClient/#attribute/CommonDomainServiceBaseUrl ""',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/sid:CommonDomainService/#attribute/CommonDomain ""',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/sid:CommonDomainService/#attribute/CookieLifeDays "365"',
+     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:ErrPageMsg/#text "errorDetail.idpSsoFailure"']
   }
 
   # enable OGNL expressions

@@ -59,5 +59,5 @@ for r in $resources; do
     /opt/pingfederate/local/bin/pf-admin-api -c $a $r >/tmp/$aname
     /opt/pingfederate/local/bin/pf-admin-api -c $b $r >/tmp/$bname
     diff -C 0 /tmp/$aname /tmp/$bname
-    rm -f /tmp/$aname /tmp/$bname
+    #rm -f /tmp/$aname /tmp/$bname
 done

@@ -3,19 +3,54 @@
 # Configure the server settings via the admin API
 #
 class pingfederate::server_settings inherits ::pingfederate {
-  $ss = "${::pingfederate::install_dir}/local/etc/serverSettings.json"
-  file {$ss:
+  $pfapi = "${::pingfederate::install_dir}/local/bin/pf-admin-api"
+  $etc = "${::pingfederate::install_dir}/local/etc"
+
+  $ss = "serverSettings"
+  file { "${etc}/${ss}.json":
     ensure   => 'present',
     mode     => 'a=r',
     owner    => $::pingfederate::owner,
     group    => $::pingfederate::group,
-    content  => template('pingfederate/serverSettings.json.erb'),
+    content  => template("pingfederate/${ss}.json.erb"),
   } ~> 
-  exec {'pf-admin-api POST serverSettings':
-    command     => "${::pingfederate::install_dir}/local/bin/pf-admin-api -m PUT -j ${ss} -r ${ss}.out serverSettings", #  || rm -f ${ss}
+  exec {"pf-admin-api PUT ${ss}":
+    command     => "${pfapi} -m PUT -j ${etc}/${ss}.json -r ${etc}/${ss}.json.out ${ss}", #  || rm -f ${ss}.json
     refreshonly => true,
     user        => $::pingfederate::owner,
     logoutput   => true,
+  }
+
+  $pcv = "passwordCredentialValidators"
+  file {"${etc}/${pcv}.json":
+    ensure   => 'present',
+    mode     => 'a=r',
+    owner    => $::pingfederate::owner,
+    group    => $::pingfederate::group,
+    content  => template("pingfederate/${pcv}.json.erb"),
+  } ~> 
+  exec {"pf-admin-api POST ${pcv}":
+    command     => "${pfapi} -m POST -j ${etc}/${pcv}.json -r ${etc}/${pcv}.json.out ${pcv}", #  || rm -f ${pcv}.json
+    refreshonly => true,
+    user        => $::pingfederate::owner,
+    logoutput   => true,
+  }
+
+  if $::pingfederate::saml2_sp_auth_policy_name {
+    $apc = "authenticationPolicyContracts"
+    file {"${etc}/${apc}.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${apc}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${apc}":
+      command     => "${pfapi} -m POST -j ${etc}/${apc}.json -r ${etc}/${apc}.json.out ${apc}", #  || rm -f ${apc}.json
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
   }
 }
 

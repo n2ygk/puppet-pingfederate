@@ -319,6 +319,34 @@ If it is `undef` then the default internal XML-based datastore will be used.
 [*oauth_jdbc_ddl_cmd*]
   Command to execute to initialize the database schema.
 
+#### OAuth client manager
+The OAuth client manager API is used to add OAuth clients to the PingFederate service.
+(This capability is required for MuleSoft AnyPoint API Manager functionality, for example.)
+You should override the user name and/or password when invoking the pingfederate class.
+
+[*oauth_client_mgr_user*]
+  Oauth client manager user name. Default `clientmgr`
+  (If you need to have more than one client manager user, you'll need to enhance this module
+  to deal with that.)
+
+[*oauth_client_mgr_pass*]
+  Oauth client manager user password. Default `ProviderP@55`
+  Make sure the password you supply meets the minimum password requirements or you may see this:
+  ```
+Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns: (422, '')
+Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns: {
+Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns:   "validationErrors": [
+Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns:     {
+Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns:       "fieldPath": "configuration.tables[0].rows[0].fields[1].value",
+Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns:       "message": "Password must contain at least 8 characters, at least 1 numeric character, at least 1 uppercase and 1 lowercase letter, at least 2 alphabetic characters.",
+Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns:       "errorId": "plugin_validation_error"
+Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns:     }
+Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns:   ],
+Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns:   "message": "Validation error(s) occurred. Please review the error(s) and address accordingly.",
+Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns:   "resultId": "validation_error"
+Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns: }
+  ```
+
 ## Limitations
 
 This has only been tested on EL 6 with Java 1.8. It might work elsewhere. Let me know!

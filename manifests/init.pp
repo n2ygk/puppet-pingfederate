@@ -91,6 +91,10 @@ class pingfederate (
   $saml1_local_issuerID                = $::pingfederate::params::saml1_local_issuerID,
   $wsfed_local_realm                   = $::pingfederate::params::wsfed_local_realm,
   $saml2_local_baseURL                 = $::pingfederate::params::saml2_local_baseURL,
+  # SAML2 SP configuration
+  $saml2_sp_auth_policy_name           = $::pingfederate::params::saml2_sp_auth_policy_name,
+  $saml2_sp_auth_policy_core_attrs     = $::pingfederate::params::saml2_sp_auth_policy_core_attrs,
+  $saml2_sp_auth_policy_extd_attrs     = $::pingfederate::params::saml2_sp_auth_policy_extd_attrs,
   # Enable Cross-Origin Resource Sharing (CORS)
   $cors_allowedOrigins                 = $::pingfederate::params::cors_allowedOrigins,
   $cors_allowedMethods                 = $::pingfederate::params::cors_allowedMethods,
@@ -112,6 +116,9 @@ class pingfederate (
   $oauth_jdbc_jar                      = $::pingfederate::params::oauth_jdbc_jar,
   $oauth_jdbc_validate                 = $::pingfederate::params::oauth_jdbc_validate,
   $oauth_jdbc_ddl_cmd                  = $::pingfederate::params::oauth_jdbc_ddl_cmd,
+  # OAuth client manager credentials
+  $oauth_client_mgr_user               = $::pingfederate::params::oauth_client_mgr_user,
+  $oauth_client_mgr_pass               = $::pingfederate::params::oauth_client_mgr_pass,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])

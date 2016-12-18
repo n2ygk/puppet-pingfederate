@@ -1,0 +1,15 @@
+<%# turn the the core and extended attribute arrays into JSON. -%>
+<%# A little ugly since JSON doesn't allow final commas in lists -%>
+{
+  "name": "<%= @saml2_sp_auth_policy_name -%>",
+  "coreAttributes": [
+<% @saml2_sp_auth_policy_core_attrs.each_with_index do |val, i| -%>
+    { "name": "<%= val -%>" }<%= ',' if i < (@saml2_sp_auth_policy_core_attrs.size - 1) %>
+<% end -%>
+  ], 
+  "extendedAttributes": [
+<% @saml2_sp_auth_policy_extd_attrs.each_with_index  do |val, i| -%>
+    { "name": "<%= val -%>" }<%= ',' if i < (@saml2_sp_auth_policy_extd_attrs.size - 1) %>
+<% end -%>
+  ]
+}
