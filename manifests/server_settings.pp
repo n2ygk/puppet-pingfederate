@@ -52,5 +52,22 @@ class pingfederate::server_settings inherits ::pingfederate {
       logoutput   => true,
     }
   }
+
+  $oas = "oauth/authServerSettings"
+  $oasf = "oauth_authServerSettings"
+  file {"${etc}/${oasf}.json":
+    ensure   => 'present',
+    mode     => 'a=r',
+    owner    => $::pingfederate::owner,
+    group    => $::pingfederate::group,
+    content  => template("pingfederate/${oasf}.json.erb"),
+  } ~> 
+  exec {"pf-admin-api PUT ${oas}":
+    command     => "${pfapi} -m PUT -j ${etc}/${oasf}.json -r ${etc}/${oasf}.json.out ${oas}", #  || rm -f ${oasf}.json
+    refreshonly => true,
+    user        => $::pingfederate::owner,
+    logoutput   => true,
+  }
+
 }
 

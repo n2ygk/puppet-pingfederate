@@ -346,6 +346,12 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
 Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns:   "resultId": "validation_error"
 Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns: }
   ```
+#### OAuth server settings
+[*oauth_svc_grant_core_attrs*]
+  Oauth server persistent grant contract core attributes. Default: `['USER_KEY','USER_NAME']`
+
+[*oauth_svc_grant_extd_attrs*]
+  Oauth server persistent grant contract extended attributes.
 
 ## Limitations
 

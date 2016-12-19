@@ -1,0 +1,31 @@
+{
+  "scopes": [ <%# fill these in later as needed -%> ], 
+  "persistentGrantReuseGrantTypes": [
+    "IMPLICIT"<%# TBD if this needs to be parameterized -%>
+  ], 
+  "adminWebServicePcvRef": {
+    "id": "simplecredential"<%# this is the name I used in passwordCredentialValidators -%>
+  }, 
+  "defaultScopeDescription": "OAuth server", 
+  "allowUnidentifiedClientExtensionGrants": false, 
+  "rollRefreshTokenValues": true, 
+  "persistentGrantContract": {
+    "coreAttributes": [
+<% @oauth_svc_grant_core_attrs.each_with_index do |val, i| -%>
+      { "name": "<%= val -%>" }<%= ',' if i < (@oauth_svc_grant_core_attrs.size - 1) %>
+<% end -%>
+    ], 
+    "extendedAttributes": [
+<% @oauth_svc_grant_extd_attrs.each_with_index do |val, i| -%>
+      { "name": "<%= val -%>" }<%= ',' if i < (@oauth_svc_grant_extd_attrs.size - 1) %>
+<% end -%>
+    ]
+  }, 
+  "refreshRollingInterval": 0, 
+  "bypassAuthorizationForApprovedGrants": false, 
+  "allowUnidentifiedClientROCreds": false, 
+  "authorizationCodeTimeout": 60, 
+  "authorizationCodeEntropy": 30, 
+  "refreshTokenLength": 42, 
+  "scopeGroups": []
+}

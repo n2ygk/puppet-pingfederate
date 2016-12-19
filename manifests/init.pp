@@ -119,6 +119,8 @@ class pingfederate (
   # OAuth client manager credentials
   $oauth_client_mgr_user               = $::pingfederate::params::oauth_client_mgr_user,
   $oauth_client_mgr_pass               = $::pingfederate::params::oauth_client_mgr_pass,
+  $oauth_svc_grant_core_attrs          = $::pingfederate::params::oauth_svc_grant_core_attrs,
+  $oauth_svc_grant_extd_attrs          = $::pingfederate::params::oauth_svc_grant_extd_attrs,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])

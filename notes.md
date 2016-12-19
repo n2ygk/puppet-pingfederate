@@ -327,7 +327,9 @@ got changed as a side-effect of the API calls. The fix was to have augeas only t
   its own
   [simple password credential store](https://documentation.pingidentity.com/display/PF610/Configuring+the+Simple+Credential+Validator#ConfiguringtheSimpleCredentialValidator-1046710).
 - authenticationPolicyContracts [done]
-  See this erb template for an example of using a multivalued array.
+  See [this erb template](templates/authenticationPolicyContracts.json.erb) for an example of using a multivalued array.
+- oauth/authServerSettings [done]
+  May need to add and/or parameterize a few more fields later.
 - sp/idpConnections
   This PF server is an SP peering with the Shibboleth SAML2 IdP.
 - idp/adapters
@@ -335,7 +337,6 @@ got changed as a side-effect of the API calls. The fix was to have augeas only t
 - oauth/accessTokenManagers
 - oauth/acccesTokenMappings
 - oauth/authenticationPolicyContractMappings
-- oauth/authServerSettings
   scope descriptions might not be needed...
 - oauth/clients
   these will be dynamically added by the pf-ws/rest/oauth/clients API.
