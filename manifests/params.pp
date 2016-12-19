@@ -70,7 +70,7 @@ class pingfederate::params {
   $saml2_local_baseURL                 = "https://${facts['fqdn']}:${https_port}"
   $saml2_sp_auth_policy_name           = undef
   $saml2_sp_auth_policy_core_attrs     = ['subject']
-  $saml2_sp_auth_policy_extd_attrs     = undef
+  $saml2_sp_auth_policy_extd_attrs     = []
   $cors_allowedOrigins                 = '*'
   $cors_allowedMethods                 = 'GET,OPTIONS,POST'
   $cors_filter_mapping                 = '/*'
@@ -92,5 +92,9 @@ class pingfederate::params {
   $oauth_client_mgr_user               = 'clientmgr'
   $oauth_client_mgr_pass               = 'ProviderP@55'
   $oauth_svc_grant_core_attrs          = ['USER_KEY','USER_NAME']
-  $oauth_svc_grant_extd_attrs          = undef
+  $oauth_svc_grant_extd_attrs          = []
+  $oauth_svc_acc_tok_mgr_id            = undef
+  $oauth_svc_acc_tok_mgr_name          = undef
+  $oauth_svc_acc_tok_mgr_core_attrs    = []
+  $oauth_svc_acc_tok_mgr_extd_attrs    = []
 }

@@ -353,6 +353,19 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
 [*oauth_svc_grant_extd_attrs*]
   Oauth server persistent grant contract extended attributes.
 
+#### OAuth Access Token Managers
+[*oauth_svc_acc_tok_mgr_id*]
+  ID
+
+[*oauth_svc_acc_tok_mgr_name*]
+  Name
+
+[*oauth_svc_acc_tok_mgr_core_attrs*]
+  List of core attributes.
+
+[*oauth_svc_acc_tok_mgr_extd_attrs*]
+  List of extended attributes.
+
 ## Limitations
 
 This has only been tested on EL 6 with Java 1.8. It might work elsewhere. Let me know!

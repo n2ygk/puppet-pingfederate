@@ -69,5 +69,22 @@ class pingfederate::server_settings inherits ::pingfederate {
     logoutput   => true,
   }
 
+  if $::pingfederate::oauth_svc_acc_tok_mgr_id {
+    $atm = "oauth/accessTokenManagers"
+    $atmf = "oauth_accessTokenManagers"
+    file {"${etc}/${atmf}.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${atmf}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${atm}":
+      command     => "${pfapi} -m POST -j ${etc}/${atmf}.json -r ${etc}/${atmf}.json.out ${atm}", #  || rm -f ${atmf}.json
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+  }
 }
 

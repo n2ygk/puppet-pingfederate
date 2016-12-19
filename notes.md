@@ -329,15 +329,16 @@ got changed as a side-effect of the API calls. The fix was to have augeas only t
 - authenticationPolicyContracts [done]
   See [this erb template](templates/authenticationPolicyContracts.json.erb) for an example of using a multivalued array.
 - oauth/authServerSettings [done]
-  May need to add and/or parameterize a few more fields later.
+  May need to add and/or parameterize a few more fields later. But I am able to succesfully invoke the pf-ws client create.
+- oauth/accessTokenManagers [done]
 - sp/idpConnections
   This PF server is an SP peering with the Shibboleth SAML2 IdP.
 - idp/adapters
   Facebook, etc. social login.
-- oauth/accessTokenManagers
-- oauth/acccesTokenMappings
+- oauth/accessTokenMappings
 - oauth/authenticationPolicyContractMappings
   scope descriptions might not be needed...
+  this one requires the 'id' assigned to the authenticationPolicyContracts/{id} to be added. This requires pulling it from somewhere....
 - oauth/clients
   these will be dynamically added by the pf-ws/rest/oauth/clients API.
 - oauth/idpAdapterMappings
