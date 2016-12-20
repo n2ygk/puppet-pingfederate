@@ -55,6 +55,10 @@ parser.add_option('-r','--response',
                   type='string',
                   default='-',
                   help='write succesful JSON response to file [default: %default]')
+parser.add_option('-i','--id',
+                  type='string',
+                  default=None,
+                  help='write resource id to file [default: %default]')
 parser.add_option('--timeout',
                   type='int',
                   default=10,
@@ -127,10 +131,15 @@ response = do_req(opt.retries,opt.method,
                   timeout=opt.timeout,
                   verify=opt.verify)
 print((response.status_code,response.reason),file=sys.stderr)
-resp = json.dumps(json.loads(response.text),indent=2) # pretty-print it
+rjson = json.loads(response.text)
+resp = json.dumps(rjson,indent=2) # pretty-print it
 if response.status_code < 400:
   output = sys.stdout if opt.response == '-' else open(opt.response,'wb')
   print(resp,file=output)
+  if opt.id:
+    id_out = open(opt.id,'wb')
+    if 'id' in rjson:
+      print(rjson['id'],file=id_out)
   exit(0)
 else:
   print(resp,file=sys.stderr)

@@ -86,5 +86,38 @@ class pingfederate::server_settings inherits ::pingfederate {
       logoutput   => true,
     }
   }
+  if $::pingfederate::oauth_oidc_policy_id {
+    $ois = "oauth/openIdConnect/settings"
+    $oisf = "oauth_openIdConnect_settings"
+    $oip = "oauth/openIdConnect/policies"
+    $oipf = "oauth_openIdConnect_policies"
+    file {"${etc}/${oipf}.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${oipf}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${oip}":
+      command     => "${pfapi} -m POST -j ${etc}/${oipf}.json -r ${etc}/${oipf}.json.out ${oip}", #  || rm -f ${oipf}.json
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+    file {"${etc}/${oisf}.json":
+      ensure   => 'present',
+      require  => File["${etc}/${oipf}.json"],
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${oisf}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api PUT ${ois}":
+      command     => "${pfapi} -m PUT -j ${etc}/${oisf}.json -r ${etc}/${oisf}.json.out ${ois}", #  || rm -f ${oisf}.json
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+  }
 }
 

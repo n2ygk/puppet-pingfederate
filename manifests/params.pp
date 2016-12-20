@@ -94,7 +94,9 @@ class pingfederate::params {
   $oauth_svc_grant_core_attrs          = ['USER_KEY','USER_NAME']
   $oauth_svc_grant_extd_attrs          = []
   $oauth_svc_acc_tok_mgr_id            = undef
-  $oauth_svc_acc_tok_mgr_name          = undef
   $oauth_svc_acc_tok_mgr_core_attrs    = []
   $oauth_svc_acc_tok_mgr_extd_attrs    = []
+  $oauth_oidc_policy_id                = undef
+  $oauth_oidc_policy_core_attrs        = []
+  $oauth_oidc_policy_extd_attrs        = []
 }

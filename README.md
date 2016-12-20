@@ -366,6 +366,22 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
 [*oauth_svc_acc_tok_mgr_extd_attrs*]
   List of extended attributes.
 
+#### OAuth OpenID Connect Policy Contracts
+[*oauth_oidc_policy_id*]
+  The ID of the policy. Default: `undef`
+
+[*oauth_oidc_policy_core_attrs*]
+  (array of hashes) Mappings from token manager core attributes to OpenID Connect attributes.
+  Each hash has the following keys:
+  - name: Name of the source
+  - type: type of the source: TOKEN or one of the other SourceTypeIdKey like TEXT, EXPRESSION and so on.
+  - value: Name of the attribute
+  Default: `[{name => 'sub', type => 'TOKEN', value =>'sub'}]`
+
+[*oauth_oidc_policy_extd_attrs*]
+  (array of hashes) Mappings from token manager core attributes to OpenID Connect attributes.
+  Default: `[]`
+  
 ## Limitations
 
 This has only been tested on EL 6 with Java 1.8. It might work elsewhere. Let me know!

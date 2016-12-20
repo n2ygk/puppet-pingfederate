@@ -1,6 +1,6 @@
 {
   "id": "<%= @oauth_svc_acc_tok_mgr_id -%>",
-  "name": "<%= @oauth_svc_acc_tok_mgr_name -%>", 
+  "name": "<%= @oauth_svc_acc_tok_mgr_id -%>",<%# just use ID as the name -%>
   "selectionSettings": {
     "resourceUris": []
   }, 
@@ -9,10 +9,11 @@
     "restrictClients": false
   }, 
   "attributeContract": {
-    "coreAttributes": [], 
+    "coreAttributes": [ 
 <% @oauth_svc_acc_tok_mgr_core_attrs.each_with_index do |val, i| -%>
       { "name": "<%= val -%>" }<%= ',' if i < (@oauth_svc_acc_tok_mgr_core_attrs.size - 1) %>
 <% end -%>
+    ],
     "extendedAttributes": [
 <% @oauth_svc_acc_tok_mgr_extd_attrs.each_with_index do |val, i| -%>
       { "name": "<%= val -%>" }<%= ',' if i < (@oauth_svc_acc_tok_mgr_extd_attrs.size - 1) %>

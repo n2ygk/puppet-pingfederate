@@ -123,9 +123,11 @@ class pingfederate (
   $oauth_svc_grant_extd_attrs          = $::pingfederate::params::oauth_svc_grant_extd_attrs,
   # OAuth Access Token Managers
   $oauth_svc_acc_tok_mgr_id            = $::pingfederate::params::oauth_svc_acc_tok_mgr_id,
-  $oauth_svc_acc_tok_mgr_name          = $::pingfederate::params::oauth_svc_acc_tok_mgr_name,
   $oauth_svc_acc_tok_mgr_core_attrs    = $::pingfederate::params::oauth_svc_acc_tok_mgr_core_attrs,
   $oauth_svc_acc_tok_mgr_extd_attrs    = $::pingfederate::params::oauth_svc_acc_tok_mgr_extd_attrs,
+  $oauth_oidc_policy_id                = $::pingfederate::params::oauth_oidc_policy_id,
+  $oauth_oidc_policy_core_map          = $::pingfederate::params::oauth_oidc_policy_core_map,
+  $oauth_oidc_policy_extd_map          = $::pingfederate::params::oauth_oidc_policy_extd_map,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])

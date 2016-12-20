@@ -313,17 +313,35 @@ Then, resource at a time, template a new JSON file:
 $ /opt/pingfederate/local/bin/pf-admin-api -c a.json serverSettings >templates/serverSettings.json.erb
 ```
 
-### To-do list of templated json settings
-Note that adding some API calls changed settings in /opt/pingfederate/server/default/data/sourceid-saml2-local-metadata.xml
-which Puppet then restored via the augeas type. It turns out I was setting attributes that I don't care about. Those then later
-got changed as a side-effect of the API calls. The fix was to have augeas only touch what it needs to change.
+### List of templated json settings resources
+See the following checklist of resources that are set via templated JSON files.
+
+#### Be careful not to over-specify
+Adding some API calls changed settings in /opt/pingfederate/server/default/data/sourceid-saml2-local-metadata.xml
+which Puppet then reverted via the augeas type. It turns out I was setting attributes that I don't care about (e.g. to
+false or empty). Those then later got changed as a side-effect of the API calls. The fix was to have augeas only touch
+what it needs to change. Lesson learned.
+
+#### Mappings require IDs from other API JSON responses
+Not that the *...Mappings* resources are a bit complicated. They need to take a unique resource ID returned
+by one API call and insert it as a reference in another PUT/POST JSON document. I was hoping maybe augeas
+could allow the <VALUE> to come from another place in the tree, but it looks like VALUEs are constants. 
+Perhaps the [concat](https://forge.puppet.com/puppetlabs/concat)
+module can be used for assembling the pieces. (I already did this a different kludgy way in
+the [templates/oauth_jdbc_augeas.erb](templates/oauth_jdbc_augeas.erb) shell script.
+Maybe [augeasfacter](https://github.com/hercules-team/augeasfacter) will help -- although that 
+requires the value to pre-exist the current puppet run -- so probably not.
+
+#### Checklist
+This checklist only shows those resources that need to be configured. Some others like keyPairs, etc.
+are automatical set to random values on each installation and don't need to be explicitly configured.
 
 - serverSettings [done]
 - dataStores [done]
-  See above.
+  See [above](#ping-oauth-client manager-service-using-mysql-jdbc).
 - passwordCredentialValidators [done]
   My purpose for setting up this PingFederate server is to use it with MuleSoft's AnyPoint Platform for client
-  management. They use the deprecated pf-ws API `https://localhost:9031/pf-ws/rest/oauth/clients` which needs
+  management. They use the deprecated pf-ws API `https://localhost:9031/pf-ws/rest/oauth/clients` which requires
   its own
   [simple password credential store](https://documentation.pingidentity.com/display/PF610/Configuring+the+Simple+Credential+Validator#ConfiguringtheSimpleCredentialValidator-1046710).
 - authenticationPolicyContracts [done]
@@ -331,6 +349,10 @@ got changed as a side-effect of the API calls. The fix was to have augeas only t
 - oauth/authServerSettings [done]
   May need to add and/or parameterize a few more fields later. But I am able to succesfully invoke the pf-ws client create.
 - oauth/accessTokenManagers [done]
+- oauth/openIdConnect/policies [done]
+  This one demonstrates using an array of hashes in the erb template.
+- oauth/openIdConnect/settings [done]
+  This references a policy set in oauth/openIdConnect/policies so has to 'require' it.
 - sp/idpConnections
   This PF server is an SP peering with the Shibboleth SAML2 IdP.
 - idp/adapters
@@ -339,12 +361,6 @@ got changed as a side-effect of the API calls. The fix was to have augeas only t
 - oauth/authenticationPolicyContractMappings
   scope descriptions might not be needed...
   this one requires the 'id' assigned to the authenticationPolicyContracts/{id} to be added. This requires pulling it from somewhere....
-- oauth/clients
-  these will be dynamically added by the pf-ws/rest/oauth/clients API.
 - oauth/idpAdapterMappings
-- oauth/openIdConnect/settings
-- oauth/openIdConnect/policies
 - authenticationSelectors/descriptors
   Seems connected to the scopes in oauth/authServerSettings
-- keyPairs
-  Probably don't need to tweak these.

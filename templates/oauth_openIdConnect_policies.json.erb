@@ -1,0 +1,35 @@
+<%# defaults are left out for optional attributes -%>
+{
+  "id": "<%= @oauth_oidc_policy_id -%>",
+  "name": "<%= @oauth_oidc_policy_id -%>",<%# just use ID as the name -%>
+  "accessTokenManagerRef": {
+    "id": "<%= @oauth_svc_acc_tok_mgr_id -%>", 
+    "location": "<%= @adm_api_baseURL -%>/oauth/accessTokenManagers/<%= @oauth_svc_acc_tok_mgr_id -%>"
+  }, 
+  "attributeContract": {
+    "coreAttributes": [
+<% @oauth_oidc_policy_core_map.each_with_index do |val, i| -%>
+      { "name": "<%= val['name'] -%>" }<%= ',' if i < (@oauth_oidc_policy_core_attrs.size - 1) %>
+<% end -%>
+    ], 
+    "extendedAttributes": [
+<% @oauth_oidc_policy_extd_map.each_with_index do |val, i| -%>
+      { "name": "<%= val['name'] -%>" }<%= ',' if i < (@oauth_oidc_policy_extd_attrs.size - 1) %>
+<% end -%>
+    ]
+  }, 
+<%# combine the two lists into one -%>
+<% @l = @oauth_oidc_policy_extd_map + @oauth_oidc_policy_core_map -%>
+  "attributeMapping": {
+    "attributeContractFulfillment": {
+<% @l.each_with_index do |val, i| -%>
+      "<%= val['name'] -%>": {
+        "source": {
+          "type": "<%= val['type'] -%>"
+        }, 
+        "value": "<%= val['value'] -%>"
+      }<%= ',' if i < (@l.size - 1) %> 
+<% end -%>
+    }
+  }
+}
