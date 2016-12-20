@@ -9,12 +9,12 @@
   "attributeContract": {
     "coreAttributes": [
 <% @oauth_oidc_policy_core_map.each_with_index do |val, i| -%>
-      { "name": "<%= val['name'] -%>" }<%= ',' if i < (@oauth_oidc_policy_core_attrs.size - 1) %>
+      { "name": "<%= val['name'] -%>" }<%= ',' if i < (@oauth_oidc_policy_core_map.size - 1) %>
 <% end -%>
     ], 
     "extendedAttributes": [
 <% @oauth_oidc_policy_extd_map.each_with_index do |val, i| -%>
-      { "name": "<%= val['name'] -%>" }<%= ',' if i < (@oauth_oidc_policy_extd_attrs.size - 1) %>
+      { "name": "<%= val['name'] -%>" }<%= ',' if i < (@oauth_oidc_policy_extd_map.size - 1) %>
 <% end -%>
     ]
   }, 
