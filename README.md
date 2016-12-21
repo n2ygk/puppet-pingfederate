@@ -125,7 +125,13 @@ You will need to explicitly enable and configure the various social identity plu
 [*facebook_package_ensure*]
   Ensure that the package is installed.
 
-*And likewise for the following:
+[*facebook_app_id*]
+  [Facebook](https://developers.facebook.com) app ID.
+
+[*facebook_app_secret*]
+  Facebook app secret.
+
+*And likewise for the following (configuration of these adapters not yet implemented):
 [*google_adapter*]
 
 [*google_package_list*]

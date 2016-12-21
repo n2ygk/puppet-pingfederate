@@ -10,6 +10,8 @@ class pingfederate::params {
   $facebook_adapter                    = false
   $facebook_package_list               = 'pingfederate-facebook-adapter'
   $facebook_package_ensure             = 'installed'
+  $facebook_app_id                     = undef
+  $facebook_app_secret                 = undef
   $google_adapter                      = false
   $google_package_list                 = 'pingfederate-google-adapter'
   $google_package_ensure               = 'installed'

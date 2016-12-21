@@ -87,10 +87,10 @@ class pingfederate::server_settings inherits ::pingfederate {
     }
   }
   if $::pingfederate::oauth_oidc_policy_id {
-    $ois = "oauth/openIdConnect/settings"
-    $oisf = "oauth_openIdConnect_settings"
     $oip = "oauth/openIdConnect/policies"
     $oipf = "oauth_openIdConnect_policies"
+    $ois = "oauth/openIdConnect/settings"
+    $oisf = "oauth_openIdConnect_settings"
     file {"${etc}/${oipf}.json":
       ensure   => 'present',
       mode     => 'a=r',
@@ -103,7 +103,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
-    }
+    } ->
     file {"${etc}/${oisf}.json":
       ensure   => 'present',
       require  => File["${etc}/${oipf}.json"],
@@ -119,5 +119,23 @@ class pingfederate::server_settings inherits ::pingfederate {
       logoutput   => true,
     }
   }
+  if $::pingfederate::facebook_adapter {
+    $fba = "idp/adapters"
+    $fbaf = "idp_adapters_facebook"
+    file {"${etc}/${fbaf}.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${fbaf}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${fbaf}":
+      command     => "${pfapi} -m POST -j ${etc}/${fbaf}.json -r ${etc}/${fbaf}.json.out ${fba}", #  || rm -f ${fbaf}.json
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+  }
+  # TO DO: additional social adapters.
 }
 

@@ -31,6 +31,8 @@ class pingfederate (
   $facebook_adapter                    = $::pingfederate::params::facebook_adapter,
   $facebook_package_list               = $::pingfederate::params::facebook_package_list,
   $facebook_package_ensure             = $::pingfederate::params::facebook_package_ensure,
+  $facebook_app_id                     = $::pingfederate::params::facebook_app_id,
+  $facebook_app_secret                 = $::pingfederate::params::facebook_app_secret,
   $google_adapter                      = $::pingfederate::params::google_adapter,
   $google_package_list                 = $::pingfederate::params::google_package_list,
   $google_package_ensure               = $::pingfederate::params::google_package_ensure,

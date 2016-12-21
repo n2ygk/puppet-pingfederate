@@ -1,0 +1,313 @@
+<%# This is a complex adapter. The "right" way to configure it is
+    GET idp/adapters/descriptors/com.pingidentity.adapters.idp.facebook.FacebookAuthenticationAdapter
+    and configure the following based on it. For now, just use what we have from our initial example
+    and circle back later as needed. %>
+{
+  "id": "Facebook",<%# just hardcode it -%>
+  "name": "Facebook", 
+  "attributeMapping": {
+    "attributeContractFulfillment": {
+      "bio": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "bio"
+      }, 
+      "about": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "about"
+      }, 
+      "last_name": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "last_name"
+      }, 
+      "verified": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "verified"
+      }, 
+      "name": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "name"
+      }, 
+      "access_token": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "access_token"
+      }, 
+      "locale": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "locale"
+      }, 
+      "hometown": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "hometown"
+      }, 
+      "work": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "work"
+      }, 
+      "first_name": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "first_name"
+      }, 
+      "updated_time": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "updated_time"
+      }, 
+      "quotes": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "quotes"
+      }, 
+      "birthday": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "birthday"
+      }, 
+      "link": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "link"
+      }, 
+      "location": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "location"
+      }, 
+      "email": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "email"
+      }, 
+      "gender": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "gender"
+      }, 
+      "timezone": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "timezone"
+      }, 
+      "education": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "education"
+      }, 
+      "id": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "id"
+      }, 
+      "token_expires": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "token_expires"
+      }
+    } 
+  }, 
+  "attributeContract": {
+    "coreAttributes": [
+      {
+	"pseudonym": false, 
+	"name": "birthday", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "updated_time", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "hometown", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "education", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "gender", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "timezone", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "work", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "about", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "link", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "verified", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "bio", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "last_name", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "locale", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "token_expires", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "quotes", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "access_token", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": true, 
+	"name": "name", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "location", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "id", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "first_name", 
+	"masked": false
+      }
+    ], 
+    "maskOgnlValues": false, 
+    "extendedAttributes": [
+      {
+	"pseudonym": false, 
+	"name": "email", 
+	"masked": false
+      }
+    ]
+  }, 
+  "pluginDescriptorRef": {
+    "id": "com.pingidentity.adapters.idp.facebook.FacebookAuthenticationAdapter", 
+    "location": "<%= @adm_api_baseURL-%>/idp/adapters/descriptors/com.pingidentity.adapters.idp.facebook.FacebookAuthenticationAdapter"
+  }, 
+  "configuration": {
+    "tables": [
+      {
+	"rows": [
+	  {
+	    "fields": [
+	      {
+		"name": "Facebook Scope Permission", 
+		"value": "email"
+	      }, 
+	      {
+		"name": "Additional Facebook Scope Permission", 
+		"value": ""
+	      }
+	    ]
+	  }
+	], 
+	"name": "Scope Permissions"
+      }
+    ], 
+    "fields": [
+      {
+	"name": "Application ID", 
+	"value": "<%= @facebook_app_id -%>"
+      }, 
+      {
+	"name": "Application Secret", 
+	"value": "<%= @facebook_app_secret -%>"
+      }, 
+      {
+	"name": "Site URL", 
+	"value": "<%= @saml2_local_baseURL -%>/ext/facebook-authn"
+      }, 
+      {
+	"name": "Error Redirect URL", 
+	"value": ""
+      }, 
+      {
+	"name": "Logout URL", 
+	"value": "https://www.facebook.com/logout.php"
+      }, 
+      {
+	"name": "Unauthorized Redirect URL", 
+	"value": ""
+      }, 
+      {
+	"name": "Facebook Authentication URL", 
+	"value": "https://www.facebook.com/dialog/oauth"
+      }, 
+      {
+	"name": "Facebook Access Token URL", 
+	"value": "https://graph.facebook.com/oauth/access_token"
+      }, 
+      {
+	"name": "Facebook User Data URL", 
+	"value": "https://graph.facebook.com/v2.2/me"
+      }
+    ]
+  }
+}

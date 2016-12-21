@@ -356,7 +356,9 @@ are automatical set to random values on each installation and don't need to be e
 - sp/idpConnections
   This PF server is an SP peering with the Shibboleth SAML2 IdP.
 - idp/adapters
-  Facebook, etc. social login.
+  Facebook, etc. social login. Includes contract mappings. Needs to 
+  GET idp/adapters/com.pingidentity.adapters.idp.facebook.FacebookAuthenticationAdapter
+  in order to fill in the POST template file. Probably needs a Python script.
 - oauth/accessTokenMappings
 - oauth/authenticationPolicyContractMappings
   scope descriptions might not be needed...
