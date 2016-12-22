@@ -353,12 +353,18 @@ are automatical set to random values on each installation and don't need to be e
   This one demonstrates using an array of hashes in the erb template.
 - oauth/openIdConnect/settings [done]
   This references a policy set in oauth/openIdConnect/policies so has to 'require' it.
-- sp/idpConnections
-  This PF server is an SP peering with the Shibboleth SAML2 IdP.
 - idp/adapters
-  Facebook, etc. social login. Includes contract mappings. Needs to 
+  - Facebook [done]
+  Social login. Includes contract mappings. Needs to 
   GET idp/adapters/com.pingidentity.adapters.idp.facebook.FacebookAuthenticationAdapter
-  in order to fill in the POST template file. Probably needs a Python script.
+  in order to fill in the POST template file. Probably needs a Python script. For now, just
+  hardcode what I need.
+- sp/idpConnections
+  This PF server is an SP peering with the Shibboleth SAML2 IdP. The UI has an import feature which
+  reads the IdP metadata XML and parses it into the various JSON API parameters. So a cool way to
+  do this would be to mimic the same process, converting the XML to JSON. Maybe later. KISS for now.
+  One does have to decode the x509 cert to pull out some of the metadata. See
+  [this](http://stackoverflow.com/questions/16899247/how-can-i-decode-a-ssl-certificate-using-python).
 - oauth/accessTokenMappings
 - oauth/authenticationPolicyContractMappings
   scope descriptions might not be needed...

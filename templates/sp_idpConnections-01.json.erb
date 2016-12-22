@@ -1,0 +1,55 @@
+<%# optional default values are removed and tried to order to match the swagger documentation -%>
+{
+  "entityId": "<%= @saml2_idp_url -%>/<%= @saml2_idp_entityID -%>", 
+  "name": "<%= @saml2_idp_url -%>/<%= @saml2_idp_entityID -%>", 
+  "active": true, 
+  "contactInfo": {
+    "firstName": "<%= @saml2_idp_contact['firstName'] -%>",
+    "lastName": "<%= @saml2_idp_contact['lastName'] -%>",
+    "email": "<%= @saml2_idp_contact['email'] -%>"
+  }, 
+  "type": "IDP",
+  "idpBrowserSso": {
+    "protocol": "SAML20", 
+    "enabledProfiles": [
+<% @saml2_idp_profiles.each_with_index do |val, i| -%>
+    "<%= val -%><%= ',' if i < (@saml2_idp_profiles.size - 1) %>
+<% end -%>
+    ],
+    "incomingBindings": [
+      "REDIRECT", 
+      "POST"
+    ],
+    "ssoServiceEndpoints": [
+      {
+        "url": "<%= @saml2_idp_url -%>/<%= @saml2_idp_post -%>", 
+        "binding": "POST"
+      }, 
+      {
+        "url": "<%= @saml2_idp_url -%>/<%= @saml2_idp_redirect -%>", 
+        "binding": "REDIRECT"
+      }
+    ], 
+    "idpIdentityMapping": "<%= @saml2_idp_id_mapping -%>", 
+    "attributeContract": {<%# list of attributes sent in the IdP assertion -%>
+      "coreAttributes": [
+<% @saml2_idp_core_attrs.each_with_index do |val, i| -%>
+        {
+          "name": "<%= val -%>", 
+          "masked": false
+        }<%= ',' if i < (@saml2_idp_core_attrs.size - 1) %>
+<% end -%>
+      ], 
+      "extendedAttributes": [
+<% @saml2_idp_extd_attrs.each_with_index do |val, i| -%>
+        {
+          "name": "<%= val -%>", 
+          "masked": false
+        }<%= ',' if i < (@saml2_idp_extd_attrs.size - 1) %>
+<% end -%>
+      ]
+    }, 
+    "authenticationPolicyContractMappings": [
+      {
+        "authenticationPolicyContractRef": {
+<%# ----- CUT HERE ----- -%>

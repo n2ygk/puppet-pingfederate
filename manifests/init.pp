@@ -97,6 +97,17 @@ class pingfederate (
   $saml2_sp_auth_policy_name           = $::pingfederate::params::saml2_sp_auth_policy_name,
   $saml2_sp_auth_policy_core_attrs     = $::pingfederate::params::saml2_sp_auth_policy_core_attrs,
   $saml2_sp_auth_policy_extd_attrs     = $::pingfederate::params::saml2_sp_auth_policy_extd_attrs,
+  # SAML2 partner IdP
+  $saml2_idp_url                       = $::pingfederate::params::saml2_idp_url,
+  $saml2_idp_entityID                  = $::pingfederate::params::saml2_idp_entityID,
+  $saml2_idp_post                      = $::pingfederate::params::saml2_idp_post,
+  $saml2_idp_redirect                  = $::pingfederate::params::saml2_idp_redirect,
+  $saml2_idp_contact                   = $::pingfederate::params::saml2_idp_contact,
+  $saml2_idp_profiles                  = $::pingfederate::params::saml2_idp_profiles,
+  $saml2_idp_id_mapping                = $::pingfederate::params::saml2_idp_id_mapping,
+  $saml2_idp_core_attrs                = $::pingfederate::params::saml2_idp_core_attrs,
+  $saml2_idp_extd_attrs                = $::pingfederate::params::saml2_idp_extd_attrs,
+  $saml2_idp_oauth_map                 = $::pingfederate::params::saml2_idp_oauth_map,
   # Enable Cross-Origin Resource Sharing (CORS)
   $cors_allowedOrigins                 = $::pingfederate::params::cors_allowedOrigins,
   $cors_allowedMethods                 = $::pingfederate::params::cors_allowedMethods,
