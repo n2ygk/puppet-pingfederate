@@ -82,9 +82,10 @@ class pingfederate::params {
   $saml2_idp_id_mapping                = 'ACCOUNT_MAPPING'
   $saml2_idp_core_attrs                = ['SAML_SUBJECT']
   $saml2_idp_extd_attrs                = []
+  $saml2_idp_attr_map                  = []
   $saml2_idp_oauth_map                 = []
-  $saml2_idp_cert_serialNumber         = undef
-  
+  $saml2_idp_cert_file                 = undef
+  $saml2_idp_cert_str                  = undef
   $cors_allowedOrigins                 = '*'
   $cors_allowedMethods                 = 'GET,OPTIONS,POST'
   $cors_filter_mapping                 = '/*'

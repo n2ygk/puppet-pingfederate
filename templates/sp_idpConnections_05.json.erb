@@ -1,0 +1,41 @@
+"
+        }, 
+        "attributeContractFulfillment": {<%# mapping of attribute names to their fulfillment values %>
+<% @saml2_idp_attr_map.each_with_index do |val, i| -%>
+          "<%= val['name'] -%>": {
+            "source": {
+              "type": "<%= val['type'] -%>"
+            },
+            "value": "<%= val['value'] -%>"
+          }<%= ',' if i < (@saml2_idp_attr_map.size - 1) %>
+<% end -%>
+        }
+      }
+    ],
+    "ssoOAuthMapping": {
+      "attributeContractFulfillment": {
+<% @saml2_idp_oauth_map.each_with_index do |val, i| -%>
+          "<%= val['name'] -%>": {
+            "source": {
+              "type": "<%= val['type'] -%>"
+            },
+            "value": "<%= val['value'] -%>"
+          }<%= ',' if i < (@saml2_idp_oauth_map.size - 1) %>
+<% end -%>
+        }
+      }
+    }
+  }, 
+  "credentials": {
+    "certs": [
+      {
+        "primaryVerificationCert": true, 
+        "secondaryVerificationCert": false, 
+        "encryptionCert": false, 
+        "x509File": {
+          "fileData": "<%= @x509_string -%>"
+        }
+      }
+    ]
+  }
+}

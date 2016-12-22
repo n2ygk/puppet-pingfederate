@@ -139,7 +139,7 @@ if response.status_code < 400:
   if opt.id:
     id_out = open(opt.id,'wb')
     if 'id' in rjson:
-      print(rjson['id'],file=id_out)
+      print(rjson['id'],file=id_out,end='')
   exit(0)
 else:
   print(resp,file=sys.stderr)

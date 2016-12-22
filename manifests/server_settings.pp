@@ -46,7 +46,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${apc}.json.erb"),
     } ~> 
     exec {"pf-admin-api POST ${apc}":
-      command     => "${pfapi} -m POST -j ${etc}/${apc}.json -r ${etc}/${apc}.json.out ${apc}", #  || rm -f ${apc}.json
+      command     => "${pfapi} -m POST -j ${etc}/${apc}.json -r ${etc}/${apc}.json.out -i ${etc}/${apc}.id ${apc}", #  || rm -f ${apc}.json
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -137,5 +137,54 @@ class pingfederate::server_settings inherits ::pingfederate {
     }
   }
   # TO DO: additional social adapters.
+
+  # SP idp partner configuration needs to pull in an ID from authenticationPolicyContracts.
+  # So template the fragments and then concatenate them.
+  if $::pingfederate::saml2_idp_url {
+    $spidp = 'sp/idpConnections'
+    $spidpf = 'sp_idpConnections'
+    $spidp_frag01 = 'sp_idpConnections_01'
+    $spidp_frag03 = 'sp_idpConnections_03'
+    $spidp_frag05 = 'sp_idpConnections_05'
+    $x509_string = regsubst($::pingfederate::saml2_idp_cert_str,'\n','\\n','G')
+    concat {"${etc}/${spidpf}.json":
+      ensure => present,
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+    }
+    concat::fragment {"${spidp_frag01}":
+      target  => "${etc}/${spidpf}.json",
+      content => template("pingfederate/${spidp_frag01}.json.erb"),
+      order   => '01',
+    }
+    concat::fragment {"${apc}.id 02":
+      target => "${etc}/${spidpf}.json",
+      source => "${etc}/${apc}.id",
+      order  => '02',
+    }
+    concat::fragment {"${spidp_frag03}":
+      target  => "${etc}/${spidpf}.json",
+      content => template("pingfederate/${spidp_frag03}.json.erb"),
+      order   => '03',
+    }
+    concat::fragment {"${apc}.id 04":
+      target => "${etc}/${spidpf}.json",
+      source => "${etc}/${apc}.id",
+      order  => '04',
+    }
+    concat::fragment {"${spidp_frag05}":
+      target  => "${etc}/${spidpf}.json",
+      content => template("pingfederate/${spidp_frag05}.json.erb"),
+      order   => '05',
+    } 
+    exec {"pf-admin-api POST ${spidp}":
+      subscribe   => Concat["${etc}/${spidpf}.json"],
+      command     => "${pfapi} -m POST -j ${etc}/${spidpf}.json -r ${etc}/${spidpf}.json.out -i ${etc}/${spidpf}.id ${spidp}", #  || rm -f ${fbaf}.json
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+  }
 }
 

@@ -107,7 +107,10 @@ class pingfederate (
   $saml2_idp_id_mapping                = $::pingfederate::params::saml2_idp_id_mapping,
   $saml2_idp_core_attrs                = $::pingfederate::params::saml2_idp_core_attrs,
   $saml2_idp_extd_attrs                = $::pingfederate::params::saml2_idp_extd_attrs,
+  $saml2_idp_attr_map                  = $::pingfederate::params::saml2_idp_attr_map,
   $saml2_idp_oauth_map                 = $::pingfederate::params::saml2_idp_oauth_map,
+  $saml2_idp_cert_file                 = $::pingfederate::params::saml2_idp_cert_file,
+  $saml2_idp_cert_str                  = $::pingfederate::params::saml2_idp_cert_str,
   # Enable Cross-Origin Resource Sharing (CORS)
   $cors_allowedOrigins                 = $::pingfederate::params::cors_allowedOrigins,
   $cors_allowedMethods                 = $::pingfederate::params::cors_allowedMethods,

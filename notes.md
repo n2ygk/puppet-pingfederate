@@ -363,8 +363,7 @@ are automatical set to random values on each installation and don't need to be e
   This PF server is an SP peering with the Shibboleth SAML2 IdP. The UI has an import feature which
   reads the IdP metadata XML and parses it into the various JSON API parameters. So a cool way to
   do this would be to mimic the same process, converting the XML to JSON. Maybe later. KISS for now.
-  One does have to decode the x509 cert to pull out some of the metadata. See
-  [this](http://stackoverflow.com/questions/16899247/how-can-i-decode-a-ssl-certificate-using-python).
+  The cert metadata(certView) is ignored on POST and PUT we don't have to provide it; just the x509File.
 - oauth/accessTokenMappings
 - oauth/authenticationPolicyContractMappings
   scope descriptions might not be needed...
