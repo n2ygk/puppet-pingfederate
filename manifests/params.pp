@@ -12,6 +12,8 @@ class pingfederate::params {
   $facebook_package_ensure             = 'installed'
   $facebook_app_id                     = undef
   $facebook_app_secret                 = undef
+  $facebook_oauth_idp_map              = []
+  $facebook_oauth_token_map            = []
   $google_adapter                      = false
   $google_package_list                 = 'pingfederate-google-adapter'
   $google_package_ensure               = 'installed'
@@ -86,6 +88,7 @@ class pingfederate::params {
   $saml2_idp_oauth_map                 = []
   $saml2_idp_cert_file                 = undef
   $saml2_idp_cert_str                  = undef
+  $saml2_oauth_token_map               = undef
   $cors_allowedOrigins                 = '*'
   $cors_allowedMethods                 = 'GET,OPTIONS,POST'
   $cors_filter_mapping                 = '/*'
@@ -111,6 +114,7 @@ class pingfederate::params {
   $oauth_svc_acc_tok_mgr_id            = undef
   $oauth_svc_acc_tok_mgr_core_attrs    = []
   $oauth_svc_acc_tok_mgr_extd_attrs    = []
+  $oauth_authn_policy_map              = []
   $oauth_oidc_policy_id                = undef
   $oauth_oidc_policy_core_map          = []
   $oauth_oidc_policy_extd_map          = []

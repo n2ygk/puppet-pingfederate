@@ -1,0 +1,18 @@
+"
+    }
+  }, 
+  "accessTokenManagerRef": {
+    "id": "<%= @oauth_svc_acc_tok_mgr_id -%>", 
+    "location": "<%= @adm_api_baseURL -%>/oauth/accessTokenManagers/<%= @oauth_svc_acc_tok_mgr_id -%>"
+  }, 
+  "attributeContractFulfillment": {
+<% @saml2_oauth_token_map.each_with_index do |val, i| -%>
+          "<%= val['name'] -%>": {
+            "source": {
+              "type": "<%= val['type'] -%>"
+            },
+            "value": "<%= val['value'] -%>"
+          }<%= ',' if i < (@saml2_oauth_token_map.size - 1) %>
+<% end -%>
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "Facebook",<%# hardcoded ID %>
+  "idpAdapterRef": {
+    "id": "Facebook", 
+    "location": "https://ac45devapp01.cc.columbia.edu:9999/pf-admin-api/v1/idp/adapters/Facebook"
+  },
+  "attributeContractFulfillment": {
+<% @facebook_oauth_idp_map.each_with_index do |val, i| -%>
+      "<%= val['name'] -%>": {
+        "source": {
+          "type": "<%= val['type'] -%>"
+        },
+        "value": "<%= val['value'] -%>"
+      }<%= ',' if i < (@facebook_oauth_idp_map.size - 1) %>
+<% end -%>
+   }
+}

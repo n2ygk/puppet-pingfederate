@@ -359,15 +359,18 @@ are automatical set to random values on each installation and don't need to be e
   GET idp/adapters/com.pingidentity.adapters.idp.facebook.FacebookAuthenticationAdapter
   in order to fill in the POST template file. Probably needs a Python script. For now, just
   hardcode what I need.
-- sp/idpConnections
+- sp/idpConnections [done]
   This PF server is an SP peering with the Shibboleth SAML2 IdP. The UI has an import feature which
   reads the IdP metadata XML and parses it into the various JSON API parameters. So a cool way to
   do this would be to mimic the same process, converting the XML to JSON. Maybe later. KISS for now.
   The cert metadata(certView) is ignored on POST and PUT we don't have to provide it; just the x509File.
-- oauth/accessTokenMappings
 - oauth/authenticationPolicyContractMappings
   scope descriptions might not be needed...
-  this one requires the 'id' assigned to the authenticationPolicyContracts/{id} to be added. This requires pulling it from somewhere....
-- oauth/idpAdapterMappings
+- oauth/idpAdapterMappings [done, needs something prior]
+- oauth/accessTokenMappings [in process; needs something prior -- idpAdapterMappings??]
+  Templates: `oauth_accessTokenMappings_saml2_*.json erb` and `oauth_accessTokenMappings_facebook.json.erb`.
+  For each IdP (saml2, facebook, etc.) there's a mapping between IdP-sourced attributes and what to put
+  in the oauth access token. The saml2 IdP has a dynamically-assigned ID so it's a pain to insert, having to
+  use fragments as done in sp/idpConnections whereas the social adapters allow us to statically assign the ID.
 - authenticationSelectors/descriptors
   Seems connected to the scopes in oauth/authServerSettings

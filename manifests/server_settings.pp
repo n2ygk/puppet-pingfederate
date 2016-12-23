@@ -51,6 +51,60 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
+    $apcm = 'oauth/authenticationPolicyContractMappings'
+    $apcmf = 'oauth_authenticationPolicyContractMappings'
+    $apcm_frag01 = "${apcmf}_01"
+    $apcm_frag03 = "${apcmf}_03"
+    $apcm_frag05 = "${apcmf}_05"
+    $apcm_frag07 = "${apcmf}_07"
+    concat {"${etc}/${apcmf}.json":
+      ensure => present,
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+    }
+    concat::fragment {"${apcm_frag01}":
+      target  => "${etc}/${apcmf}.json",
+      content => template("pingfederate/${apcm_frag01}.json.erb"),
+      order   => '01',
+    }
+    concat::fragment {"${apc}.id ${apcm} 02":
+      target => "${etc}/${apcmf}.json",
+      source => "${etc}/${apc}.id",
+      order  => '02',
+    }
+    concat::fragment {"${apcm_frag03}":
+      target  => "${etc}/${apcmf}.json",
+      content => template("pingfederate/${apcm_frag03}.json.erb"),
+      order   => '03',
+    }
+    concat::fragment {"${apc}.id ${apcm} 04":
+      target => "${etc}/${apcmf}.json",
+      source => "${etc}/${apc}.id",
+      order  => '04',
+    }
+    concat::fragment {"${apcm_frag05}":
+      target  => "${etc}/${apcmf}.json",
+      content => template("pingfederate/${apcm_frag05}.json.erb"),
+      order   => '05',
+    } 
+    concat::fragment {"${apc}.id ${apcm} 06":
+      target => "${etc}/${apcmf}.json",
+      source => "${etc}/${apc}.id",
+      order  => '06',
+    }
+    concat::fragment {"${apcm_frag07}":
+      target  => "${etc}/${apcmf}.json",
+      content => template("pingfederate/${apcm_frag07}.json.erb"),
+      order   => '07',
+    } 
+    exec {"pf-admin-api POST ${apcm}/saml2":
+      subscribe   => Concat["${etc}/${apcmf}.json"],
+      command     => "${pfapi} -m POST -j ${etc}/${apcmf}.json -r ${etc}/${apcmf}.json.out -i ${etc}/${apcmf}.id ${apcm}", #  || rm -f ${apcmf}.json
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
   }
 
   $oas = "oauth/authServerSettings"
@@ -135,17 +189,48 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
+    $fbi = "oauth/idpAdapterMappings"
+    $fbif = "oauth_idpAdapterMappings_facebook"
+    file {"${etc}/${fbif}.json":
+      require  => Concat["${etc}/${apcmf}.json"], # ???
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${fbif}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${fbif}":
+      command     => "${pfapi} -m POST -j ${etc}/${fbif}.json -r ${etc}/${fbif}.json.out ${fbi}", #  || rm -f ${fbif}.json
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+    $oatfb = 'oauth/accessTokenMappings'
+    $oatfbf = 'oauth_accessTokenMappings_facebook'
+    file {"${etc}/${oatfbf}.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${oatfbf}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${oatfb}/Facebook":
+      command     => "${pfapi} -m POST -j ${etc}/${oatfbf}.json -r ${etc}/${oatfbf}.json.out -i ${etc}/${oatfbf}.id ${oatfb}", #  || rm -f ${oatfbf}.json
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
   }
-  # TO DO: additional social adapters.
+  # TO DO: additional social adapters. Can probably parameterize and reuse the facebook stuff,
 
   # SP idp partner configuration needs to pull in an ID from authenticationPolicyContracts.
   # So template the fragments and then concatenate them.
   if $::pingfederate::saml2_idp_url {
     $spidp = 'sp/idpConnections'
     $spidpf = 'sp_idpConnections'
-    $spidp_frag01 = 'sp_idpConnections_01'
-    $spidp_frag03 = 'sp_idpConnections_03'
-    $spidp_frag05 = 'sp_idpConnections_05'
+    $spidp_frag01 = "${spidpf}_01"
+    $spidp_frag03 = "${spidpf}_03"
+    $spidp_frag05 = "${spidpf}_05"
     $x509_string = regsubst($::pingfederate::saml2_idp_cert_str,'\n','\\n','G')
     concat {"${etc}/${spidpf}.json":
       ensure => present,
@@ -180,11 +265,65 @@ class pingfederate::server_settings inherits ::pingfederate {
     } 
     exec {"pf-admin-api POST ${spidp}":
       subscribe   => Concat["${etc}/${spidpf}.json"],
-      command     => "${pfapi} -m POST -j ${etc}/${spidpf}.json -r ${etc}/${spidpf}.json.out -i ${etc}/${spidpf}.id ${spidp}", #  || rm -f ${fbaf}.json
+      command     => "${pfapi} -m POST -j ${etc}/${spidpf}.json -r ${etc}/${spidpf}.json.out -i ${etc}/${spidpf}.id ${spidp}", #  || rm -f ${spidpf}.json
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
+    $oatsp = 'oauth/accessTokenMappings'
+    $oatspf = 'oauth_accessTokenMappings_saml2'
+    $oatsp_frag01 = "${oatspf}_01"
+    $oatsp_frag03 = "${oatspf}_03"
+    $oatsp_frag05 = "${oatspf}_05"
+    $oatsp_frag07 = "${oatspf}_07"
+    concat {"${etc}/${oatspf}.json":
+      ensure => present,
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+    }
+    concat::fragment {"${oatsp_frag01}":
+      target  => "${etc}/${oatspf}.json",
+      content => template("pingfederate/${oatsp_frag01}.json.erb"),
+      order   => '01',
+    }
+    concat::fragment {"${apc}.id ${oatsp} 02":
+      target => "${etc}/${oatspf}.json",
+      source => "${etc}/${apc}.id",
+      order  => '02',
+    }
+    concat::fragment {"${oatsp_frag03}":
+      target  => "${etc}/${oatspf}.json",
+      content => template("pingfederate/${oatsp_frag03}.json.erb"),
+      order   => '03',
+    }
+    concat::fragment {"${apc}.id ${oatsp} 04":
+      target => "${etc}/${oatspf}.json",
+      source => "${etc}/${apc}.id",
+      order  => '04',
+    }
+    concat::fragment {"${oatsp_frag05}":
+      target  => "${etc}/${oatspf}.json",
+      content => template("pingfederate/${oatsp_frag05}.json.erb"),
+      order   => '05',
+    } 
+    concat::fragment {"${apc}.id ${oatsp} 06":
+      target => "${etc}/${oatspf}.json",
+      source => "${etc}/${apc}.id",
+      order  => '06',
+    }
+    concat::fragment {"${oatsp_frag07}":
+      target  => "${etc}/${oatspf}.json",
+      content => template("pingfederate/${oatsp_frag07}.json.erb"),
+      order   => '07',
+    } 
+    exec {"pf-admin-api POST ${oatsp}/saml2":
+      subscribe   => Concat["${etc}/${oatspf}.json"],
+      command     => "${pfapi} -m POST -j ${etc}/${oatspf}.json -r ${etc}/${oatspf}.json.out -i ${etc}/${oatspf}.id ${oatsp}", #  || rm -f ${oatspf}.json
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+
   }
 }
-

@@ -1,0 +1,13 @@
+"
+  },
+  "attributeContractFulfillment": {
+<% @oauth_authn_policy_map.each_with_index do |val, i| -%>
+    "<%= val['name'] -%>": {
+        "source": {
+          "type": "<%= val['type'] -%>"
+        },
+        "value": "<%= val['value'] -%>"
+      }<%= ',' if i < (@oauth_authn_policy_map.size - 1) %>
+<% end -%>
+  } 
+}

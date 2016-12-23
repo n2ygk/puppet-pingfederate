@@ -33,6 +33,8 @@ class pingfederate (
   $facebook_package_ensure             = $::pingfederate::params::facebook_package_ensure,
   $facebook_app_id                     = $::pingfederate::params::facebook_app_id,
   $facebook_app_secret                 = $::pingfederate::params::facebook_app_secret,
+  $facebook_oauth_idp_map              = $::pingfederate::params::facebook_oauth_idp_map,
+  $facebook_oauth_token_map            = $::pingfederate::params::facebook_oauth_token_map,
   $google_adapter                      = $::pingfederate::params::google_adapter,
   $google_package_list                 = $::pingfederate::params::google_package_list,
   $google_package_ensure               = $::pingfederate::params::google_package_ensure,
@@ -111,6 +113,7 @@ class pingfederate (
   $saml2_idp_oauth_map                 = $::pingfederate::params::saml2_idp_oauth_map,
   $saml2_idp_cert_file                 = $::pingfederate::params::saml2_idp_cert_file,
   $saml2_idp_cert_str                  = $::pingfederate::params::saml2_idp_cert_str,
+  $saml2_oauth_token_map               = $::pingfederate::params::saml2_oauth_token_map,
   # Enable Cross-Origin Resource Sharing (CORS)
   $cors_allowedOrigins                 = $::pingfederate::params::cors_allowedOrigins,
   $cors_allowedMethods                 = $::pingfederate::params::cors_allowedMethods,
@@ -144,6 +147,8 @@ class pingfederate (
   $oauth_oidc_policy_id                = $::pingfederate::params::oauth_oidc_policy_id,
   $oauth_oidc_policy_core_map          = $::pingfederate::params::oauth_oidc_policy_core_map,
   $oauth_oidc_policy_extd_map          = $::pingfederate::params::oauth_oidc_policy_extd_map,
+  # OAuth Authentication policy contract mappings
+  $oauth_authn_policy_map              = $::pingfederate::params::oauth_authn_policy_map,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])
