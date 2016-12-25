@@ -63,27 +63,27 @@ the license key file via a secure manner (e.g. via hiera).
 You will need to explicitly enable and configure the various social identity plugins.
 
 #### Packaging
-[*install_dir*]
+##### `install_dir`
   (string)
   Path to installation directory of PingFederate server.
   Default: `'/opt/pingfederate'`
 
-[*owner*]
+##### `owner`
   (string)
   Filesystem owner. Make sure this matches whatever the packaging system uses.
   Default: `'pingfederate'`
 
-[*group*]
+##### `group`
   (string)
   Filesystem group. Make sure this matches whatever the packaging system uses.
   Default: `'pingfederate'`
 
-[*package_list*]
+##### `package_list`
   (array[string])
-  Name() of package(s) that contains the PingFederate server.
+  Name(s) of package(s) that contains the PingFederate server.
   Default: `'pingfederate-server'`
 
-[*package_ensure*]
+##### `package_ensure`
   (string)
   Ensure that the package is installed. Values are the same as those used by the
   [Package type](https://docs.puppet.com/puppet/latest/types/package.html)
@@ -91,26 +91,26 @@ You will need to explicitly enable and configure the various social identity plu
   specfic version string.
   Default: `'installed'`
 
-[*package_java_ensure*]
+##### `package_java_ensure`
   (string)
   Ensure that the Java JRE package is installed.
   Default: `'installed'`
 
-[*package_java_redhat*]
+##### `package_java_redhat`
   (string)
   Name of the preferred Java JRE package under RHEL
   Default: `'java-1.8.0-oracle'`
 
-[*package_java_centos*]
+##### `package_java_centos`
   (string)
   Name of the preferred Java JRE package under CentOS
   Default: `jre1.8.0_111`
 
 #### Service
-[*service_name*]
+##### `service_name`
   (string) Service name. Default: `'pingfederate'`
 
-[*service_ensure*]
+##### `service_ensure`
   (boolean).
   Ensure it is running. Default: `true`
 
@@ -120,7 +120,7 @@ Provide this either in your invocation of the module or, preferably, via Hiera.
 
 Provide either a license file or the content as a multiline string.
 
-[*license_content*]
+##### `license_content`
   (string) Content of the pflicense.lic file. Example:
   ```
   $lic = @(LICENSE)
@@ -146,7 +146,7 @@ Provide either a license file or the content as a multiline string.
   }
 ```
 
-[*license_file*]
+##### `license_file`
   (string) Path to the pflicense.lic file.
 
 #### Run.properties
@@ -155,111 +155,111 @@ The following are used to configure `run.properties`. See the
 [PingFederate documentation](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/changingConfigurationParameters.html)
 for an explanation. The defaults are as distributed by PingIdentity.
 
-[*admin_https_port*]
+##### `admin_https_port`
   (integer) Default: `9999`
 
-[*admin_hostname*]
+##### `admin_hostname`
   (string) No default.
 
-[*console_bind_address*]
+##### `console_bind_address`
   (string) Default: `'0.0.0.0'`
 
-[*console_title*]
+##### `console_title`
   (string) Default: `'PingFederate'`
 
-[*console_session_timeout*]
+##### `console_session_timeout`
   (integer) Default: `30`
 
-[*console_login_mode*]
+##### `console_login_mode`
   (string) Default `'multiple'`
 
-[*console_authentication*]
+##### `console_authentication`
   (string) Default: `'native'`
 
-[*admin_api_authentication*]
+##### `admin_api_authentication`
   (string) Default: `'native'`
 
-[*http_port*]
+##### `http_port`
   (integer) Default: `-1` (none)
 
-[*https_port*]
+##### `https_port`
   (integer) Default: `9031`
 
-[*secondary_https_port*]
+##### `secondary_https_port`
   (integer) Default: `-1` (none)
 
-[*engine_bind_address*]
+##### `engine_bind_address`
   (string) Default: `'0.0.0.0'`
   
-[*monitor_bind_address*]
+##### `monitor_bind_address`
   (string) Default: `'0.0.0.0'`
   
-[*log_event_detail*]
+##### `log_event_detail`
   (boolean) Default: `false`
 
-[*heartbeat_system_monitoring*]
+##### `heartbeat_system_monitoring`
   (boolean) Default: `false`
 
-[*operational_mode*]
+##### `operational_mode`
   (string) Default: `'STANDALONE'`
 
-[*cluster_node_index*]
+##### `cluster_node_index`
   (integer) Default `0`
 
-[*cluster_auth_pwd*]
+##### `cluster_auth_pwd`
   (string) No default.
 
-[*cluster_encrypt*]
+##### `cluster_encrypt`
   (boolean) Default: `false`
 
-[*cluster_bind_address*]
+##### `cluster_bind_address`
   (string) Default: `'NON_LOOPBACK'`
 
-[*cluster_bind_port*]
+##### `cluster_bind_port`
   (integer) Default `7600`
 
-[*cluster_failure_detection_bind_port*]
+##### `cluster_failure_detection_bind_port`
   (integer) Default `7700`
 
-[*cluster_transport_protocol*]
+##### `cluster_transport_protocol`
   (string) Default: `'tcp'`
 
-[*cluster_mcast_group_address*]
+##### `cluster_mcast_group_address`
   (string) Default: `'239.16.96.69'`
 
-[*cluster_mcast_group_port*]
+##### `cluster_mcast_group_port`
   (integer) Default `7601`
   
-[*cluster_tcp_discovery_initial_hosts*]
+##### `cluster_tcp_discovery_initial_hosts`
   (array[string]) No default.
   
-[*cluster_diagnostics_enabled*]
+##### `cluster_diagnostics_enabled`
   (boolean) Default: `false`
   
-[*cluster_diagnostics_addr*]
+##### `cluster_diagnostics_addr`
   (string) Default: `'224.0.75.75'`
 
-[*cluster_diagnostics_port*]
+##### `cluster_diagnostics_port`
   (integer) Default `7500`
 
 #### Administration
 
-[*adm_user*]
+##### `adm_user`
   (string) Initial administrator user. Default: `'Administrator'`
 
-[*adm_pass*]
+##### `adm_pass`
   (string) Administrator user's password. Default: `'p@Ssw0rd'`
 
-[*adm_hash*]
+##### `adm_hash`
   (string) Hash of administrator user's password. Must match the password. (*I don't
   currently know how to generate this, so make sure to copy it wheh you change
   the passowrd*)
 
-[*adm_api_baseURL*]
+##### `adm_api_baseURL`
   (string) Base URL of the pf-admin-api.
   Default: `"https://${facts['fqdn']}:${admin_https_port}/pf-admin-api/v1"`
 
-[*service_api_baseURL*]
+##### `service_api_baseURL`
   (string) Base URL for the various services.
   Default: `"https://${facts['fqdn']}:${https_port}"`
   
@@ -267,37 +267,37 @@ for an explanation. The defaults are as distributed by PingIdentity.
 These are the native SAML2 IdP settings used for native *console_authentication* and
 *admin_api_authentication*. The *adm_user* and *adm_pass* are used for HTTP Basic Auth.
 
-[*saml2_local_entityID*]
+##### `saml2_local_entityID`
   (string)
   SAML 2 EntityID for the native local IdP (that provides the *adm_user* authentication).
   Default: `"${facts['hostname']}-ping:urn:saml2"`
 
-[*saml1_local_issuerID*]
+##### `saml1_local_issuerID`
   (string)
   SAML 1 issuerID for the native local IdP.
   Default: `${facts['hostname']}-ping:urn:saml1`
 
-[*wsfed_local_realm*]
+##### `wsfed_local_realm`
   (string) Default: `"${facts['hostname']}-ping:urn:wsfed"`
 
 #### Cross-Origin Resource Sharing (CORS)
 CORS needs to be enabled as otherwise Javascript Oauth clients will throw an XHR error
 when attempting XMLHttpRequest (XHR).
 
-[*cors_allowedOrigins*]
+##### `cors_allowedOrigins`
   (string)
   Allowed origins for CORS. Default `*`
 
-[*cors_allowedMethods*]
+##### `cors_allowedMethods`
   (string)
   Allowed HTTP methods for CORS. Default `GET,OPTIONS,POST`
   
-[*cors_filter_mapping*]
+##### `cors_filter_mapping`
   (string)
   Allowed URL filter mappings for CORS. Default `/*`
 
 #### OGNL expressions
-[*ognl_expressions_enable*]
+##### `ognl_expressions_enable`
   (boolean)
   Enable OGNL scripting. Default `true`
 
@@ -305,73 +305,73 @@ when attempting XMLHttpRequest (XHR).
 To enable use of an external JDBC database, set *oauth_jdbc_type* to a value (see below).
 If it is `undef` then the default internal XML-based datastore will be used.
 
-[*oauth_jdbc_type*]
+##### `oauth_jdbc_type`
   Type of JDBC
   [OAuth Client Datastore](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#concept_definingOauthClientDataStore.html)
   connector. One of `undef`, `mysql`,`sqlserver`,`oracle`,`other`. Default: `undef`. If `other`, you'll need to fill in the following as well.
   Otherwise they default to expected values for the given *oauth_jdbc_type* but can still be used to override the defaults.
   
-[*oauth_jdbc_db*]
+##### `oauth_jdbc_db`
   (string)
   JDBC database name (also found in `oauth_jdbc_url`)
   Default: `'pingfed'`
 
-[*oauth_jdbc_user*]
+##### `oauth_jdbc_user`
   (string)
   JDBC user name.
   Default: `'pingfed'`
 
-[*oauth_jdbc_pass*]
+##### `oauth_jdbc_pass`
   (string)
   JDBC password.
   Default: `'pingfed'`
 
-[*oauth_jdbc_host*]
+##### `oauth_jdbc_host`
   (string)
   JDBC database host.
   Default: `localhost`
 
-[*oauth_jdbc_port*]
+##### `oauth_jdbc_port`
   (string)
   JDBC database port.
   Default: `3306`.
 
-[*oauth_jdbc_driver*]
+##### `oauth_jdbc_driver`
   (string)
   Name of the JDBC driver class.
   Default: `com.mysql.jdbc.Driver`
 
-[*oauth_jdbc_package_list*]
+##### `oauth_jdbc_package_list`
   (string)
   JDBC connector and command-line interface (CLI) pacakge(s).
   Default: `['mysql','mysql-connector-java']`
 
-[*oauth_jdbc_package_ensure*]
+##### `oauth_jdbc_package_ensure`
   (string)
   Ensure that the package is installed.
   Default: `'installed'`
 
-[*oauth_jdbc_jar_dir*]
+##### `oauth_jdbc_jar_dir`
   (string)
   Directory where the JDBC jar file can be found.
   Default: `/usr/share/java`
 
-[*oauth_jdbc_jar*]
+##### `oauth_jdbc_jar`
   (string)
   Name of the jar file.
   Default: `mysql-connector-java.jar`
 
-[*oauth_jdbc_url*]
+##### `oauth_jdbc_url`
   (string)
   JDBC URL.
   Default: `jdbc:mysql://<host>:<port>/<database>`
 
-[*oauth_jdbc_validate*]
+##### `oauth_jdbc_validate`
   (string)
   JDBC validation test.
   Default: `SELECT 1 from dual`
 
-[*oauth_jdbc_ddl_cmd*]
+##### `oauth_jdbc_ddl_cmd`
   (string)
   Command to execute to initialize the database schema.
   Set based on the *oauth_jdbc_type*
@@ -381,13 +381,13 @@ The OAuth client manager API is used to add OAuth clients to the PingFederate se
 (This capability is required for MuleSoft AnyPoint API Manager functionality, for example.)
 You should override the user name and/or password when invoking the pingfederate class.
 
-[*oauth_client_mgr_user*]
+##### `oauth_client_mgr_user`
   (string)
   Oauth client manager user name. Default `clientmgr`
   (If you need to have more than one client manager user, you'll need to enhance this module
   to deal with that.)
 
-[*oauth_client_mgr_pass*]
+##### `oauth_client_mgr_pass`
   (string)
   Oauth client manager user password. Default `ProviderP@55`
   Make sure the password you supply meets the minimum password requirements or you may see this:
@@ -406,35 +406,35 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
 Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns: }
   ```
 #### OAuth server settings
-[*oauth_svc_grant_core_attrs*]
+##### `oauth_svc_grant_core_attrs`
   (array[string])
   Oauth server persistent grant contract core attributes. Default: `['USER_KEY','USER_NAME']`
 
-[*oauth_svc_grant_extd_attrs*]
+##### `oauth_svc_grant_extd_attrs`
   (array[string])
   Oauth server persistent grant contract extended attributes.
 
 #### OAuth Access Token Managers
-[*oauth_svc_acc_tok_mgr_id*]
+##### `oauth_svc_acc_tok_mgr_id`
   (string)
   ID of the access token manager. No default.
 
-[*oauth_svc_acc_tok_mgr_core_attrs*]
+##### `oauth_svc_acc_tok_mgr_core_attrs`
   (array[string])
   List of core attributes.
   No default.
 
-[*oauth_svc_acc_tok_mgr_extd_attrs*]
+##### `oauth_svc_acc_tok_mgr_extd_attrs`
   (array[string])
   List of extended attributes.
   No default.
 
 #### OAuth OpenID Connect Policy Contracts
-[*oauth_oidc_policy_id*]
+##### `oauth_oidc_policy_id`
   (string)
   The ID of the policy. No default.
 
-[*oauth_oidc_policy_core_attrs*]
+##### `oauth_oidc_policy_core_attrs`
   (array of hashes) Mappings from token manager core attributes to OpenID Connect attributes.
   Each hash has the following keys:
   - name: Name of the source
@@ -442,7 +442,7 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   - value: Name of the attribute
   Default: `[{name => 'sub', type => 'TOKEN', value =>'sub'}]`
 
-[*oauth_oidc_policy_extd_attrs*]
+##### `oauth_oidc_policy_extd_attrs`
   (array of hashes) Mappings from token manager core attributes to OpenID Connect attributes.
   Default: `[]`. Here's an example:
   ```
@@ -451,7 +451,7 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   ...
   ```
 
-[*oauth_authn_policy_map*]
+##### `oauth_authn_policy_map`
   OAuth Authentication policy contract mappings. Default `[]`. Example:
   ```
   ...
@@ -463,58 +463,58 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   ```
 
 #### Social Identity Adapters
-[*facebook_adapter*]
+##### `facebook_adapter`
   (boolean)
   Set to true to enable the Facebook CIC adapter. Default: `false`
 
-[*facebook_package_list*]
+##### `facebook_package_list`
   (array[string])
   Name of package(s) that contains the Facebook adapter.
   Default: `'pingfederate-facebook-adapter'`
   
-[*facebook_package_ensure*]
+##### `facebook_package_ensure`
   (string)
   Ensure that the package is installed.
   Default: `'installed'`
 
-[*facebook_app_id*]
+##### `facebook_app_id`
   (string)
   [Facebook](https://developers.facebook.com) app ID.
 
-[*facebook_app_secret*]
+##### `facebook_app_secret`
   (string)
   Facebook app secret.
 
-[*facebook_oauth_token_map*]
+##### `facebook_oauth_token_map`
   Mapping of Facebook attributes to oauth token attributes.
 
-[*facebook_oauth_idp_map*]
+##### `facebook_oauth_idp_map`
   Mapping of Facebook attributes to oauth token attributes.
 
 *And likewise for the following (configuration of these adapters not yet implemented):
-[*google_adapter*]
+##### `google_adapter`
 
-[*google_package_list*]
+##### `google_package_list`
 
-[*google_package_ensure*]
+##### `google_package_ensure`
 
-[*linkedin_adapter*]
+##### `linkedin_adapter`
 
-[*linkedin_package_list*]
+##### `linkedin_package_list`
 
-[*linkedin_package_ensure*]
+##### `linkedin_package_ensure`
 
-[*twitter_adapter*]
+##### `twitter_adapter`
 
-[*twitter_package_list*]
+##### `twitter_package_list`
 
-[*twitter_package_ensure*]
+##### `twitter_package_ensure`
 
-[*windowslive_adapter*]
+##### `windowslive_adapter`
 
-[*windowslive_package_list*]
+##### `windowslive_package_list`
 
-[*windowslive_package_ensure*]
+##### `windowslive_package_ensure`
 
 ## Limitations
 
