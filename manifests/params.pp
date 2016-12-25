@@ -68,10 +68,10 @@ class pingfederate::params {
   $adm_pass                            = 'p@Ssw0rd'
   $adm_hash                            = 'k1H1o2jc66sgkDjJKq85Sr22QNk143S20oR2Yyt2kqo.5Cu-mnqB.2'
   $adm_api_baseURL                     = "https://${facts['fqdn']}:${admin_https_port}/pf-admin-api/v1"
+  $service_api_baseURL                 = "https://${facts['fqdn']}:${https_port}"
   $saml2_local_entityID                = "${facts['hostname']}-ping:urn:saml2"
   $saml1_local_issuerID                = "${facts['hostname']}-ping:urn:saml1"
   $wsfed_local_realm                   = "${facts['hostname']}-ping:urn:wsfed"
-  $saml2_local_baseURL                 = "https://${facts['fqdn']}:${https_port}"
   $saml2_sp_auth_policy_name           = undef
   $saml2_sp_auth_policy_core_attrs     = ['subject']
   $saml2_sp_auth_policy_extd_attrs     = []
@@ -87,7 +87,7 @@ class pingfederate::params {
   $saml2_idp_attr_map                  = []
   $saml2_idp_oauth_map                 = []
   $saml2_idp_cert_file                 = undef
-  $saml2_idp_cert_str                  = undef
+  $saml2_idp_cert_content                  = undef
   $saml2_oauth_token_map               = undef
   $cors_allowedOrigins                 = '*'
   $cors_allowedMethods                 = 'GET,OPTIONS,POST'

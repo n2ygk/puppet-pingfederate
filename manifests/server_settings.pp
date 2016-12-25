@@ -200,7 +200,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     $spidp_frag01 = "${spidpf}_01"
     $spidp_frag03 = "${spidpf}_03"
     $spidp_frag05 = "${spidpf}_05"
-    $x509_string = regsubst($::pingfederate::saml2_idp_cert_str,'\n','\\n','G')
+    $x509_string = regsubst($::pingfederate::saml2_idp_cert_content,'\n','\\n','G')
     concat {"${etc}/${spidpf}.json":
       ensure => present,
       mode     => 'a=r',

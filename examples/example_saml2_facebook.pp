@@ -66,7 +66,7 @@ class { '::pingfederate':
   facebook_adapter                 => true,
   facebook_app_id                  => '1141518492609366',
   facebook_app_secret              => '99bd671e89381082a3f2f2743cad4635',
-  facebook_oauth_token_map         => [{'name' => 'username', 'type' => 'ADAPTER', 'value' => 'name'}, # maybe these two maps are really one
+  facebook_oauth_token_map         => [{'name' => 'username', 'type' => 'ADAPTER', 'value' => 'name'},
                                        {'name' => 'group', 'type' => 'TEXT', 'value' => 'facebook'},
                                        {'name' => 'uid', 'type' => 'ADAPTER', 'value' => 'id'}
                                        ],

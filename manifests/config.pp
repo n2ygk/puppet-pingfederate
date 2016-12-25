@@ -136,8 +136,8 @@ class pingfederate::config inherits ::pingfederate {
     [
      "set EntityDescriptor/#attribute/entityID \"${::pingfederate::saml2_local_entityID}\"",
      'set EntityDescriptor/#attribute/cacheDuration "PT1440M"',
-     "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/BaseURL \"${::pingfederate::saml2_local_baseURL}\"",
-     "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/DynaFedID \"${::pingfederate::saml2_local_baseURL}\"",
+     "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/BaseURL \"${::pingfederate::service_api_baseURL}\"",
+     "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/DynaFedID \"${::pingfederate::service_api_baseURL}\"",
      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/Saml1xId \"${::pingfederate::saml1_local_issuerID}\"",
      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/WsFedID \"${::pingfederate::wsfed_local_realm}\"",
      ]

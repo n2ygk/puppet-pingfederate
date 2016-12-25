@@ -27,26 +27,6 @@ class pingfederate (
   $package_java_ensure                 = $::pingfederate::params::package_java_ensure,
   $package_java_redhat                 = $::pingfederate::params::package_java_redhat,
   $package_java_centos                 = $::pingfederate::params::package_java_centos,
-  # add-on packages: social media oauth adapters
-  $facebook_adapter                    = $::pingfederate::params::facebook_adapter,
-  $facebook_package_list               = $::pingfederate::params::facebook_package_list,
-  $facebook_package_ensure             = $::pingfederate::params::facebook_package_ensure,
-  $facebook_app_id                     = $::pingfederate::params::facebook_app_id,
-  $facebook_app_secret                 = $::pingfederate::params::facebook_app_secret,
-  $facebook_oauth_idp_map              = $::pingfederate::params::facebook_oauth_idp_map,
-  $facebook_oauth_token_map            = $::pingfederate::params::facebook_oauth_token_map,
-  $google_adapter                      = $::pingfederate::params::google_adapter,
-  $google_package_list                 = $::pingfederate::params::google_package_list,
-  $google_package_ensure               = $::pingfederate::params::google_package_ensure,
-  $linkedin_adapter                    = $::pingfederate::params::linkedin_adapter,
-  $linkedin_package_list               = $::pingfederate::params::linkedin_package_list,
-  $linkedin_package_ensure             = $::pingfederate::params::linkedin_package_ensure,
-  $twitter_adapter                     = $::pingfederate::params::twitter_adapter,
-  $twitter_package_list                = $::pingfederate::params::twitter_package_list,
-  $twitter_package_ensure              = $::pingfederate::params::twitter_package_ensure,
-  $windowslive_adapter                 = $::pingfederate::params::windowslive_adapter,
-  $windowslive_package_list            = $::pingfederate::params::windowslive_package_list,
-  $windowslive_package_ensure          = $::pingfederate::params::windowslive_package_ensure,
   # ensure the service is up
   $service_name                        = $::pingfederate::params::service_name,
   $service_ensure                      = $::pingfederate::params::service_ensure,
@@ -90,16 +70,16 @@ class pingfederate (
   $adm_pass                            = $::pingfederate::params::adm_pass,
   $adm_hash                            = $::pingfederate::params::adm_hash,
   $adm_api_baseURL                     = $::pingfederate::params::adm_api_baseURL,
-  # local SAML IdP configuration: sourceid-saml2-local-metadata.xml
+  # API: serverSettings & XML: sourceid-saml2-local-metadata.xml (local SAML IdP configuration)
+  $service_api_baseURL                 = $::pingfederate::params::service_api_baseURL,
   $saml2_local_entityID                = $::pingfederate::params::saml2_local_entityID,
   $saml1_local_issuerID                = $::pingfederate::params::saml1_local_issuerID,
   $wsfed_local_realm                   = $::pingfederate::params::wsfed_local_realm,
-  $saml2_local_baseURL                 = $::pingfederate::params::saml2_local_baseURL,
-  # SAML2 SP configuration
+  # API: authenticationPolicyContracts (SAML2 SP configuration)
   $saml2_sp_auth_policy_name           = $::pingfederate::params::saml2_sp_auth_policy_name,
   $saml2_sp_auth_policy_core_attrs     = $::pingfederate::params::saml2_sp_auth_policy_core_attrs,
   $saml2_sp_auth_policy_extd_attrs     = $::pingfederate::params::saml2_sp_auth_policy_extd_attrs,
-  # SAML2 partner IdP
+  # API: sp/idpConnections (SAML2 partner IdP)
   $saml2_idp_url                       = $::pingfederate::params::saml2_idp_url,
   $saml2_idp_entityID                  = $::pingfederate::params::saml2_idp_entityID,
   $saml2_idp_post                      = $::pingfederate::params::saml2_idp_post,
@@ -112,43 +92,73 @@ class pingfederate (
   $saml2_idp_attr_map                  = $::pingfederate::params::saml2_idp_attr_map,
   $saml2_idp_oauth_map                 = $::pingfederate::params::saml2_idp_oauth_map,
   $saml2_idp_cert_file                 = $::pingfederate::params::saml2_idp_cert_file,
-  $saml2_idp_cert_str                  = $::pingfederate::params::saml2_idp_cert_str,
+  $saml2_idp_cert_content                  = $::pingfederate::params::saml2_idp_cert_content,
   $saml2_oauth_token_map               = $::pingfederate::params::saml2_oauth_token_map,
-  # Enable Cross-Origin Resource Sharing (CORS)
+  # XML: etc/webdefault.xml (Enable Cross-Origin Resource Sharing -- CORS)
   $cors_allowedOrigins                 = $::pingfederate::params::cors_allowedOrigins,
   $cors_allowedMethods                 = $::pingfederate::params::cors_allowedMethods,
   $cors_filter_mapping                 = $::pingfederate::params::cors_filter_mapping,
-  # OGNL expressions
+  # XML: server/default/data/config-store/org.sourceid.common.ExpressionManager.xml (OGNL expressions)
   $ognl_expressions_enable             = $::pingfederate::params::ognl_expressions_enable,
-  # OAuth JDBC database (configured iff oauth_jdbc_type is defined)
+  # API: dataStores: OAuth JDBC database (configured iff oauth_jdbc_type is defined)
   $oauth_jdbc_type                     = $::pingfederate::params::oauth_jdbc_type,
+  $oauth_jdbc_package_list             = $::pingfederate::params::oauth_jdbc_package_list,
+  $oauth_jdbc_package_ensure           = $::pingfederate::params::oauth_jdbc_package_ensure,
+  $oauth_jdbc_jar_dir                  = $::pingfederate::params::oauth_jdbc_jar_dir,
+  $oauth_jdbc_jar                      = $::pingfederate::params::oauth_jdbc_jar,
+  $oauth_jdbc_driver                   = $::pingfederate::params::oauth_jdbc_driver,
   $oauth_jdbc_host                     = $::pingfederate::params::oauth_jdbc_host,
   $oauth_jdbc_port                     = $::pingfederate::params::oauth_jdbc_port,
   $oauth_jdbc_db                       = $::pingfederate::params::oauth_jdbc_db,
   $oauth_jdbc_url                      = $::pingfederate::params::oauth_jdbc_url,
   $oauth_jdbc_user                     = $::pingfederate::params::oauth_jdbc_user,
   $oauth_jdbc_pass                     = $::pingfederate::params::oauth_jdbc_pass,
-  $oauth_jdbc_driver                   = $::pingfederate::params::oauth_jdbc_driver,
-  $oauth_jdbc_package_list             = $::pingfederate::params::oauth_jdbc_package_list,
-  $oauth_jdbc_package_ensure           = $::pingfederate::params::oauth_jdbc_package_ensure,
-  $oauth_jdbc_jar_dir                  = $::pingfederate::params::oauth_jdbc_jar_dir,
-  $oauth_jdbc_jar                      = $::pingfederate::params::oauth_jdbc_jar,
   $oauth_jdbc_validate                 = $::pingfederate::params::oauth_jdbc_validate,
   $oauth_jdbc_ddl_cmd                  = $::pingfederate::params::oauth_jdbc_ddl_cmd,
-  # OAuth client manager credentials
+  # API: passwordCredentialValidators (for OAuth client manager)
   $oauth_client_mgr_user               = $::pingfederate::params::oauth_client_mgr_user,
   $oauth_client_mgr_pass               = $::pingfederate::params::oauth_client_mgr_pass,
+  # API: oauth/authServerSettings
   $oauth_svc_grant_core_attrs          = $::pingfederate::params::oauth_svc_grant_core_attrs,
   $oauth_svc_grant_extd_attrs          = $::pingfederate::params::oauth_svc_grant_extd_attrs,
-  # OAuth Access Token Managers
+  # API: oauth/accessTokenManagers
   $oauth_svc_acc_tok_mgr_id            = $::pingfederate::params::oauth_svc_acc_tok_mgr_id,
   $oauth_svc_acc_tok_mgr_core_attrs    = $::pingfederate::params::oauth_svc_acc_tok_mgr_core_attrs,
   $oauth_svc_acc_tok_mgr_extd_attrs    = $::pingfederate::params::oauth_svc_acc_tok_mgr_extd_attrs,
+  # API: oauth/openIdConnect_policies
   $oauth_oidc_policy_id                = $::pingfederate::params::oauth_oidc_policy_id,
   $oauth_oidc_policy_core_map          = $::pingfederate::params::oauth_oidc_policy_core_map,
   $oauth_oidc_policy_extd_map          = $::pingfederate::params::oauth_oidc_policy_extd_map,
-  # OAuth Authentication policy contract mappings
+  # API: oauth/authenticationPolicyContractMappings
   $oauth_authn_policy_map              = $::pingfederate::params::oauth_authn_policy_map,
+  # add-on packages: social media oauth adapters
+  # facebook
+  $facebook_adapter                    = $::pingfederate::params::facebook_adapter,
+  $facebook_package_list               = $::pingfederate::params::facebook_package_list,
+  $facebook_package_ensure             = $::pingfederate::params::facebook_package_ensure,
+  # API: idp/adapters
+  $facebook_app_id                     = $::pingfederate::params::facebook_app_id,
+  $facebook_app_secret                 = $::pingfederate::params::facebook_app_secret,
+  # API: oauth/idpAdapterMappings
+  $facebook_oauth_idp_map              = $::pingfederate::params::facebook_oauth_idp_map,
+  # API: oauth/accessTokenMappings
+  $facebook_oauth_token_map            = $::pingfederate::params::facebook_oauth_token_map,
+  # google
+  $google_adapter                      = $::pingfederate::params::google_adapter,
+  $google_package_list                 = $::pingfederate::params::google_package_list,
+  $google_package_ensure               = $::pingfederate::params::google_package_ensure,
+  # linkedin
+  $linkedin_adapter                    = $::pingfederate::params::linkedin_adapter,
+  $linkedin_package_list               = $::pingfederate::params::linkedin_package_list,
+  $linkedin_package_ensure             = $::pingfederate::params::linkedin_package_ensure,
+  # twitter
+  $twitter_adapter                     = $::pingfederate::params::twitter_adapter,
+  $twitter_package_list                = $::pingfederate::params::twitter_package_list,
+  $twitter_package_ensure              = $::pingfederate::params::twitter_package_ensure,
+  # windowslive
+  $windowslive_adapter                 = $::pingfederate::params::windowslive_adapter,
+  $windowslive_package_list            = $::pingfederate::params::windowslive_package_list,
+  $windowslive_package_ensure          = $::pingfederate::params::windowslive_package_ensure,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])
