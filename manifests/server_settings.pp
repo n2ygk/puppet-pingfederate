@@ -189,37 +189,6 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
-    $fbi = "oauth/idpAdapterMappings"
-    $fbif = "oauth_idpAdapterMappings_facebook"
-    file {"${etc}/${fbif}.json":
-      require  => Concat["${etc}/${apcmf}.json"], # ???
-      ensure   => 'present',
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
-      content  => template("pingfederate/${fbif}.json.erb"),
-    } ~> 
-    exec {"pf-admin-api POST ${fbif}":
-      command     => "${pfapi} -m POST -j ${etc}/${fbif}.json -r ${etc}/${fbif}.json.out ${fbi}", #  || rm -f ${fbif}.json
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
-    $oatfb = 'oauth/accessTokenMappings'
-    $oatfbf = 'oauth_accessTokenMappings_facebook'
-    file {"${etc}/${oatfbf}.json":
-      ensure   => 'present',
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
-      content  => template("pingfederate/${oatfbf}.json.erb"),
-    } ~> 
-    exec {"pf-admin-api POST ${oatfb}/Facebook":
-      command     => "${pfapi} -m POST -j ${etc}/${oatfbf}.json -r ${etc}/${oatfbf}.json.out -i ${etc}/${oatfbf}.id ${oatfb}", #  || rm -f ${oatfbf}.json
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
   }
   # TO DO: additional social adapters. Can probably parameterize and reuse the facebook stuff,
 
@@ -287,9 +256,9 @@ class pingfederate::server_settings inherits ::pingfederate {
       content => template("pingfederate/${oatsp_frag01}.json.erb"),
       order   => '01',
     }
-    concat::fragment {"${apc}.id ${oatsp} 02":
+    concat::fragment {"${spidpf}.id ${oatsp} 02":
       target => "${etc}/${oatspf}.json",
-      source => "${etc}/${apc}.id",
+      source => "${etc}/${spidpf}.id",
       order  => '02',
     }
     concat::fragment {"${oatsp_frag03}":
@@ -297,9 +266,9 @@ class pingfederate::server_settings inherits ::pingfederate {
       content => template("pingfederate/${oatsp_frag03}.json.erb"),
       order   => '03',
     }
-    concat::fragment {"${apc}.id ${oatsp} 04":
+    concat::fragment {"${spidpf}.id ${oatsp} 04":
       target => "${etc}/${oatspf}.json",
-      source => "${etc}/${apc}.id",
+      source => "${etc}/${spidpf}.id",
       order  => '04',
     }
     concat::fragment {"${oatsp_frag05}":
@@ -307,9 +276,9 @@ class pingfederate::server_settings inherits ::pingfederate {
       content => template("pingfederate/${oatsp_frag05}.json.erb"),
       order   => '05',
     } 
-    concat::fragment {"${apc}.id ${oatsp} 06":
+    concat::fragment {"${spidpf}.id ${oatsp} 06":
       target => "${etc}/${oatspf}.json",
-      source => "${etc}/${apc}.id",
+      source => "${etc}/${spidpf}.id",
       order  => '06',
     }
     concat::fragment {"${oatsp_frag07}":
@@ -324,6 +293,38 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
-
-  }
+  } ->
+  # move this after the OAuth stuff?
+  if $::pingfederate::facebook_adapter {
+    $fbi = "oauth/idpAdapterMappings"
+    $fbif = "oauth_idpAdapterMappings_facebook"
+    file {"${etc}/${fbif}.json":
+      ensure     => 'present',
+      mode       => 'a=r',
+      owner      => $::pingfederate::owner,
+      group      => $::pingfederate::group,
+      content    => template("pingfederate/${fbif}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${fbif}":
+      command     => "${pfapi} -m POST -j ${etc}/${fbif}.json -r ${etc}/${fbif}.json.out ${fbi}", #  || rm -f ${fbif}.json
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+    $oatfb = 'oauth/accessTokenMappings'
+    $oatfbf = 'oauth_accessTokenMappings_facebook'
+    file {"${etc}/${oatfbf}.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${oatfbf}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${oatfb}/Facebook":
+      command     => "${pfapi} -m POST -j ${etc}/${oatfbf}.json -r ${etc}/${oatfbf}.json.out -i ${etc}/${oatfbf}.id ${oatfb}", #  || rm -f ${oatfbf}.json
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+  }    
 }
