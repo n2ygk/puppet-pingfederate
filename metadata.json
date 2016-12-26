@@ -8,10 +8,10 @@
   "project_page": "https://github.com/n2ygk/puppet-pingfederate",
   "issues_url": "https://github.com/n2ygk/puppet-pingfederate/issues",
   "dependencies": [
-    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"},
+    {"name":"puppetlabs-stdlib","version_requirement":">= 4.13.0"},
     {"name":"camptocamp-augeas","version_requirement":">= 1.5.1"},
-    {"name":"puppetlabs-inifile","version_requirement":">= 1.6.0"},
-    {"name":"puppetlabs-concat", "version_requirement":">= 2.2.0"}
+    {"name":"puppetlabs-inifile","version_requirement":">= 1.4.3"},
+    {"name":"puppetlabs-concat", "version_requirement":">= 1.2.4"}
   ],
   "data_provider": null
 }
