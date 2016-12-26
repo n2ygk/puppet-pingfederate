@@ -734,7 +734,7 @@ $ /opt/pingfederate/local/bin/pf-admin-api -c pf.json version
 ```
 
 Note that the --id file is useful with the `concat` module to concatenate IDs
-into templated XML fragements.
+into templated JSON or XML fragments.
 
 
 #### oauth_jdbc_augeas script
@@ -743,6 +743,6 @@ than having Puppet manage them. This is ugly but the only way to make it happen 
 fault of the app for not having a clean set of APIs that do everything.) It's kinda ugly, using augeas three times:
 1. pulls the jndi-name out of the API result file created by pf-admin-api.
 2. Edits hivemodule.xml to switch from using built-in XML datastore to JDBC.
-3. Edits and org.sourceid.oauth20.domain.ClientManagerJdbcImpl.xml to stuf fin the jndi-name.
+3. Edits and org.sourceid.oauth20.domain.ClientManagerJdbcImpl.xml to stuff in the jndi-name.
 
 There's also an `oauth_jdbc_revert_augeas` script that reverts back to the built-in non-JDBC datastore.
