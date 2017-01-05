@@ -371,6 +371,11 @@ If it is `undef` then the default internal XML-based datastore will be used.
   JDBC validation test.
   Default: `SELECT 1 from dual`
 
+##### `oauth_jdbc_create_cmd`
+  (string)
+  Command to execute to create the database schema.
+  Set based on the *oauth_jdbc_type*
+
 ##### `oauth_jdbc_ddl_cmd`
   (string)
   Command to execute to initialize the database schema.
