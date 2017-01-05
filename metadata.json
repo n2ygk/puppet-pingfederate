@@ -9,14 +9,14 @@
   "issues_url": "https://github.com/n2ygk/puppet-pingfederate/issues",
   "operatingsystem_support": [
     {
-      "operatingsystem":"RedHat",
+      "operatingsystem": "RedHat",
       "operatingsystemrelease":[ "6.8" ]
     },
     {
-      "operatingsystem":"CentOS",
+      "operatingsystem": "CentOS",
       "operatingsystemrelease":[ "6.8" ]
     }
-  ]
+  ],
   "requirements": [
     {
       "name": "puppet",

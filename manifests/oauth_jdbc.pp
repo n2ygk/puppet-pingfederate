@@ -39,6 +39,12 @@ class pingfederate::oauth_jdbc inherits ::pingfederate {
       user        =>  $::pingfederate::owner,
       refreshonly => true,
       logoutput   => true,
+    } ~>
+    exec {"oauth_jdbc CREATE ${::pingfederate::o_url}": # database has to exist before adding the dataStore
+      command => $::pingfederate::o_create,
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
     }
 
     $ds = "${::pingfederate::install_dir}/local/etc/dataStores.json"

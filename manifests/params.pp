@@ -106,6 +106,7 @@ class pingfederate::params {
   $oauth_jdbc_jar_dir                  = undef
   $oauth_jdbc_jar                      = undef
   $oauth_jdbc_validate                 = undef
+  $oauth_jdbc_create_cmd               = undef
   $oauth_jdbc_ddl_cmd                  = undef
   $oauth_client_mgr_user               = 'clientmgr'
   $oauth_client_mgr_pass               = 'ProviderP@55'

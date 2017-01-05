@@ -114,6 +114,7 @@ class pingfederate (
   $oauth_jdbc_user                     = $::pingfederate::params::oauth_jdbc_user,
   $oauth_jdbc_pass                     = $::pingfederate::params::oauth_jdbc_pass,
   $oauth_jdbc_validate                 = $::pingfederate::params::oauth_jdbc_validate,
+  $oauth_jdbc_create_cmd               = $::pingfederate::params::oauth_jdbc_create_cmd,
   $oauth_jdbc_ddl_cmd                  = $::pingfederate::params::oauth_jdbc_ddl_cmd,
   # API: passwordCredentialValidators (for OAuth client manager)
   $oauth_client_mgr_user               = $::pingfederate::params::oauth_client_mgr_user,
@@ -196,6 +197,14 @@ class pingfederate (
         $portstr      = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
         $def_url      = "jdbc:mysql://${oauth_jdbc_host}${portstr}/${oauth_jdbc_db}"
         $script       = 'oauth-client-management-mysql.sql'
+        $def_create   = "/usr/bin/mysqladmin --wait                    \
+                         --connect_timeout=30                          \
+                         --host=${::pingfederate::oauth_jdbc_host}     \
+                         --port=${::pingfederate::oauth_jdbc_port}     \
+                         --user=${::pingfederate::oauth_jdbc_user}     \
+                         --password=${::pingfederate::oauth_jdbc_pass} \
+                         create ${::pingfederate::oauth_jdbc_db}       \
+                         | /bin/awk '/database exists/{exit 0}/./{exit 1}' " # allow database exists error or no output
         $def_cmd      = "/usr/bin/mysql --wait --connect_timeout=30    \
                          --host=${::pingfederate::oauth_jdbc_host}     \
                          --port=${::pingfederate::oauth_jdbc_port}     \
@@ -220,6 +229,7 @@ class pingfederate (
         $def_validate = undef
         $def_driver   = undef
         $def_url      = undef
+        $def_create   = undef
         $def_cmd      = undef
       }
       default: { fail("Don't know to configure for database type ${::pingfederate::oauth_jdbc_type}.") }
@@ -232,6 +242,7 @@ class pingfederate (
     $o_validate = if $::pingfederate::oauth_jdbc_validate { $::pingfederate::oauth_jdbc_validate } else { $def_validate }
     $o_driver   = if $::pingfederate::oauth_jdbc_driver { $::pingfederate::oauth_jdbc_driver } else { $def_driver }
     $o_url      = if $::pingfederate::oauth_jdbc_url { $::pingfederate::oauth_jdbc_url } else { $def_url }
+    $o_create   = if $::pingfederate::oauth_jdbc_create_cmd { $::pingfederate::oauth_jdbc_create_cmd } else { $def_create }
     $o_cmd      = if $::pingfederate::oauth_jdbc_ddl_cmd { $::pingfederate::oauth_jdbc_ddl_cmd } else { $def_cmd }
   }
 
