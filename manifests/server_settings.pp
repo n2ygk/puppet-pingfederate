@@ -293,7 +293,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
-  } ->
+  }
   # move this after the OAuth stuff?
   if $::pingfederate::facebook_adapter {
     $fbi = "oauth/idpAdapterMappings"
@@ -304,6 +304,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       owner      => $::pingfederate::owner,
       group      => $::pingfederate::group,
       content    => template("pingfederate/${fbif}.json.erb"),
+      require    => Concat["${etc}/${oatspf}.json"],
     } ~> 
     exec {"pf-admin-api POST ${fbif}":
       command     => "${pfapi} -m POST -j ${etc}/${fbif}.json -r ${etc}/${fbif}.json.out ${fbi}", #  || rm -f ${fbif}.json
