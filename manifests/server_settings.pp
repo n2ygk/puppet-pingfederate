@@ -173,7 +173,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       logoutput   => true,
     }
   }
-  if $::pingfederate::facebook_adapter {
+  if str2bool($::pingfederate::facebook_adapter) {
     $fba = "idp/adapters"
     $fbaf = "idp_adapters_facebook"
     file {"${etc}/${fbaf}.json":
@@ -295,7 +295,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     }
   }
   # move this after the OAuth stuff?
-  if $::pingfederate::facebook_adapter {
+  if str2bool($::pingfederate::facebook_adapter) {
     $fbi = "oauth/idpAdapterMappings"
     $fbif = "oauth_idpAdapterMappings_facebook"
     file {"${etc}/${fbif}.json":

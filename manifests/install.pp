@@ -21,19 +21,19 @@ class pingfederate::install inherits ::pingfederate {
     ensure_packages($pingfederate::package_list, {'ensure' => $pingfederate::package_ensure})
   }
   # TBD: Refactor to a list of adapters to add? Or to download from PingIdentity.com?
-  if $pingfederate::facebook_adapter {
+  if str2bool($pingfederate::facebook_adapter) {
     ensure_packages($pingfederate::facebook_package_list, {'ensure' => $pingfederate::facebook_package_ensure})
   }
-  if $pingfederate::google_adapter {
+  if str2bool($pingfederate::google_adapter) {
     ensure_packages($pingfederate::google_package_list,{'ensure' => $pingfederate::google_package_ensure})
   }
-  if $pingfederate::linkedin_adapter {
+  if str2bool($pingfederate::linkedin_adapter) {
     ensure_packages($pingfederate::linkedin_package_list,{'ensure' => $pingfederate::linkedin_package_ensure})
   }
-  if $pingfederate::twitter_adapter {
+  if str2bool($pingfederate::twitter_adapter) {
     ensure_packages($pingfederate::twitter_adapter_list,{'ensure' => $pingfederate::twitter_package_ensure})
   }
-  if $pingfederate::windowslive_adapter {
+  if str2bool($pingfederate::windowslive_adapter) {
     ensure_packages($pingfederate::windowslive_adapter_list,{'ensure' => $pingfederate::windowslive_package_ensure})
   }
   # python and augeas scripts are in templates/

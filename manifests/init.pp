@@ -170,7 +170,7 @@ class pingfederate (
   validate_integer($cluster_failure_detection_bind_port,65535,1)
   validate_integer($cluster_node_index,undef,0)
   validate_bool($cluster_encrypt)
-  if $cluster_encrypt {
+  if str2bool($cluster_encrypt) {
     validate_string($cluster_auth_pwd)
   }
   # Example: host1[7600],10.0.1.4[7600],host7[1033],10.0.9.45[2231] 
