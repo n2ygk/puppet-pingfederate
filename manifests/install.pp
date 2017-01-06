@@ -36,8 +36,8 @@ class pingfederate::install inherits ::pingfederate {
   if $pingfederate::windowslive_adapter {
     ensure_packages($pingfederate::windowslive_adapter_list,{'ensure' => $pingfederate::windowslive_package_ensure})
   }
-  # python scripts are in templates/
-  ensure_packages(['python','python-requests','python-libs'],{'ensure' => 'installed'})
+  # python and augeas scripts are in templates/
+  ensure_packages(['python','python-requests','python-libs','augeas'],{'ensure' => 'installed'})
 
   # Also install some local configuration tools
   file { "${::pingfederate::install_dir}/local":
