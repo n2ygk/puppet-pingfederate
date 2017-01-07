@@ -15,7 +15,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     content  => template("pingfederate/${ss}.json.erb"),
   } ~> 
   exec {"pf-admin-api PUT ${ss}":
-    command     => "${pfapi} -m PUT -j ${etc}/${ss}.json -r ${etc}/${ss}.json.out ${ss}", #  || rm -f ${ss}.json
+    command     => "${pfapi} -m PUT -j ${etc}/${ss}.json -r ${etc}/${ss}.json.out ${ss} || rm -f ${ss}.json",
     refreshonly => true,
     user        => $::pingfederate::owner,
     logoutput   => true,
@@ -30,7 +30,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     content  => template("pingfederate/${pcv}.json.erb"),
   } ~> 
   exec {"pf-admin-api POST ${pcv}":
-    command     => "${pfapi} -m POST -j ${etc}/${pcv}.json -r ${etc}/${pcv}.json.out ${pcv}", #  || rm -f ${pcv}.json
+    command     => "${pfapi} -m POST -j ${etc}/${pcv}.json -r ${etc}/${pcv}.json.out ${pcv} || rm -f ${pcv}.json",
     refreshonly => true,
     user        => $::pingfederate::owner,
     logoutput   => true,
@@ -46,7 +46,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${apc}.json.erb"),
     } ~> 
     exec {"pf-admin-api POST ${apc}":
-      command     => "${pfapi} -m POST -j ${etc}/${apc}.json -r ${etc}/${apc}.json.out -i ${etc}/${apc}.id ${apc}", #  || rm -f ${apc}.json
+      command     => "${pfapi} -m POST -j ${etc}/${apc}.json -r ${etc}/${apc}.json.out -i ${etc}/${apc}.id ${apc} || rm -f ${apc}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -100,7 +100,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     } 
     exec {"pf-admin-api POST ${apcm}/saml2":
       subscribe   => Concat["${etc}/${apcmf}.json"],
-      command     => "${pfapi} -m POST -j ${etc}/${apcmf}.json -r ${etc}/${apcmf}.json.out -i ${etc}/${apcmf}.id ${apcm}", #  || rm -f ${apcmf}.json
+      command     => "${pfapi} -m POST -j ${etc}/${apcmf}.json -r ${etc}/${apcmf}.json.out -i ${etc}/${apcmf}.id ${apcm} || rm -f ${apcmf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -117,7 +117,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     content  => template("pingfederate/${oasf}.json.erb"),
   } ~> 
   exec {"pf-admin-api PUT ${oas}":
-    command     => "${pfapi} -m PUT -j ${etc}/${oasf}.json -r ${etc}/${oasf}.json.out ${oas}", #  || rm -f ${oasf}.json
+    command     => "${pfapi} -m PUT -j ${etc}/${oasf}.json -r ${etc}/${oasf}.json.out ${oas} || rm -f ${oasf}.json",
     refreshonly => true,
     user        => $::pingfederate::owner,
     logoutput   => true,
@@ -134,7 +134,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${atmf}.json.erb"),
     } ~> 
     exec {"pf-admin-api POST ${atm}":
-      command     => "${pfapi} -m POST -j ${etc}/${atmf}.json -r ${etc}/${atmf}.json.out ${atm}", #  || rm -f ${atmf}.json
+      command     => "${pfapi} -m POST -j ${etc}/${atmf}.json -r ${etc}/${atmf}.json.out ${atm} || rm -f ${atmf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -153,7 +153,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${oipf}.json.erb"),
     } ~> 
     exec {"pf-admin-api POST ${oip}":
-      command     => "${pfapi} -m POST -j ${etc}/${oipf}.json -r ${etc}/${oipf}.json.out ${oip}", #  || rm -f ${oipf}.json
+      command     => "${pfapi} -m POST -j ${etc}/${oipf}.json -r ${etc}/${oipf}.json.out ${oip} || rm -f ${oipf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -167,7 +167,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${oisf}.json.erb"),
     } ~> 
     exec {"pf-admin-api PUT ${ois}":
-      command     => "${pfapi} -m PUT -j ${etc}/${oisf}.json -r ${etc}/${oisf}.json.out ${ois}", #  || rm -f ${oisf}.json
+      command     => "${pfapi} -m PUT -j ${etc}/${oisf}.json -r ${etc}/${oisf}.json.out ${ois} || rm -f ${oisf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -184,7 +184,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${fbaf}.json.erb"),
     } ~> 
     exec {"pf-admin-api POST ${fbaf}":
-      command     => "${pfapi} -m POST -j ${etc}/${fbaf}.json -r ${etc}/${fbaf}.json.out ${fba}", #  || rm -f ${fbaf}.json
+      command     => "${pfapi} -m POST -j ${etc}/${fbaf}.json -r ${etc}/${fbaf}.json.out ${fba} || rm -f ${fbaf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -234,7 +234,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     } 
     exec {"pf-admin-api POST ${spidp}":
       subscribe   => Concat["${etc}/${spidpf}.json"],
-      command     => "${pfapi} -m POST -j ${etc}/${spidpf}.json -r ${etc}/${spidpf}.json.out -i ${etc}/${spidpf}.id ${spidp}", #  || rm -f ${spidpf}.json
+      command     => "${pfapi} -m POST -j ${etc}/${spidpf}.json -r ${etc}/${spidpf}.json.out -i ${etc}/${spidpf}.id ${spidp} || rm -f ${spidpf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -288,7 +288,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     } 
     exec {"pf-admin-api POST ${oatsp}/saml2":
       subscribe   => Concat["${etc}/${oatspf}.json"],
-      command     => "${pfapi} -m POST -j ${etc}/${oatspf}.json -r ${etc}/${oatspf}.json.out -i ${etc}/${oatspf}.id ${oatsp}", #  || rm -f ${oatspf}.json
+      command     => "${pfapi} -m POST -j ${etc}/${oatspf}.json -r ${etc}/${oatspf}.json.out -i ${etc}/${oatspf}.id ${oatsp} || rm -f ${oatspf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -307,7 +307,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       require    => Concat["${etc}/${oatspf}.json"],
     } ~> 
     exec {"pf-admin-api POST ${fbif}":
-      command     => "${pfapi} -m POST -j ${etc}/${fbif}.json -r ${etc}/${fbif}.json.out ${fbi}", #  || rm -f ${fbif}.json
+      command     => "${pfapi} -m POST -j ${etc}/${fbif}.json -r ${etc}/${fbif}.json.out ${fbi} || rm -f ${fbif}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -322,7 +322,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${oatfbf}.json.erb"),
     } ~> 
     exec {"pf-admin-api POST ${oatfb}/Facebook":
-      command     => "${pfapi} -m POST -j ${etc}/${oatfbf}.json -r ${etc}/${oatfbf}.json.out -i ${etc}/${oatfbf}.id ${oatfb}", #  || rm -f ${oatfbf}.json
+      command     => "${pfapi} -m POST -j ${etc}/${oatfbf}.json -r ${etc}/${oatfbf}.json.out -i ${etc}/${oatfbf}.id ${oatfb} || rm -f ${oatfbf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
