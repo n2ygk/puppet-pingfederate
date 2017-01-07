@@ -15,7 +15,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     content  => template("pingfederate/${ss}.json.erb"),
   } ~> 
   exec {"pf-admin-api PUT ${ss}":
-    command     => "${pfapi} -m PUT -j ${etc}/${ss}.json -r ${etc}/${ss}.json.out ${ss} || rm -f ${ss}.json",
+    command     => "${pfapi} -m PUT -j ${etc}/${ss}.json -r ${etc}/${ss}.json.out ${ss}", # || rm -f ${ss}.json",
     refreshonly => true,
     user        => $::pingfederate::owner,
     logoutput   => true,
@@ -30,12 +30,13 @@ class pingfederate::server_settings inherits ::pingfederate {
     content  => template("pingfederate/${pcv}.json.erb"),
   } ~> 
   exec {"pf-admin-api POST ${pcv}":
-    command     => "${pfapi} -m POST -j ${etc}/${pcv}.json -r ${etc}/${pcv}.json.out ${pcv} || rm -f ${pcv}.json",
+    command     => "${pfapi} -m POST -j ${etc}/${pcv}.json -r ${etc}/${pcv}.json.out ${pcv}", # || rm -f ${pcv}.json",
     refreshonly => true,
     user        => $::pingfederate::owner,
     logoutput   => true,
   }
 
+  notify {$::pingfederate::saml2_sp_auth_policy_name:}
   if $::pingfederate::saml2_sp_auth_policy_name {
     $apc = "authenticationPolicyContracts"
     file {"${etc}/${apc}.json":
@@ -46,7 +47,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${apc}.json.erb"),
     } ~> 
     exec {"pf-admin-api POST ${apc}":
-      command     => "${pfapi} -m POST -j ${etc}/${apc}.json -r ${etc}/${apc}.json.out -i ${etc}/${apc}.id ${apc} || rm -f ${apc}.json",
+      command     => "${pfapi} -m POST -j ${etc}/${apc}.json -r ${etc}/${apc}.json.out -i ${etc}/${apc}.id ${apc}", # || rm -f ${apc}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -57,11 +58,12 @@ class pingfederate::server_settings inherits ::pingfederate {
     $apcm_frag03 = "${apcmf}_03"
     $apcm_frag05 = "${apcmf}_05"
     $apcm_frag07 = "${apcmf}_07"
+    Exec["pf-admin-api POST ${apc}"] ->
     concat {"${etc}/${apcmf}.json":
-      ensure => present,
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
+      ensure  => present,
+      mode    => 'a=r',
+      owner   => $::pingfederate::owner,
+      group   => $::pingfederate::group,
     }
     concat::fragment {"${apcm_frag01}":
       target  => "${etc}/${apcmf}.json",
@@ -87,7 +89,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       target  => "${etc}/${apcmf}.json",
       content => template("pingfederate/${apcm_frag05}.json.erb"),
       order   => '05',
-    } 
+    }
     concat::fragment {"${apc}.id ${apcm} 06":
       target => "${etc}/${apcmf}.json",
       source => "${etc}/${apc}.id",
@@ -97,10 +99,10 @@ class pingfederate::server_settings inherits ::pingfederate {
       target  => "${etc}/${apcmf}.json",
       content => template("pingfederate/${apcm_frag07}.json.erb"),
       order   => '07',
-    } 
+    }
     exec {"pf-admin-api POST ${apcm}/saml2":
       subscribe   => Concat["${etc}/${apcmf}.json"],
-      command     => "${pfapi} -m POST -j ${etc}/${apcmf}.json -r ${etc}/${apcmf}.json.out -i ${etc}/${apcmf}.id ${apcm} || rm -f ${apcmf}.json",
+      command     => "${pfapi} -m POST -j ${etc}/${apcmf}.json -r ${etc}/${apcmf}.json.out -i ${etc}/${apcmf}.id ${apcm}", # || rm -f ${apcmf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -117,7 +119,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     content  => template("pingfederate/${oasf}.json.erb"),
   } ~> 
   exec {"pf-admin-api PUT ${oas}":
-    command     => "${pfapi} -m PUT -j ${etc}/${oasf}.json -r ${etc}/${oasf}.json.out ${oas} || rm -f ${oasf}.json",
+    command     => "${pfapi} -m PUT -j ${etc}/${oasf}.json -r ${etc}/${oasf}.json.out ${oas}", # || rm -f ${oasf}.json",
     refreshonly => true,
     user        => $::pingfederate::owner,
     logoutput   => true,
@@ -126,6 +128,7 @@ class pingfederate::server_settings inherits ::pingfederate {
   if $::pingfederate::oauth_svc_acc_tok_mgr_id {
     $atm = "oauth/accessTokenManagers"
     $atmf = "oauth_accessTokenManagers"
+    Exec["pf-admin-api PUT ${oas}"] ->
     file {"${etc}/${atmf}.json":
       ensure   => 'present',
       mode     => 'a=r',
@@ -134,7 +137,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${atmf}.json.erb"),
     } ~> 
     exec {"pf-admin-api POST ${atm}":
-      command     => "${pfapi} -m POST -j ${etc}/${atmf}.json -r ${etc}/${atmf}.json.out ${atm} || rm -f ${atmf}.json",
+      command     => "${pfapi} -m POST -j ${etc}/${atmf}.json -r ${etc}/${atmf}.json.out ${atm}", # || rm -f ${atmf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -153,21 +156,20 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${oipf}.json.erb"),
     } ~> 
     exec {"pf-admin-api POST ${oip}":
-      command     => "${pfapi} -m POST -j ${etc}/${oipf}.json -r ${etc}/${oipf}.json.out ${oip} || rm -f ${oipf}.json",
+      command     => "${pfapi} -m POST -j ${etc}/${oipf}.json -r ${etc}/${oipf}.json.out ${oip}", # || rm -f ${oipf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
     } ->
     file {"${etc}/${oisf}.json":
       ensure   => 'present',
-      require  => File["${etc}/${oipf}.json"],
       mode     => 'a=r',
       owner    => $::pingfederate::owner,
       group    => $::pingfederate::group,
       content  => template("pingfederate/${oisf}.json.erb"),
     } ~> 
     exec {"pf-admin-api PUT ${ois}":
-      command     => "${pfapi} -m PUT -j ${etc}/${oisf}.json -r ${etc}/${oisf}.json.out ${ois} || rm -f ${oisf}.json",
+      command     => "${pfapi} -m PUT -j ${etc}/${oisf}.json -r ${etc}/${oisf}.json.out ${ois}", # || rm -f ${oisf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -184,7 +186,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${fbaf}.json.erb"),
     } ~> 
     exec {"pf-admin-api POST ${fbaf}":
-      command     => "${pfapi} -m POST -j ${etc}/${fbaf}.json -r ${etc}/${fbaf}.json.out ${fba} || rm -f ${fbaf}.json",
+      command     => "${pfapi} -m POST -j ${etc}/${fbaf}.json -r ${etc}/${fbaf}.json.out ${fba}", # || rm -f ${fbaf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -192,8 +194,6 @@ class pingfederate::server_settings inherits ::pingfederate {
   }
   # TO DO: additional social adapters. Can probably parameterize and reuse the facebook stuff,
 
-  # SP idp partner configuration needs to pull in an ID from authenticationPolicyContracts.
-  # So template the fragments and then concatenate them.
   if $::pingfederate::saml2_idp_url {
     $spidp = 'sp/idpConnections'
     $spidpf = 'sp_idpConnections'
@@ -201,8 +201,10 @@ class pingfederate::server_settings inherits ::pingfederate {
     $spidp_frag03 = "${spidpf}_03"
     $spidp_frag05 = "${spidpf}_05"
     $x509_string = regsubst($::pingfederate::saml2_idp_cert_content,'\n','\\n','G')
+
+    Exec["pf-admin-api POST ${apc}"] ->
     concat {"${etc}/${spidpf}.json":
-      ensure => present,
+      ensure   => present,
       mode     => 'a=r',
       owner    => $::pingfederate::owner,
       group    => $::pingfederate::group,
@@ -234,7 +236,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     } 
     exec {"pf-admin-api POST ${spidp}":
       subscribe   => Concat["${etc}/${spidpf}.json"],
-      command     => "${pfapi} -m POST -j ${etc}/${spidpf}.json -r ${etc}/${spidpf}.json.out -i ${etc}/${spidpf}.id ${spidp} || rm -f ${spidpf}.json",
+      command     => "${pfapi} -m POST -j ${etc}/${spidpf}.json -r ${etc}/${spidpf}.json.out -i ${etc}/${spidpf}.id ${spidp}", # || rm -f ${spidpf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -245,11 +247,13 @@ class pingfederate::server_settings inherits ::pingfederate {
     $oatsp_frag03 = "${oatspf}_03"
     $oatsp_frag05 = "${oatspf}_05"
     $oatsp_frag07 = "${oatspf}_07"
+
+    Exec["pf-admin-api POST ${spidp}"] ->
     concat {"${etc}/${oatspf}.json":
-      ensure => present,
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
+      ensure  => present,
+      mode    => 'a=r',
+      owner   => $::pingfederate::owner,
+      group   => $::pingfederate::group,
     }
     concat::fragment {"${oatsp_frag01}":
       target  => "${etc}/${oatspf}.json",
@@ -288,7 +292,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     } 
     exec {"pf-admin-api POST ${oatsp}/saml2":
       subscribe   => Concat["${etc}/${oatspf}.json"],
-      command     => "${pfapi} -m POST -j ${etc}/${oatspf}.json -r ${etc}/${oatspf}.json.out -i ${etc}/${oatspf}.id ${oatsp} || rm -f ${oatspf}.json",
+      command     => "${pfapi} -m POST -j ${etc}/${oatspf}.json -r ${etc}/${oatspf}.json.out -i ${etc}/${oatspf}.id ${oatsp}", # || rm -f ${oatspf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -299,21 +303,25 @@ class pingfederate::server_settings inherits ::pingfederate {
     $fbi = "oauth/idpAdapterMappings"
     $fbif = "oauth_idpAdapterMappings_facebook"
     file {"${etc}/${fbif}.json":
+      require    => [
+                     Exec["pf-admin-api POST ${fbaf}"], # need idp/apapters/Facebook
+                     Exec["pf-admin-api POST ${atm}"],  # need oauth/accessTokenManagers/{id}
+                     ],
       ensure     => 'present',
       mode       => 'a=r',
       owner      => $::pingfederate::owner,
       group      => $::pingfederate::group,
       content    => template("pingfederate/${fbif}.json.erb"),
-      require    => Concat["${etc}/${oatspf}.json"],
     } ~> 
     exec {"pf-admin-api POST ${fbif}":
-      command     => "${pfapi} -m POST -j ${etc}/${fbif}.json -r ${etc}/${fbif}.json.out ${fbi} || rm -f ${fbif}.json",
+      command     => "${pfapi} -m POST -j ${etc}/${fbif}.json -r ${etc}/${fbif}.json.out ${fbi}", # || rm -f ${fbif}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
     $oatfb = 'oauth/accessTokenMappings'
     $oatfbf = 'oauth_accessTokenMappings_facebook'
+    Exec["pf-admin-api POST ${fbaf}"] ->
     file {"${etc}/${oatfbf}.json":
       ensure   => 'present',
       mode     => 'a=r',
@@ -322,7 +330,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${oatfbf}.json.erb"),
     } ~> 
     exec {"pf-admin-api POST ${oatfb}/Facebook":
-      command     => "${pfapi} -m POST -j ${etc}/${oatfbf}.json -r ${etc}/${oatfbf}.json.out -i ${etc}/${oatfbf}.id ${oatfb} || rm -f ${oatfbf}.json",
+      command     => "${pfapi} -m POST -j ${etc}/${oatfbf}.json -r ${etc}/${oatfbf}.json.out -i ${etc}/${oatfbf}.id ${oatfb}", # || rm -f ${oatfbf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
