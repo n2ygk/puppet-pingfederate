@@ -202,14 +202,14 @@ class pingfederate (
                          --host=${::pingfederate::oauth_jdbc_host}     \
                          --port=${::pingfederate::oauth_jdbc_port}     \
                          --user=${::pingfederate::oauth_jdbc_user}     \
-                         --password=${::pingfederate::oauth_jdbc_pass} \
+                         --password=\"${::pingfederate::oauth_jdbc_pass}\" \
                          create ${::pingfederate::oauth_jdbc_db}       \
                          | /bin/awk '/database exists/{exit 0}/./{exit 1}' " # allow database exists error or no output
         $def_cmd      = "/usr/bin/mysql --wait --connect_timeout=30    \
                          --host=${::pingfederate::oauth_jdbc_host}     \
                          --port=${::pingfederate::oauth_jdbc_port}     \
                          --user=${::pingfederate::oauth_jdbc_user}     \
-                         --password=${::pingfederate::oauth_jdbc_pass} \
+                         --password=\"${::pingfederate::oauth_jdbc_pass}\" \
                          --database=${::pingfederate::oauth_jdbc_db}   \
                          < ${script_dir}/${script}                     \
                          | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'  " # allow 1050 (table already exists) or no output
