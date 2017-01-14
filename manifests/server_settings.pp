@@ -36,7 +36,6 @@ class pingfederate::server_settings inherits ::pingfederate {
     logoutput   => true,
   }
 
-  notify {$::pingfederate::saml2_sp_auth_policy_name:}
   if $::pingfederate::saml2_sp_auth_policy_name {
     $apc = "authenticationPolicyContracts"
     file {"${etc}/${apc}.json":
