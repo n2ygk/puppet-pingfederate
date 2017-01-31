@@ -32,10 +32,11 @@ def do_req(retries,method,url,**kwargs):
       time.sleep(timeout)
 
   # only get here if retries is exceeded
-  response.status_code = '408'
-  response.reason = 'Request Timeout'
-  response.text = jsons.dumps({'error': 'timed out', 'error_description': 'the API did not respond'})
-  return response
+  class R:
+    status_code = 408
+    reason = 'Request Timeout'
+    text = jsons.dumps({'error': 'timed out', 'error_description': 'the API did not respond'})
+  return R()
 
 
 parser = OptionParser(usage='%prog [options] resource')
