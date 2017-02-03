@@ -376,9 +376,19 @@ If it is `undef` then the default internal XML-based datastore will be used.
   Command to execute to create the database schema.
   Set based on the *oauth_jdbc_type*
 
-##### `oauth_jdbc_ddl_cmd`
+##### `oauth_jdbc_client_ddl_cmd`
   (string)
-  Command to execute to initialize the database schema.
+  Command to execute to initialize the OAuth Client Manager database schema.
+  Set based on the *oauth_jdbc_type*
+
+##### `oauth_jdbc_access_ddl_cmd`
+  (string)
+  Command to execute to initialize the OAuth Access database schema.
+  Set based on the *oauth_jdbc_type*
+
+##### `acct_jdbc_linking_ddl_cmd`
+  (string)
+  Command to execute to initialize the Account Linking database schema.
   Set based on the *oauth_jdbc_type*
 
 #### OAuth client manager

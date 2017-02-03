@@ -116,6 +116,8 @@ class pingfederate (
   $oauth_jdbc_validate                 = $::pingfederate::params::oauth_jdbc_validate,
   $oauth_jdbc_create_cmd               = $::pingfederate::params::oauth_jdbc_create_cmd,
   $oauth_jdbc_ddl_cmd                  = $::pingfederate::params::oauth_jdbc_ddl_cmd,
+  # drag in acct linking datastore while we are at it...
+  $acct_jdbc_linking_ddl_cmd           = $::pingfederate::params::acct_jdbc_linking_ddl_cmd,
   # API: passwordCredentialValidators (for OAuth client manager)
   $oauth_client_mgr_user               = $::pingfederate::params::oauth_client_mgr_user,
   $oauth_client_mgr_pass               = $::pingfederate::params::oauth_client_mgr_pass,
@@ -182,11 +184,17 @@ class pingfederate (
   validate_integer($secondary_https_port,65535,-1)
 
   # Setup the OAuth JDBC settings, if requested (oauth_jdbc_type is defined)
+  # Do this for both oauth client management and access grants in the same database (MYSQL example shown):
+  # .../server/default/conf/oauth-client-management/sql-scripts/oauth-client-management-mysql.sql
+  # .../server/default/conf/access-grant/sql-scripts/access-grant-mysql.sql
+  # .../server/default/conf/account-linking/sql-scripts/account-linking-mysql.sql
   # If overriding settings are not provided, the defaults are filled in based on the type.
   if $::pingfederate::oauth_jdbc_type {
     validate_re($oauth_jdbc_type,['^mysql$','^sqlserver$','^oracle$','^other$'])
     # The following defaults based on database type (mysql, mssql, oracle) can still be overidden.
-    $script_dir = "${::pingfederate::install_dir}/server/default/conf/oauth-client-management/sql-scripts/"
+    $oauth_client_script_dir = "${::pingfederate::install_dir}/server/default/conf/oauth-client-management/sql-scripts/"
+    $oauth_access_script_dir = "${::pingfederate::install_dir}/server/default/conf/access-grant/sql-scripts/"
+    $acct_linking_script_dir = "${::pingfederate::install_dir}/server/default/conf/account-linking/sql-scripts/"
     case $::pingfederate::oauth_jdbc_type {
       'mysql': {
         $def_pkgs     = ['mysql','mysql-connector-java']
@@ -196,7 +204,9 @@ class pingfederate (
         $def_driver   = 'com.mysql.jdbc.Driver'
         $portstr      = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
         $def_url      = "jdbc:mysql://${oauth_jdbc_host}${portstr}/${oauth_jdbc_db}"
-        $script       = 'oauth-client-management-mysql.sql'
+        $oauth_client_script = 'oauth-client-management-mysql.sql'
+        $oauth_access_script = 'access-grant-mysql.sql'
+        $acct_linking_script = 'account-linking-mysql.sql'
         $def_create   = "/usr/bin/mysqladmin --wait                    \
                          --connect_timeout=30                          \
                          --host=${::pingfederate::oauth_jdbc_host}     \
@@ -205,13 +215,29 @@ class pingfederate (
                          --password=\"${::pingfederate::oauth_jdbc_pass}\" \
                          create ${::pingfederate::oauth_jdbc_db}       \
                          | /bin/awk '/database exists/{exit 0}/./{exit 1}' " # allow database exists error or no output
-        $def_cmd      = "/usr/bin/mysql --wait --connect_timeout=30    \
+        $def_oauth_client_cmd      = "/usr/bin/mysql --wait --connect_timeout=30    \
                          --host=${::pingfederate::oauth_jdbc_host}     \
                          --port=${::pingfederate::oauth_jdbc_port}     \
                          --user=${::pingfederate::oauth_jdbc_user}     \
                          --password=\"${::pingfederate::oauth_jdbc_pass}\" \
                          --database=${::pingfederate::oauth_jdbc_db}   \
-                         < ${script_dir}/${script}                     \
+                         < ${oauth_client_script_dir}/${oauth_client_script} \
+                         | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'  " # allow 1050 (table already exists) or no output
+        $def_oauth_access_cmd      = "/usr/bin/mysql --wait --connect_timeout=30    \
+                         --host=${::pingfederate::oauth_jdbc_host}     \
+                         --port=${::pingfederate::oauth_jdbc_port}     \
+                         --user=${::pingfederate::oauth_jdbc_user}     \
+                         --password=\"${::pingfederate::oauth_jdbc_pass}\" \
+                         --database=${::pingfederate::oauth_jdbc_db}   \
+                         < ${oauth_access_script_dir}/${oauth_access_script} \
+                         | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'  " # allow 1050 (table already exists) or no output
+        $def_acct_linking_cmd      = "/usr/bin/mysql --wait --connect_timeout=30    \
+                         --host=${::pingfederate::oauth_jdbc_host}     \
+                         --port=${::pingfederate::oauth_jdbc_port}     \
+                         --user=${::pingfederate::oauth_jdbc_user}     \
+                         --password=\"${::pingfederate::oauth_jdbc_pass}\" \
+                         --database=${::pingfederate::oauth_jdbc_db}   \
+                         < ${acct_linking_script_dir}/${acct_linking_script} \
                          | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'  " # allow 1050 (table already exists) or no output
       }
       'sqlserver': {
@@ -230,7 +256,9 @@ class pingfederate (
         $def_driver   = undef
         $def_url      = undef
         $def_create   = undef
-        $def_cmd      = undef
+        $def_oauth_client_cmd      = undef
+        $def_oauth_access_cmd      = undef
+        $def_acct_linking_cmd      = undef
       }
       default: { fail("Don't know to configure for database type ${::pingfederate::oauth_jdbc_type}.") }
     }
@@ -243,7 +271,9 @@ class pingfederate (
     $o_driver   = if $::pingfederate::oauth_jdbc_driver { $::pingfederate::oauth_jdbc_driver } else { $def_driver }
     $o_url      = if $::pingfederate::oauth_jdbc_url { $::pingfederate::oauth_jdbc_url } else { $def_url }
     $o_create   = if $::pingfederate::oauth_jdbc_create_cmd { $::pingfederate::oauth_jdbc_create_cmd } else { $def_create }
-    $o_cmd      = if $::pingfederate::oauth_jdbc_ddl_cmd { $::pingfederate::oauth_jdbc_ddl_cmd } else { $def_cmd }
+    $o_c_cmd    = if $::pingfederate::oauth_jdbc_client_ddl_cmd { $::pingfederate::oauth_jdbc_client_ddl_cmd } else { $def_oauth_client_cmd }
+    $o_a_cmd    = if $::pingfederate::oauth_jdbc_access_ddl_cmd { $::pingfederate::oauth_jdbc_ddl_access_cmd } else { $def_oauth_access_cmd }
+    $a_l_cmd    = if $::pingfederate::acct_jdbc_linking_ddl_cmd { $::pingfederate::acct_jdbc_ddl_linking_cmd } else { $def_acct_linking_cmd }
   }
 
   # need to do more validation...

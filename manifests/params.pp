@@ -107,7 +107,9 @@ class pingfederate::params {
   $oauth_jdbc_jar                      = undef
   $oauth_jdbc_validate                 = undef
   $oauth_jdbc_create_cmd               = undef
-  $oauth_jdbc_ddl_cmd                  = undef
+  $oauth_jdbc_client_ddl_cmd           = undef
+  $oauth_jdbc_access_ddl_cmd           = undef
+  $acct_jdbc_linking_ddl_cmd           = undef
   $oauth_client_mgr_user               = 'clientmgr'
   $oauth_client_mgr_pass               = 'ProviderP@55'
   $oauth_svc_grant_core_attrs          = ['USER_KEY','USER_NAME']

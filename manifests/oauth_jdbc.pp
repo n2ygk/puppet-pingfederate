@@ -67,8 +67,20 @@ class pingfederate::oauth_jdbc inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     } ~>
-    exec {"oauth_jdbc DDL ${::pingfederate::o_url}":
-      command => $::pingfederate::o_cmd,
+    exec {"oauth_jdbc_client DDL ${::pingfederate::o_url}":
+      command => $::pingfederate::o_c_cmd,
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    } ~>
+    exec {"oauth_jdbc_access DDL ${::pingfederate::o_url}":
+      command => $::pingfederate::o_a_cmd,
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    } ~>
+    exec {"acct_jdbc_linking DDL ${::pingfederate::o_url}":
+      command => $::pingfederate::a_l_cmd,
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
