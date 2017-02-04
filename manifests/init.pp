@@ -186,7 +186,7 @@ class pingfederate (
   # Setup the OAuth JDBC settings, if requested (oauth_jdbc_type is defined)
   # Do this for both oauth client management and access grants in the same database (MYSQL example shown):
   # .../server/default/conf/oauth-client-management/sql-scripts/oauth-client-management-mysql.sql
-  # .../server/default/conf/access-grant/sql-scripts/access-grant-mysql.sql
+  # .../server/default/conf/access-grant/sql-scripts/access-grant-*-mysql.sql (2 scripts!)
   # .../server/default/conf/account-linking/sql-scripts/account-linking-mysql.sql
   # If overriding settings are not provided, the defaults are filled in based on the type.
   if $::pingfederate::oauth_jdbc_type {
@@ -205,7 +205,8 @@ class pingfederate (
         $portstr      = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
         $def_url      = "jdbc:mysql://${oauth_jdbc_host}${portstr}/${oauth_jdbc_db}"
         $oauth_client_script = 'oauth-client-management-mysql.sql'
-        $oauth_access_script = 'access-grant-mysql.sql'
+        $oauth_access_script1 = 'access-grant-mysql.sql'
+        $oauth_access_script2 = 'access-grant-attribute-mysql.sql'
         $acct_linking_script = 'account-linking-mysql.sql'
         $def_create   = "/usr/bin/mysqladmin --wait                    \
                          --connect_timeout=30                          \
@@ -223,13 +224,15 @@ class pingfederate (
                          --database=${::pingfederate::oauth_jdbc_db}   \
                          < ${oauth_client_script_dir}/${oauth_client_script} \
                          | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'  " # allow 1050 (table already exists) or no output
-        $def_oauth_access_cmd      = "/usr/bin/mysql --wait --connect_timeout=30    \
+        # kludge to deal with a back-level mysql < 5.6
+        $def_oauth_access_cmd      = "/bin/cat ${oauth_access_script_dir}/${oauth_access_script1} ${oauth_access_script_dir}/${oauth_access_script2} \
+                         | /bin/sed -e 's/default CURRENT_TIMESTAMP//' \
+                         | /usr/bin/mysql --wait --connect_timeout=30  \
                          --host=${::pingfederate::oauth_jdbc_host}     \
                          --port=${::pingfederate::oauth_jdbc_port}     \
                          --user=${::pingfederate::oauth_jdbc_user}     \
                          --password=\"${::pingfederate::oauth_jdbc_pass}\" \
                          --database=${::pingfederate::oauth_jdbc_db}   \
-                         < ${oauth_access_script_dir}/${oauth_access_script} \
                          | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'  " # allow 1050 (table already exists) or no output
         $def_acct_linking_cmd      = "/usr/bin/mysql --wait --connect_timeout=30    \
                          --host=${::pingfederate::oauth_jdbc_host}     \
