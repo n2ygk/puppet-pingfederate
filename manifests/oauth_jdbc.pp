@@ -23,6 +23,8 @@ class pingfederate::oauth_jdbc inherits ::pingfederate {
       ensure_packages($::pingfederate::o_pkgs,{'ensure' => $::pingfederate::oauth_jdbc_package_ensure})
     }
     # make sure the jar file is there and, if newly installed, bounce the server.
+    $ds = "${::pingfederate::install_dir}/local/etc/dataStores.json"
+
     file { "${::pingfederate::install_dir}/server/default/lib/${::pingfederate::o_jar}":
       ensure => 'present',
       source => "${::pingfederate::o_jar_dir}/${::pingfederate::o_jar}",
@@ -45,9 +47,8 @@ class pingfederate::oauth_jdbc inherits ::pingfederate {
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
-    }
-
-    $ds = "${::pingfederate::install_dir}/local/etc/dataStores.json"
+      before      => File[$ds],
+    } ->
     file {$ds:
       ensure   => 'present',
       mode     => 'u=r,go=',
