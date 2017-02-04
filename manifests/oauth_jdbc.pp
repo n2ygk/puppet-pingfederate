@@ -63,6 +63,7 @@ class pingfederate::oauth_jdbc inherits ::pingfederate {
       logoutput   => true,
     } ~>
     exec {'oauth_jdbc_augeas':
+      subscribe   => File["${::pingfederate::install_dir}/local/bin/oauth_jdbc_augeas"],
       command     => "${::pingfederate::install_dir}/local/bin/oauth_jdbc_augeas",
       refreshonly => true,
       user        => $::pingfederate::owner,
