@@ -42,7 +42,7 @@ class pingfederate::config inherits ::pingfederate {
       'pf.cluster.transport.protocol'          => $::pingfederate::cluster_transport_protocol,
       'pf.cluster.mcast.group.address'         => $::pingfederate::cluster_mcast_group_address,
       'pf.cluster.mcast.group.port'            => $::pingfederate::cluster_mcast_group_port,
-      'pf.cluster.tcp.discovery.initial.hosts' => $::pingfederate::cluster_tcp_discovery_initial_hosts,
+      'pf.cluster.tcp.discovery.initial.hosts' => join($::pingfederate::cluster_tcp_discovery_initial_hosts,',')
       'pf.cluster.diagnostics.enabled'         => $::pingfederate::cluster_diagnostics_enabled,
       'pf.cluster.diagnostics.addr'            => $::pingfederate::cluster_diagnostics_addr,
       'pf.cluster.diagnostics.port'            => $::pingfederate::cluster_diagnostics_port,
