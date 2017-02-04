@@ -176,7 +176,9 @@ class pingfederate (
     validate_string($cluster_auth_pwd)
   }
   # Example: host1[7600],10.0.1.4[7600],host7[1033],10.0.9.45[2231] 
-  validate_string($cluster_tcp_discovery_initial_hosts)
+  if $cluster_tcp_discovery_initial_hosts {
+    validate_array($cluster_tcp_discovery_initial_hosts)
+  }
   validate_ip_address($console_bind_address)
   validate_integer($admin_https_port,65535,1)
   validate_integer($http_port,65535,-1)
