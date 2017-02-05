@@ -1,9 +1,8 @@
 # Class ::pingfederate::install
-# (optionally) install the packages.
+# (optionally) install the pingfederate packages and ensures other required packages.
 # As delivered by the vendor, there are no packages, but I've RPMed them.
+# Future developer: add a way to just use the vendor-supplied ZIP files.
 class pingfederate::install inherits ::pingfederate {
-  # not sure if this java thing belongs here... looks like puppetlabs-java only works for Oracle on CentOS.
-  # use ensure_packages() instead?
   if $::pingfederate::package_java_ensure {
     # if a specific java pkg is specified use it, otherwise use our defaults for redhat or centos
     if $::pingfederate::package_java_list { 
@@ -88,5 +87,43 @@ class pingfederate::install inherits ::pingfederate {
     owner    => $::pingfederate::owner,
     group    => $::pingfederate::group,
     content  => template('pingfederate/pf-admin-cfg.json.erb')
+  }
+  # If using an external JDBC database, install the JAR on the classpath and initialize the database.
+  if $::pingfederate::oauth_jdbc_type {  
+    if $::pingfederate::oauth_jdbc_package_ensure {
+      ensure_packages($::pingfederate::o_pkgs,{'ensure' => $::pingfederate::oauth_jdbc_package_ensure})
+    }
+    file { "${::pingfederate::install_dir}/server/default/lib/${::pingfederate::o_jar}":
+      ensure => 'present',
+      source => "${::pingfederate::o_jar_dir}/${::pingfederate::o_jar}",
+      links  => 'follow',
+      owner  => $::pingfederate::owner,
+      group  => $::pingfederate::group,
+    } ~>
+    exec {"oauth_jdbc CREATE ${::pingfederate::o_url}": # database has to exist before adding the dataStore
+      command => $::pingfederate::o_create,
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+      before      => File[$ds],
+    } ~>
+    exec {"oauth_jdbc_client DDL ${::pingfederate::o_url}": # define tables for oauth client management
+      command => $::pingfederate::o_c_cmd,
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    } ~>
+    exec {"oauth_jdbc_access DDL ${::pingfederate::o_url}": # define tables for sml2 access management
+      command => $::pingfederate::o_a_cmd,
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    } ~>
+    exec {"acct_jdbc_linking DDL ${::pingfederate::o_url}": # define tables for account linking
+      command => $::pingfederate::a_l_cmd,
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
   }
 }
