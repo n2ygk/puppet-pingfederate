@@ -4,19 +4,18 @@
 # license key, etc. that can be installed prior to starting the server.
 # Additional configuration happens after the server is running. See pingfederarte::admin.
 class pingfederate::config inherits ::pingfederate {
-  # apparently the augeas-1.4 Properties.lens doesn't work!
-  # this throws a parser error:
-  # augeas{'run.properties':
-  #   lens    => 'Properties.lns',
-  #   incl    => "$::pingfederate::install_dir/bin/run.properties",
-  #   changes => ['set "abc.def" "2345"']
-  #}
-
-  # use inifile for this and augeas for the XML files
   $defaults = {'path' => "${::pingfederate::install_dir}/bin/run.properties"}
-  # this Java properties file has no sections so the section name is ''
+  # The syntax required is for each list element is "hostname[port]".
+  # The "right" way to get the port would be to use exported resources... For now, just use our value.
+  if $::pingfederate::cluster_tcp_discovery_initial_hosts {
+    $dharray = $::pingfederate::cluster_tcp_discovery_initial_hosts.map |$i| { "${i}[${::pingfederate::cluster_bind_port}]" }
+    $dhstring = join($dharray,',')
+  }
+  else {
+    $dhstring = undef
+  }
   $settings = {
-    '' => {
+    '' => { # this Java properties file has no sections so the section name is ''
       'pf.admin.https.port'                    => $::pingfederate::admin_https_port,
       'pf.admin.hostname'                      => $::pingfederate::admin_hostname,
       'pf.console.bind.address'                => $::pingfederate::console_bind_address,
@@ -42,7 +41,7 @@ class pingfederate::config inherits ::pingfederate {
       'pf.cluster.transport.protocol'          => $::pingfederate::cluster_transport_protocol,
       'pf.cluster.mcast.group.address'         => $::pingfederate::cluster_mcast_group_address,
       'pf.cluster.mcast.group.port'            => $::pingfederate::cluster_mcast_group_port,
-      'pf.cluster.tcp.discovery.initial.hosts' => join($::pingfederate::cluster_tcp_discovery_initial_hosts,','),
+      'pf.cluster.tcp.discovery.initial.hosts' => $dhstring,
       'pf.cluster.diagnostics.enabled'         => $::pingfederate::cluster_diagnostics_enabled,
       'pf.cluster.diagnostics.addr'            => $::pingfederate::cluster_diagnostics_addr,
       'pf.cluster.diagnostics.port'            => $::pingfederate::cluster_diagnostics_port,

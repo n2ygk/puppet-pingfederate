@@ -231,7 +231,7 @@ for an explanation. The defaults are as distributed by PingIdentity.
   (integer) Default `7601`
   
 ##### `cluster_tcp_discovery_initial_hosts`
-  (array[string]) No default.
+  (array[string]) No default. Note that the `cluster_bind_port` must be the same on the other hosts as this one.
   
 ##### `cluster_diagnostics_enabled`
   (boolean) Default: `false`
