@@ -26,7 +26,7 @@ class pingfederate::oauth_jdbc inherits ::pingfederate {
       content  => template('pingfederate/dataStores.json.erb'),
     } ~>
     exec {'pf-admin-api POST dataStores':
-      command     => "${::pingfederate::install_dir}/local/bin/pf-admin-api -m POST -j ${ds} -r ${ds}.out dataStores || rm -f ${ds}",
+      command     => "${::pingfederate::install_dir}/local/bin/pf-admin-api -m POST -j ${ds} -r ${ds}.out dataStores", # || rm -f ${ds}
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
