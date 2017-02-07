@@ -122,6 +122,8 @@ class pingfederate (
   $oauth_client_mgr_user               = $::pingfederate::params::oauth_client_mgr_user,
   $oauth_client_mgr_pass               = $::pingfederate::params::oauth_client_mgr_pass,
   # API: oauth/authServerSettings
+  $oauth_svc_scopes                    = $::pingfederate::params::oauth_svc_scopes,
+  $oauth_svc_scope_groups              = $::pingfederate::params::oauth_svc_scope_groups,
   $oauth_svc_grant_core_attrs          = $::pingfederate::params::oauth_svc_grant_core_attrs,
   $oauth_svc_grant_extd_attrs          = $::pingfederate::params::oauth_svc_grant_extd_attrs,
   # API: oauth/accessTokenManagers

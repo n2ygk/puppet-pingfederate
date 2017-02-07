@@ -421,6 +421,36 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
 Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns: }
   ```
 #### OAuth server settings
+##### `oauth_svc_scopes`
+  (array of hashes) Allowable OAuth scopes. Each hash has the following keys:
+  - name: (string) scope name 
+  - description: (string) descriptive text that is displayed to the user for authorization_code flow.
+  Here's an example in a Hiera YAML file:
+
+  ```yaml
+  pingfederate::oauth_svc_scopes:
+    - name: read
+      description: Can read stuff
+    - name: write
+      description: Can write stuff
+  ```
+
+##### `oauth_svc_scope_groups`
+  (array of hashes) Groupings of OAuth scopes. Each hash has the following keys:
+  - name: (string) scope group name 
+  - description: (string) descriptive text that is displayed to the user for authorization_code flow.
+  - scopes: (array[string]) Names of scopes defined in `oauth_svc_scopes`.
+  Here's an example in a Hiera YAML file:
+
+  ```yaml
+  pingfederate::oauth_svc_scope_groups:
+    - name: readwrite
+      description: Can read and write stuff
+      scopes:
+	    - read
+	    - write
+  ```
+
 ##### `oauth_svc_grant_core_attrs`
   (array[string])
   Oauth server persistent grant contract core attributes. Default: `['USER_KEY','USER_NAME']`

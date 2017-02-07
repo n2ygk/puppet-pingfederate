@@ -347,7 +347,7 @@ are automatical set to random values on each installation and don't need to be e
 - authenticationPolicyContracts [done]
   See [this erb template](templates/authenticationPolicyContracts.json.erb) for an example of using a multivalued array.
 - oauth/authServerSettings [done]
-  May need to add and/or parameterize a few more fields later. But I am able to succesfully invoke the pf-ws client create.
+  There are a few parameters still hardcoded with default values.
 - oauth/accessTokenManagers [done]
 - oauth/openIdConnect/policies [done]
   This one demonstrates using an array of hashes in the erb template.
@@ -355,17 +355,17 @@ are automatical set to random values on each installation and don't need to be e
   This references a policy set in oauth/openIdConnect/policies so has to 'require' it.
 - idp/adapters
   - Facebook [done]
-  Social login. Includes contract mappings. Needs to 
-  GET idp/adapters/com.pingidentity.adapters.idp.facebook.FacebookAuthenticationAdapter
-  in order to fill in the POST template file. Probably needs a Python script. For now, just
-  hardcode what I need.
+	Social login. Includes contract mappings. Needs to 
+	GET idp/adapters/com.pingidentity.adapters.idp.facebook.FacebookAuthenticationAdapter
+	in order to fill in the POST template file. Probably needs a Python script. For now, just
+	hardcode what I need.
+  - still need to do this the other social IdP's.	
 - sp/idpConnections [done]
   This PF server is an SP peering with the Shibboleth SAML2 IdP. The UI has an import feature which
   reads the IdP metadata XML and parses it into the various JSON API parameters. So a cool way to
   do this would be to mimic the same process, converting the XML to JSON. Maybe later. KISS for now.
   The cert metadata(certView) is ignored on POST and PUT we don't have to provide it; just the x509File.
 - oauth/authenticationPolicyContractMappings [done]
-  scope descriptions might not be needed...
 - oauth/idpAdapterMappings [done]
 - oauth/accessTokenMappings [done]
   Templates: `oauth_accessTokenMappings_saml2_*.json erb` and `oauth_accessTokenMappings_facebook.json.erb`.

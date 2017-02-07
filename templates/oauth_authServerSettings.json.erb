@@ -1,10 +1,30 @@
 {
-  "scopes": [ <%# fill these in later as needed -%> ], 
+  "scopes": [
+<% @oauth_svc_scopes.each_with_index do |val, i| -%>
+      {
+        "name": "<%= val['name'] -%>",
+        "description": "<%= val['description'] -%>"
+      }<%= ',' if i < (@oauth_svc_scopes.size - 1) %>
+<% end -%>
+  ], 
+  "scopeGroups": [
+<% @oauth_svc_scope_groups.each_with_index do |val, i| -%>
+      {
+        "name": "<%= val['name'] -%>",
+        "description": "<%= val['description'] -%>",
+        "scopes": [
+<% val['scopes'].each_with_index do |s, j| -%>
+          "<%= s -%>"<%= ',' if j < (val['scopes'].size - 1) %>
+<% end -%>
+        ]
+      }<%= ',' if i < (@oauth_svc_scope_groups.size - 1) %>
+<% end -%>
+  ], 
   "persistentGrantReuseGrantTypes": [
-    "IMPLICIT"<%# TBD if this needs to be parameterized -%>
+    "IMPLICIT"<%# TBD if this needs to be parameterized %>
   ], 
   "adminWebServicePcvRef": {
-    "id": "simplecredential"<%# this is the name I used in passwordCredentialValidators -%>
+    "id": "simplecredential"<%# this is the name I used in passwordCredentialValidators %>
   }, 
   "defaultScopeDescription": "OAuth server", 
   "allowUnidentifiedClientExtensionGrants": false, 
@@ -26,6 +46,5 @@
   "allowUnidentifiedClientROCreds": false, 
   "authorizationCodeTimeout": 60, 
   "authorizationCodeEntropy": 30, 
-  "refreshTokenLength": 42, 
-  "scopeGroups": []
+  "refreshTokenLength": 42
 }
