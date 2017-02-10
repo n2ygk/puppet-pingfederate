@@ -82,6 +82,7 @@ class pingfederate (
   # API: sp/idpConnections (SAML2 partner IdP)
   $saml2_idp_url                       = $::pingfederate::params::saml2_idp_url,
   $saml2_idp_entityID                  = $::pingfederate::params::saml2_idp_entityID,
+  $saml2_idp_name                      = $::pingfederate::params::saml2_idp_name,
   $saml2_idp_post                      = $::pingfederate::params::saml2_idp_post,
   $saml2_idp_redirect                  = $::pingfederate::params::saml2_idp_redirect,
   $saml2_idp_contact                   = $::pingfederate::params::saml2_idp_contact,
@@ -92,7 +93,7 @@ class pingfederate (
   $saml2_idp_attr_map                  = $::pingfederate::params::saml2_idp_attr_map,
   $saml2_idp_oauth_map                 = $::pingfederate::params::saml2_idp_oauth_map,
   $saml2_idp_cert_file                 = $::pingfederate::params::saml2_idp_cert_file,
-  $saml2_idp_cert_content                  = $::pingfederate::params::saml2_idp_cert_content,
+  $saml2_idp_cert_content              = $::pingfederate::params::saml2_idp_cert_content,
   $saml2_oauth_token_map               = $::pingfederate::params::saml2_oauth_token_map,
   # XML: etc/webdefault.xml (Enable Cross-Origin Resource Sharing -- CORS)
   $cors_allowedOrigins                 = $::pingfederate::params::cors_allowedOrigins,

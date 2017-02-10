@@ -76,6 +76,7 @@ class pingfederate::params {
   $saml2_sp_auth_policy_core_attrs     = ['subject']
   $saml2_sp_auth_policy_extd_attrs     = []
   $saml2_idp_url                       = undef
+  $saml2_idp_name                      = undef
   $saml2_idp_entityID                  = 'idp/shibboleth'
   $saml2_idp_post                      = 'idp/profile/SAML2/POST/SSO'
   $saml2_idp_redirect                  = 'idp/profile/SAML2/Redirect/SSO'

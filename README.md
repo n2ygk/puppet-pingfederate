@@ -6,7 +6,22 @@
 1. [Setup - The basics of getting started with pingfederate](#setup)
     * [Beginning with pingfederate](#beginning-with-pingfederate)
 1. [Usage - Configuration options and additional functionality](#usage)
-1. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
+  1. [Packaging](#packaging)
+  1. [Service](#service)
+  1. [License Key](#providing_the_license_key)
+  1. [Run.properties](#runproperties)
+  1. [Administration](#administration)
+  1. [Cross-Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors)
+  1. [OGNL expressions](#ognl-expressions)
+  1. [SAML 2.0 SP Configuration](#saml-20-sp-configuration)
+  1. [SAML 2.0 Partner IdP Configuration](#saml-20-partner-idp-configuration)
+  1. [OAuth JDBC configuration](#oauth-jdbc-configuration)
+  1. [OAuth client manager](#oauth-client-manager)
+  1. [OAuth server settings](#oauth-server-settings)
+  1. [OAuth Access Token Managers](#oauth-access-token-managers)
+  1. [OAuth OpenID Connect Policy Contracts](#oauth-openid-connect-policy-contracts)
+  1. [Social Identity Adapters](#social-identity-adapters)
+1. [Reference - Parameters](#reference)
 1. [Limitations - OS compatibility, etc.](#limitations)
 1. [Development - Guide for contributing to the module](#development)
 
@@ -39,13 +54,14 @@ If you have access to the RPMs (custom-built; not distributed by PingIdentity),
 this module will install them, if not, install it the usual way by downloading and unzipping; you can still
 use this module to manage the configuration.
 
-### Basic Usage with RPMS available
+### Basic Usage
+#### with RPMS available
 This example will only work if you use Hiera to override the default parameters.
 ```
 include pingfederate
 ```
 
-### Basic Usage without RPMS
+#### without RPMS
 Install PingFederate per the [installation manual](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#gettingStartedGuide/concept/gettingStarted.html) and disable RPM installation:
 ```
   class {'pingfederate':
@@ -54,13 +70,9 @@ Install PingFederate per the [installation manual](https://documentation.pingide
   }
 ```
 
-## Reference
-
 ### Parameters
-Using most of the defaults will just work to get the basic server installed and running. You will have to supply
-the license key file via a secure manner (e.g. via hiera).
-
-You will need to explicitly enable and configure the various social identity plugins.
+Using most of the defaults will just work to get the basic server installed and running. However, it will not do a heck of a lot. You'll need
+to set a number of the following parameters.
 
 #### Packaging
 ##### `install_dir`
@@ -242,6 +254,27 @@ for an explanation. The defaults are as distributed by PingIdentity.
 ##### `cluster_diagnostics_port`
   (integer) Default `7500`
 
+#### Cross-Origin Resource Sharing (CORS)
+CORS needs to be enabled as otherwise Javascript Oauth clients will throw an XHR error
+when attempting XMLHttpRequest (XHR).
+
+##### `cors_allowedOrigins`
+  (string)
+  Allowed origins for CORS. Default `*`
+
+##### `cors_allowedMethods`
+  (string)
+  Allowed HTTP methods for CORS. Default `GET,OPTIONS,POST`
+  
+##### `cors_filter_mapping`
+  (string)
+  Allowed URL filter mappings for CORS. Default `/*`
+
+#### OGNL expressions
+##### `ognl_expressions_enable`
+  (boolean)
+  Enable OGNL scripting. Default `true`
+
 #### Administration
 
 ##### `adm_user`
@@ -280,37 +313,42 @@ These are the native SAML2 IdP settings used for native *console_authentication*
 ##### `wsfed_local_realm`
   (string) Default: `"${facts['hostname']}-ping:urn:wsfed"`
 
-#### Cross-Origin Resource Sharing (CORS)
-CORS needs to be enabled as otherwise Javascript Oauth clients will throw an XHR error
-when attempting XMLHttpRequest (XHR).
+#### SAML 2.0 SP Configuration
+  N.B. The current capability of this module is to configure PingFederate as an SP so as to
+  federate a SAML 2.0 IdP for purposes of the OAuth 2.0 authorization code flow. 
+##### Authentication Policy Contracts
+###### `saml2_sp_auth_policy_name` (string)
+###### `saml2_sp_auth_policy_core_attrs` (Array[string])
+###### `saml2_sp_auth_policy_extd_attrs` (Array[string])
 
-##### `cors_allowedOrigins`
-  (string)
-  Allowed origins for CORS. Default `*`
-
-##### `cors_allowedMethods`
-  (string)
-  Allowed HTTP methods for CORS. Default `GET,OPTIONS,POST`
-  
-##### `cors_filter_mapping`
-  (string)
-  Allowed URL filter mappings for CORS. Default `/*`
-
-#### OGNL expressions
-##### `ognl_expressions_enable`
-  (boolean)
-  Enable OGNL scripting. Default `true`
+#### SAML 2.0 Partner IdP Configuration
+  Currently only a single partner IdP can be configure by this module.
+##### `saml2_idp_url`
+##### `saml2_idp_entityID`
+##### `saml2_idp_name`
+##### `saml2_idp_post`
+##### `saml2_idp_redirect`
+##### `saml2_idp_contact`
+##### `saml2_idp_profiles`
+##### `saml2_idp_id_mapping`
+##### `saml2_idp_core_attrs`
+##### `saml2_idp_extd_attrs`
+##### `saml2_idp_attr_map`
+##### `saml2_idp_oauth_map`
+##### `saml2_idp_cert_file`
+##### `saml2_idp_cert_content`
+##### `saml2_oauth_token_map`
 
 #### OAuth JDBC configuration
-To enable use of an external JDBC database, set *oauth_jdbc_type* to a value (see below).
+To enable use of an external JDBC data store, set *oauth_jdbc_type* to a value (see below).
 If it is `undef` then the default internal XML-based datastore will be used.
 
 ##### `oauth_jdbc_type`
-  Type of JDBC
+  (string) Type of JDBC
   [OAuth Client Datastore](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#concept_definingOauthClientDataStore.html)
   connector. One of `undef`, `mysql`,`sqlserver`,`oracle`,`other`. Default: `undef`. If `other`, you'll need to fill in the following as well.
-  Otherwise they default to expected values for the given *oauth_jdbc_type* but can still be used to override the defaults.
-  
+  Otherwise they default to expected values for the given *oauth_jdbc_type* but can still be used to override the defaults. 
+  N.B. currently only fully implemented for `mysql`.
 ##### `oauth_jdbc_db`
   (string)
   JDBC database name (also found in `oauth_jdbc_url`)
@@ -560,6 +598,8 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
 ##### `windowslive_package_list`
 
 ##### `windowslive_package_ensure`
+
+## Reference
 
 ## Limitations
 

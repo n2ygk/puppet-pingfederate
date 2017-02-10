@@ -1,7 +1,6 @@
-<%# optional default values are removed and tried to order to match the swagger documentation -%>
 {
   "entityId": "<%= @saml2_idp_url -%>/<%= @saml2_idp_entityID -%>", 
-  "name": "<%= @saml2_idp_url -%>/<%= @saml2_idp_entityID -%>", 
+  "name": "<%= @saml2_idp_name -%>", 
   "active": true, 
   "contactInfo": {
     "firstName": "<%= @saml2_idp_contact['firstName'] -%>",
