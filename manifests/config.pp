@@ -111,22 +111,11 @@ class pingfederate::config inherits ::pingfederate {
                 'set adm:administrative-users/adm:user/adm:password-change-required/#text "false"']
   }
 
-  # create local built-in SAML2 IdP so the adm_user can login
-  # N.B. This stuff gets changed when pf-admin-api calls are used to configured SPs and IdPs.
-  # Make sure you sync up all the attributes.
+  # Create local built-in SAML2 IdP so the adm_user can login
+  # N.B. This stuff gets changed when pf-admin-api calls are used to configured SPs and IdPs which can lead to
+  # thrashing each time puppet runs if the exact same values are not synchronized.
+  # XXX Don't configure this if CLUSTERED_ENGINE since this gets pushed from the CLUSTERED_CONSOLE???
   $saml_file = "$::pingfederate::install_dir/server/default/data/sourceid-saml2-local-metadata.xml"
-  # XXX or, just don't manage these fields via Augeas!
-  # $EnableWsFedSP = 'true' if ${::pingfederate::wsfed_local_realm} else 'false'
-  # if $::pingfederate::saml2_local_entityID {
-  #   $EnableSaml20IdP = 'true'
-  #   $EnableSaml20Sp = 'true'
-  # }
-  # if $::pingfederate::saml1_local_issuerID {  
-  #   $EnableSaml11Rp = "true"
-  #   $EnableSaml10Rp = 'true'
-  #   $EnableSpWsTrustSts = 'true'
-  #   $EnableIdpDynaFed = 'true'
-  # }
   augeas{$saml_file:
     lens    => 'Xml.lns',
     incl    => $saml_file,
@@ -140,47 +129,6 @@ class pingfederate::config inherits ::pingfederate {
      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/Saml1xId \"${::pingfederate::saml1_local_issuerID}\"",
      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/WsFedID \"${::pingfederate::wsfed_local_realm}\"",
      ]
-    # XXX don't set things that get changed from elsewhere and the defaults are fine.
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/Saml1xSrcId ""',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableWsFedIdP "false"',
-     # "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableWsFedSp \"${EnableWsFedSP}\"",
-     # "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml20IdP \"${EnableSaml20IdP}\"",
-     # "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml20Sp  \"${EnableSaml20Sp}\"",
-     # "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml11Rp \"${EnableSaml11Rp}\"",
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml11Ap "false"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml10Rp "false"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSaml10Ap "false"',
-     # "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSpWsTrustSts \"${EnableSpWsTrustSts}\"",
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableInboundProvisioning "false"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableIdpWsTrustSts "false"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableX509Discovery "false"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableIdpDiscovery "false"',
-     # "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableIdpDynaFed \"${EnableIdpDynaFed\"",
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableSpDynaFed "false"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/DisableAutomaticConnectionValidation "false"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/DataStoreValidationInterval "300"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/CustomGlobalHttpHeaderName ""',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ClientIpHeaderIndex "last"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ForwardedHostHeaderName ""',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ForwardedHostHeaderIndex "last"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ProxyTerminatesHttpsConns "false"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/MetadataSigningKeyAlias ""',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/MetadataSigningAlgorithm ""',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/MetadataSigningKeyMD5Fingerprint ""',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ConfirmIdpSlo "false"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ClientCertSSLHeaderName ""',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ClientCertChainSSLHeaderName ""',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/EnableOIDCSp "false"',
-     # 'clear EntityDescriptor/Extensions/sid:SourceIDExtension/sid:ApplicationURLs',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/CommonDomainServer "false"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/IdPCommonDomainClient "false"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/SPCommonDomainClient "false"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/WriteCookiePath "/writecookie.cdc"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/#attribute/ReadCookiePath "/readcookie.cdc"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/sid:CommonDomainClient/#attribute/CommonDomainServiceBaseUrl ""',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/sid:CommonDomainService/#attribute/CommonDomain ""',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:IdpDiscovery/sid:CommonDomainService/#attribute/CookieLifeDays "365"',
-     # 'set EntityDescriptor/Extensions/sid:SourceIDExtension/sid:ErrPageMsg/#text "errorDetail.idpSsoFailure"']
   }
 
   # enable OGNL expressions
@@ -210,5 +158,19 @@ class pingfederate::config inherits ::pingfederate {
                     "set web-app/filter-mapping/url-pattern/#text \"${::pingfederate::cors_filter_mapping}\""]
       }
   }
-                
+  # Configure log4j2 to set logging levels. Easier to just do a cron job to delete old files!
+  # https://docs.pingidentity.com/bundle/pf_sm_managePingfederateLogs_pf83/page/pf_c_log4j2LoggingServiceAndConfiguration.html
+  # Want to set logfile rollover to daily with file retention to $log_retain_days.
+  # XXX max only works for %i filePattern! Recode all the date-based logs to %i? Too much work!
+  $log4_file = "$::pingfederate::install_dir/server/default/conf/log4j2.xml"
+  augeas{$log4_file:
+    lens    => 'Xml.lns',
+    incl    => $log4_file,
+    context => "/files/${log4_file}",
+    changes =>
+    [
+     "set Configuration/Loggers/Loggger[#attribute/name=\"httpclient.wire.content\"]/#attribute/level ${pingfederate::log_httpclient}",
+     "set Configuration/Loggers/Loggger[#attribute/name=\"org.sourceid\"]/#attribute/level ${pingfederate::log_org_sourceid}",
+     ]
+  }
 }

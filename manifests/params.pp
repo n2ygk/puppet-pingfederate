@@ -32,6 +32,9 @@ class pingfederate::params {
   $license_file                        = undef
   $owner                               = 'pingfederate'
   $group                               = 'pingfederate'
+  $log_retain_days                     = 30
+  $log_httpclient                      = 'INFO'
+  $log_org_sourceid                    = 'INFO'
   # run.properties defaults
   # see https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/changingConfigurationParameters.html
   # and /opt/pingfederate-$PF_VERSION/pingfederate/bin/run.properties

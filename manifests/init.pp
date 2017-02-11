@@ -35,6 +35,10 @@ class pingfederate (
   $license_file                        = $::pingfederate::params::license_file,
   $owner                               = $::pingfederate::params::owner,
   $group                               = $::pingfederate::params::group,
+  # log4j2 logging:
+  $log_retain_days                     = $::pingfederate::params::log_retain_days,
+  $log_httpclient                      = $::pingfederate::params::log_httpclient,
+  $log_org_sourceid                    = $::pingfederate::params::log_org_sourceid,  
   # various run.properties (there are a few more; add them as you need them):
   $admin_https_port                    = $::pingfederate::params::admin_https_port,
   $admin_hostname                      = $::pingfederate::params::admin_hostname,

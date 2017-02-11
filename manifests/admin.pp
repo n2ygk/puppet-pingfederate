@@ -15,9 +15,17 @@ class pingfederate::admin inherits ::pingfederate {
       logoutput   => true,
     }  ->
     class {'::pingfederate::server_settings':} ->
-    class {'::pingfederate::oauth_jdbc':} ~> 
+    class {'::pingfederate::oauth_jdbc_datastore':} ~> 
     exec {$restart:               # ugh
       refreshonly => true,
+    }
+  }
+  # if this is the clustered_console then make sure to replicate any changes to the engines
+  if $::pingfederate::operational_mode == 'CLUSTERED_CONSOLE' {
+    exec {'pf-admin-api cluster replicate':
+      command => "${::pingfederate::install_dir}/local/bin/pf-admin-api cluster/status | grep -q '"replicationRequired": false' || ${::pingfederate::install_dir}/local/bin/pf-admin-api -m POST --timeout=60 cluster/replicate",
+      user        =>  $::pingfederate::owner,
+      logoutput   => true,
     }
   }
 }

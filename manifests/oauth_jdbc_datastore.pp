@@ -1,6 +1,6 @@
-# Class pingfederate::oauth_jdbc
+# Class pingfederate::oauth_jdbc_datastore
 #
-# Configure the oauth JDBC service only if oauth_jdbc_type is set.
+# Configure the oauth JDBC datastore only if oauth_jdbc_type is set.
 # The JDBC JAR files and database DDL initialization were done in install.pp
 #
 # Unfortunately the 'clean' way to do this is to invoke the pf-admin-api to add the database connector
@@ -15,7 +15,7 @@
 #
 # Note that the admin API tries to connect to the database to confirm it is available.
 #
-class pingfederate::oauth_jdbc inherits ::pingfederate {
+class pingfederate::oauth_jdbc_datastore inherits ::pingfederate {
   if $::pingfederate::oauth_jdbc_type {
     $ds = "${::pingfederate::install_dir}/local/etc/dataStores.json"
     file { $ds:
