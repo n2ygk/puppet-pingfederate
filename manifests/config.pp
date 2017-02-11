@@ -169,8 +169,8 @@ class pingfederate::config inherits ::pingfederate {
     context => "/files/${log4_file}",
     changes =>
     [
-     "set Configuration/Loggers/Loggger[#attribute/name=\"httpclient.wire.content\"]/#attribute/level ${pingfederate::log_httpclient}",
-     "set Configuration/Loggers/Loggger[#attribute/name=\"org.sourceid\"]/#attribute/level ${pingfederate::log_org_sourceid}",
+     "set Configuration/Loggers/Logger[#attribute/name=\"httpclient.wire.content\"]/#attribute/level ${pingfederate::log_httpclient}",
+     "set Configuration/Loggers/Logger[#attribute/name=\"org.sourceid\"]/#attribute/level ${pingfederate::log_org_sourceid}",
      ]
   }
 }
