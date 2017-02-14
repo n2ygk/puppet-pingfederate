@@ -38,7 +38,9 @@ class pingfederate::oauth_jdbc_datastore inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
-  } else { # make sure datastore configs get reverted if the oauth_jdbc_type is (becomes) undef.
+  }
+  else { # make sure datastore configs get reverted if the oauth_jdbc_type is (becomes) undef.
+    # TODO: refactor as direct augeas edit here since there's nothing variable
     exec {'oauth_jdbc_revert_augeas': # this executes every puppet run. Need to add a notifier.
       command     => "${::pingfederate::install_dir}/local/bin/oauth_jdbc_revert_augeas",
       #refreshonly => true,

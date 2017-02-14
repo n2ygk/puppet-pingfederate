@@ -18,14 +18,6 @@ print /files/dataStores.json.out/dict/entry[.="id"]/string
 EoF`
 eval jndi=$jndi
 
-augtool -A -r <%= @install_dir -%>/server/default/conf/META-INF <<EoF
-set /augeas/load/Xml/lens Xml.lns
-set /augeas/load/Xml/incl hivemodule.xml
-load
-set /files/hivemodule.xml/module/service-point[#attribute/id="ClientManager"][#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]/invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerJdbcImpl"
-save
-EoF
-
 augtool -A -r <%= @install_dir -%>/server/default/data/config-store <<EoF
 set /augeas/load/Xml/lens Xml.lns
 set /augeas/load/Xml/incl[1] org.sourceid.oauth20.domain.ClientManagerJdbcImpl.xml

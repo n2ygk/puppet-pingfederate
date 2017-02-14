@@ -158,6 +158,26 @@ class pingfederate::config inherits ::pingfederate {
                     "set web-app/filter-mapping/url-pattern/#text \"${::pingfederate::cors_filter_mapping}\""]
       }
   }
+
+  # configure JDBC implementation
+  $hive_file = "$::pingfederate::install_dir/server/default/conf/META-INF/hivemodule.xml"
+  if $::pingfederate::oauth_jdbc_type {
+    augeas{$hive_file:
+      lens    => 'Xml.lns',
+      incl    => $hive_file,
+      context => "/files/${hive_file}",
+      changes => ['set module/service-point[#attribute/id="ClientManager"][#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]/invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerJdbcImpl']
+    }
+  }
+  else {                        # (revert JDBC back to) XML file implementation
+    augeas{$hive_file:
+      lens    => 'Xml.lns',
+      incl    => $hive_file,
+      context => "/files/${hive_file}",
+      changes => ['set module/service-point[#attribute/id="ClientManager"][#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]/invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerXmlFileImpl"']
+    }
+  }
+
   # Configure log4j2 to set logging levels. Easier to just do a cron job to delete old files!
   # https://docs.pingidentity.com/bundle/pf_sm_managePingfederateLogs_pf83/page/pf_c_log4j2LoggingServiceAndConfiguration.html
   # Want to set logfile rollover to daily with file retention to $log_retain_days.
