@@ -17,8 +17,13 @@ class pingfederate::install inherits ::pingfederate {
     ensure_packages($pkg, {'ensure' => $::pingfederate::package_java_ensure})
   }
   if $pingfederate::package_ensure {
-    ensure_packages($pingfederate::package_list, {'ensure' => $pingfederate::package_ensure})
+    ensure_packages($pingfederate::package_list,{'ensure' => $pingfederate::package_ensure})
+    $pf_pkgs = Package[$::pingfederate_package_list] # dependency used below
   }
+  else {
+    $pf_pkgs = undef
+  }
+
   # TBD: Refactor to a list of adapters to add? Or to download from PingIdentity.com?
   if str2bool($pingfederate::facebook_adapter) {
     ensure_packages($pingfederate::facebook_package_list, {'ensure' => $pingfederate::facebook_package_ensure})
@@ -40,22 +45,26 @@ class pingfederate::install inherits ::pingfederate {
 
   # Also install some local configuration tools
   file { "${::pingfederate::install_dir}/local":
-    ensure => 'directory',
-    owner  => $::pingfederate::owner,
-    group  => $::pingfederate::group,
+    require => $pf_pkgs, # require the package to create the install_dir
+    ensure  => 'directory',
+    owner   => $::pingfederate::owner,
+    group   => $::pingfederate::group,
   }
   file { "${::pingfederate::install_dir}/local/README":
-    ensure => 'present',
+    require => File["${::pingfederate::install_dir}/local"],
+    ensure  => 'present',
     content => 'These are locally-added utility scripts (in bin/) and config files (in etc/) managed by Puppet',
     owner  => $::pingfederate::owner,
     group  => $::pingfederate::group,
   }
   file { "${::pingfederate::install_dir}/local/bin":
-    ensure => 'directory',
-    owner  => $::pingfederate::owner,
-    group  => $::pingfederate::group,
+    require => File["${::pingfederate::install_dir}/local"],
+    ensure  => 'directory',
+    owner   => $::pingfederate::owner,
+    group   => $::pingfederate::group,
   }
   file { "${::pingfederate::install_dir}/local/bin/pf-admin-api":
+    require => File["${::pingfederate::install_dir}/local/bin"],
     ensure   => 'present',
     mode     => 'a=rx',
     owner    => $::pingfederate::owner,
@@ -63,6 +72,7 @@ class pingfederate::install inherits ::pingfederate {
     content  => template('pingfederate/pf-admin-api.erb')
   }
   file { "${::pingfederate::install_dir}/local/bin/oauth_jdbc_augeas":
+    require => File["${::pingfederate::install_dir}/local/bin"],
     ensure   => 'present',
     mode     => 'a=rx',
     owner    => $::pingfederate::owner,
@@ -70,6 +80,7 @@ class pingfederate::install inherits ::pingfederate {
     content  => template('pingfederate/oauth_jdbc_augeas.erb')
   }
   file { "${::pingfederate::install_dir}/local/bin/oauth_jdbc_revert_augeas":
+    require => File["${::pingfederate::install_dir}/local/bin"],
     ensure   => 'present',
     mode     => 'a=rx',
     owner    => $::pingfederate::owner,
@@ -77,11 +88,13 @@ class pingfederate::install inherits ::pingfederate {
     content  => template('pingfederate/oauth_jdbc_revert_augeas.erb')
   }
   file { "${::pingfederate::install_dir}/local/etc":
+    require => File["${::pingfederate::install_dir}/local"],
     ensure => 'directory',
     owner  => $::pingfederate::owner,
     group  => $::pingfederate::group,
   }
   file { "${::pingfederate::install_dir}/local/etc/pf-admin-cfg.json":
+    require => File["${::pingfederate::install_dir}/local/etc"],
     ensure   => 'present',
     mode     => 'u=rx,go=',
     owner    => $::pingfederate::owner,
