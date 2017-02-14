@@ -85,10 +85,10 @@ class pingfederate (
   $saml2_sp_auth_policy_extd_attrs     = $::pingfederate::params::saml2_sp_auth_policy_extd_attrs,
   # API: sp/idpConnections (SAML2 partner IdP)
   $saml2_idp_url                       = $::pingfederate::params::saml2_idp_url,
-  $saml2_idp_entityID                  = $::pingfederate::params::saml2_idp_entityID,
-  $saml2_idp_name                      = $::pingfederate::params::saml2_idp_name,
   $saml2_idp_post                      = $::pingfederate::params::saml2_idp_post,
   $saml2_idp_redirect                  = $::pingfederate::params::saml2_idp_redirect,
+  $saml2_idp_entityID                  = $::pingfederate::params::saml2_idp_entityID,
+  $saml2_idp_name                      = $::pingfederate::params::saml2_idp_name,
   $saml2_idp_contact                   = $::pingfederate::params::saml2_idp_contact,
   $saml2_idp_profiles                  = $::pingfederate::params::saml2_idp_profiles,
   $saml2_idp_id_mapping                = $::pingfederate::params::saml2_idp_id_mapping,

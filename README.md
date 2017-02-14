@@ -325,15 +325,7 @@ These are the native SAML2 IdP settings used for native *console_authentication*
   Currently only a single partner IdP can be configure by this module.
 ##### `saml2_idp_url`
   (string)
-  URL for the SAML2 IDP. For example: `https://shibboleth.example.com/idp/shibboleth`
-
-##### `saml2_idp_entityID`
-  (string)
-  Entity ID for the SAML2 IDP. For example: `urn:mace:incommon:example.com` or `https://shibboleth.example.com/idp/shibboleth`
-
-##### `saml2_idp_name`
-  (string)
-  User-friendly name for the IdP. Displayed in the authentication selector screen.
+  URL for the SAML2 IDP. For example: `https://shibboleth.example.com`
 
 ##### `saml2_idp_post`
   (string)
@@ -342,6 +334,14 @@ These are the native SAML2 IdP settings used for native *console_authentication*
 ##### `saml2_idp_redirect`
   (string)
   URL-portion for the redirect. Concatenated to the `saml2_idp_url`. Default: `idp/profile/SAML2/Redirect/SSO`
+
+##### `saml2_idp_entityID`
+  (string)
+  Entity ID for the SAML2 IDP. For example: `urn:mace:incommon:example.com` or `https://shibboleth.example.com/idp/shibboleth`
+
+##### `saml2_idp_name`
+  (string)
+  User-friendly name for the IdP. Displayed in the authentication selector screen.
 
 ##### `saml2_idp_contact`
   (map)
