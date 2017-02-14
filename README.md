@@ -324,20 +324,111 @@ These are the native SAML2 IdP settings used for native *console_authentication*
 #### SAML 2.0 Partner IdP Configuration
   Currently only a single partner IdP can be configure by this module.
 ##### `saml2_idp_url`
+  (string)
+  URL for the SAML2 IDP. For example: `https://shibboleth.example.com/idp/shibboleth`
+
 ##### `saml2_idp_entityID`
+  (string)
+  Entity ID for the SAML2 IDP. For example: `urn:mace:incommon:example.com` or `https://shibboleth.example.com/idp/shibboleth`
+
 ##### `saml2_idp_name`
+  (string)
+  User-friendly name for the IdP. Displayed in the authentication selector screen.
+
 ##### `saml2_idp_post`
+  (string)
+  URL-portion for the POST method. Concatenated to the `saml2_idp_url`. Default: `idp/profile/SAML2/POST/SSO`
+
 ##### `saml2_idp_redirect`
+  (string)
+  URL-portion for the redirect. Concatenated to the `saml2_idp_url`. Default: `idp/profile/SAML2/Redirect/SSO`
+
 ##### `saml2_idp_contact`
+  (map)
+  Contact info for the IdP operator. DefaultL `{'firstName' => '', 'lastName' => '', 'email' => ''}`
+
 ##### `saml2_idp_profiles`
+  (Array[string])
+  List of allowed SAML2 IdP profiles. Default: `['SP_INITIATED_SSO']`
+
 ##### `saml2_idp_id_mapping`
+  (string)
+  How IdP gets mapped (RTFM). Default: `'ACCOUNT_MAPPING'`
+
 ##### `saml2_idp_core_attrs`
+  (Array[string])
+  List of core attributes. Default: `['SAML_SUBJECT']`
+
 ##### `saml2_idp_extd_attrs`
+  (Array[string])
+  List of extended attributes. Default: `[]`
+
 ##### `saml2_idp_attr_map`
+  (Array[map])
+  List of attribute mappings with keys _name_, _type_, _value_. Default: `[]`
+  Example: 
+  ```
+  pingfederate::saml2_idp_attr_map:
+    - name: pingAffiliation
+      type: EXPRESSION
+      value: >-
+		#result = #this.get(\"urn:oid:1.3.6.1.4.1.5923.1.1.1.1.9\"),
+		#result = (#result? #result.toString() : \"\")
+		.replace(\"[\", \"[\\\"\")
+		.replace(\"]\", \"\\\"]\")
+		.replace(\",\", \"\\\",\\\"\")
+		.replace(\" \", \"\")
+	- name: subject
+	  type: ASSERTION
+	  value: SAML_SUBJECT
+  ```
+
 ##### `saml2_idp_oauth_map`
+  (Array[map])
+  List of attribute mappings from SAML2 to Oauth with keys _name_, _type_, _value_. Default: `[]`
+  Example:
+  ```
+  pingfederate::saml2_idp_oauth_map:
+	- name: USER_KEY
+	  type: ASSERTION
+	  value: SAML_SUBJECT
+	- name: USER_NAME
+	  type: ASSERTION
+	  value: SAML_SUBJECT
+  ```
+
 ##### `saml2_idp_cert_file`
+  (string)
+  File path to IdP certificate. NOT IMPLEMENTED.
+
 ##### `saml2_idp_cert_content`
+  (string)
+  String containing IdP certificate. Example:
+  ```
+  pingfederate::saml2_idp_cert_content: |
+	-----BEGIN CERTIFICATE-----
+	MIIDRzCCAi+gAwIBAgIUAb+rsLUvjwiVA2iVgiHAFGrtCPgwDQYJKoZIhvcNAQEF
+	BQAwIjEgMB4GA1UEAxMXc2hpYmJvbGV0aC5jb2x1bWJpYS5lZHUwHhcNMTMwODIy
+	MTQ1MzUzWhcNMzMwODIyMTQ1MzUzWjAiMSAwHgYDVQQDExdzaGliYm9sZXRoLmNv
+    ...
+	-----END CERTIFICATE-----
+  ```
+
 ##### `saml2_oauth_token_map`
+  (Array[map])
+  Mapping of OAuth attributes to fields in the access token(?). Example:
+  ```
+  pingfederate::saml2_oauth_token_map:
+	- name: username
+	  type: OAUTH_PERSISTENT_GRANT
+	  value: USER_KEY
+	- name: group
+	  type: OAUTH_PERSISTENT_GRANT
+	  value: group
+	- name: uid
+	  type: OAUTH_PERSISTENT_GRANT
+	  value: USER_KEY
+  ```
 
 #### OAuth JDBC configuration
 To enable use of an external JDBC data store, set *oauth_jdbc_type* to a value (see below).
@@ -349,6 +440,7 @@ If it is `undef` then the default internal XML-based datastore will be used.
   connector. One of `undef`, `mysql`,`sqlserver`,`oracle`,`other`. Default: `undef`. If `other`, you'll need to fill in the following as well.
   Otherwise they default to expected values for the given *oauth_jdbc_type* but can still be used to override the defaults. 
   N.B. currently only fully implemented for `mysql`.
+
 ##### `oauth_jdbc_db`
   (string)
   JDBC database name (also found in `oauth_jdbc_url`)
