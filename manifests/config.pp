@@ -180,7 +180,7 @@ class pingfederate::config inherits ::pingfederate {
     }
   }
 
-  # Configure log4j2 to set logging levels. Easier to just do a cron job to delete old files!
+  # Configure log4j2 and Jetty to set logging levels. Easier to just do a cron job to delete old files!
   # https://docs.pingidentity.com/bundle/pf_sm_managePingfederateLogs_pf83/page/pf_c_log4j2LoggingServiceAndConfiguration.html
   # Want to set logfile rollover to daily with file retention to $log_retain_days.
   # XXX max only works for %i filePattern! Recode all the date-based logs to %i? Too much work!
@@ -194,5 +194,77 @@ class pingfederate::config inherits ::pingfederate {
      "set Configuration/Loggers/Logger[#attribute/name=\"httpclient.wire.content\"]/#attribute/level ${pingfederate::log_httpclient}",
      "set Configuration/Loggers/Logger[#attribute/name=\"org.sourceid\"]/#attribute/level ${pingfederate::log_org_sourceid}",
      ]
+  }
+
+  # Jetty files
+  # here's a really ugly nested XML doc!
+  # <Configure id="AdminServer" class="org.eclipse.jetty.server.Server">
+  #     <Set name="handler">
+  #         <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+  #             <Set name="handlers">
+  #                 <Array type="org.eclipse.jetty.server.Handler">
+  #                     <Item>
+  #                         <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
+  #                     </Item>
+  #                     <Item>
+  #                         <New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler">
+  #                               <Set name="requestLog">
+  #                                 <New id="RequestLogImpl" class="org.eclipse.jetty.server.NCSARequestLog">
+  #                                        <Set name="filename"><SystemProperty name="pf.log.dir" default="."/>/yyyy_mm_dd.request2.log</Set>
+  #                                        <Set name="filenameDateFormat">yyyy_MM_dd</Set>
+  #                                        <Set name="retainDays">90</Set>
+  #                                        <Set name="append">true</Set>
+  #                                        <Set name="extended">true</Set>
+  #                                        <Set name="logCookies">false</Set>
+  #                                        <Set name="LogTimeZone">GMT</Set>
+  #                                 </New>
+  #                               </Set>
+  #                         </New>
+  #                     </Item>
+  #                 </Array>
+  #             </Set>
+  #         </New>
+  #     </Set>
+  # </Configure>
+  #
+  # And an ulgy here document so the string can be split up into somewhat readable text:
+  $adm_cfg = @(EoF/L)
+  Configure[#attribute/id="AdminServer"]\
+  /Set[#attribute/name="handler"]\
+  /New[#attribute/id="Handlers"]\
+  /Set[#attribute/name="handlers"]\
+  /Array[#attribute/type="org.eclipse.jetty.server.Handler"]\
+  /Item\
+  /New[#attribute/id="RequestLog"]\
+  /Set[#attribute/name="requestLog"]\
+  /New[#attribute/id="RequestLogImpl"]\
+  /Set[#attribute/name="retainDays"]/#text
+  |-EoF
+  $jetty_adm_file = "$::pingfederate::install_dir/etc/jetty-admin.xml"
+  augeas{$jetty_adm_file:
+    lens    => 'Xml.lns',
+    incl    => $jetty_adm_file,
+    context => "/files/${jetty_adm_file}",
+    changes => [ "set ${adm_cfg} ${::pingfederate::log_retain_days}" ]
+  }
+  # now do the same for the runtime file
+  $run_cfg = @(EoF/L)
+  Configure[#attribute/id="RuntimeServer"]\
+  /Set[#attribute/name="handler"]\
+  /New[#attribute/id="Handlers"]\
+  /Set[#attribute/name="handlers"]\
+  /Array[#attribute/type="org.eclipse.jetty.server.Handler"]\
+  /Item\
+  /New[#attribute/id="RequestLog"]\
+  /Set[#attribute/name="requestLog"]\
+  /New[#attribute/id="RequestLogImpl"]\
+  /Set[#attribute/name="retainDays"]/#text
+  |-EoF
+  $jetty_run_file = "$::pingfederate::install_dir/etc/jetty-runtime.xml"
+  augeas{$jetty_run_file:
+    lens    => 'Xml.lns',
+    incl    => $jetty_run_file,
+    context => "/files/${jetty_run_file}",
+    changes => [ "set ${run_cfg} ${::pingfederate::log_retain_days}" ]
   }
 }
