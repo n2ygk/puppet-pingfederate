@@ -126,6 +126,46 @@ to set a number of the following parameters.
   (boolean).
   Ensure it is running. Default: `true`
 
+#### Logging
+##### `log_retain_days`
+  (integer) Number of days to retain log files. Default: `30`
+
+##### `log_files`
+  (Array[map]) List of log4j RollingFile overrides. Map elements:
+  - name: name of the logger
+  - fileName: log file name.
+  - filePattern: pattern for the rotated log file name
+  Default: []
+  Example:
+  ```
+  pingfederate::log_files:
+    - name: FILE
+      fileName: 'server.log'
+      filePattern: 'server.log.%i'
+    - name: SamlTransaction
+      fileName: 'transaction.log'
+      filePattern: 'transaction.log.%i'
+    - name: SecurityAudit2File
+      fileName: 'audit.log
+      filePattern: 'audit.log.%i'
+  ```
+  Hint: add extra keys to this map for your own purposes. For example, `sumo: true` might be
+  used to flag this file for ingestion into sumologic (configured in your local profile module).
+
+##### `log_levels`
+  (Array[map]) List of log4j log level overrides. Map elements:
+  - name: name of the logger
+  - level: log level (`DEBUG`, `INFO`, etc.)
+  Default: []
+  Example:
+  ```
+  pingfederate::log_levels:
+    - name: org.sourceid
+	  level: DEBUG
+	- name: com.pingidentity.appserver.jetty
+	  level: DEBUG
+  ```
+
 #### Providing the License Key
 PingFederate is commercial licensed software and will not operate without a license key.
 Provide this either in your invocation of the module or, preferably, via Hiera.

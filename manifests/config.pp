@@ -180,20 +180,63 @@ class pingfederate::config inherits ::pingfederate {
     }
   }
 
-  # Configure log4j2 and Jetty to set logging levels. Easier to just do a cron job to delete old files!
-  # https://docs.pingidentity.com/bundle/pf_sm_managePingfederateLogs_pf83/page/pf_c_log4j2LoggingServiceAndConfiguration.html
+  # Configure log4j2 and Jetty to set logging levels.
   # Want to set logfile rollover to daily with file retention to $log_retain_days.
-  # XXX max only works for %i filePattern! Recode all the date-based logs to %i? Too much work!
+
+  # This is all highly dependent on how PingFederate delivers their log4j2.xml file.
+  # <Configuration ...>
+  #     <Appenders>
+  #         <RollingFile name="FILE" fileName="${sys:pf.log.dir}/server.log"
+  #                      filePattern="${sys:pf.log.dir}/server.log.%i" ignoreExceptions="false">
+  #             <PatternLayout>
+  #                 <!-- Uncomment this if you want to use UTF-8 encoding instead
+  #                     of system's default encoding.
+  #                 <charset>UTF-8</charset> -->
+  #                 <pattern>%d %X{trackingid} %-5p [%c] %m%n</pattern>
+  #             </PatternLayout>
+  #             <Policies>
+  #                 <SizeBasedTriggeringPolicy
+  #                         size="10000 KB" />
+  #             </Policies>
+  #             <DefaultRolloverStrategy max="5" />
+  #         </RollingFile>
+  #         <!-- ... -->
+  #     </Appenders>
+  #     <!-- ... -->
+  #     <Loggers>
+  #         <Logger name="httpclient.wire.content" level="INFO" />
+  #         <Logger name="com.pingidentity.pf.email" level="INFO" />
+  #         <Logger name="org.sourceid" level="DEBUG" />
+  #         <!-- ... -->
+  #     </Loggers>
+  #     <!-- ... -->
+  # </Configuration>
+
+  # log level settings. List of maps keyed by name and level.
+  $log4_loggers = $::pingfederate::log_levels.map |$i| {
+    "set Configuration/Loggers/Logger[#attribute/name=\"${i['name']}\"]/#attribute/level ${i['level']}"
+  }
+
+  # List of RollingFile settings to override. Set each to daily rollover and retain $log_retain_days copies
+  # List of maps keyed by name, fileName, filePattern.
+  # Sets the fileName, filePattern, removes any extant Policies, adds daily CronTriggeringPolicy and max retension days.
+  $log4_rollers = $::pingfederate::log_files.map |$i| {
+    [
+     "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/#attribute/fileName \${sys:pf.log.dir}/${i['fileName']}",
+     "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/#attribute/filePattern \${sys:pf.log.dir}/${i['filePattern']}",
+     "rm Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/Policies",
+     "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/CronTriggeringPolicy/#attribute/schedule \"0 0 0 * * ?\"",
+     "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/DefaultRolloverStrategy/#attribute/max ${::pingfederate::log_retain_days}"
+    ]
+  }
+
+  $log4_do = flatten($log4_loggers) + flatten($log4_rollers)
   $log4_file = "$::pingfederate::install_dir/server/default/conf/log4j2.xml"
   augeas{$log4_file:
     lens    => 'Xml.lns',
     incl    => $log4_file,
     context => "/files/${log4_file}",
-    changes =>
-    [
-     "set Configuration/Loggers/Logger[#attribute/name=\"httpclient.wire.content\"]/#attribute/level ${pingfederate::log_httpclient}",
-     "set Configuration/Loggers/Logger[#attribute/name=\"org.sourceid\"]/#attribute/level ${pingfederate::log_org_sourceid}",
-     ]
+    changes => $log4_do,
   }
 
   # Jetty files
@@ -226,7 +269,7 @@ class pingfederate::config inherits ::pingfederate {
   #         </New>
   #     </Set>
   # </Configure>
-  #
+
   # And an ulgy here document so the string can be split up into somewhat readable text:
   $adm_cfg = @(EoF/L)
   Configure[#attribute/id="AdminServer"]\

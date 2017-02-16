@@ -30,15 +30,15 @@ class pingfederate (
   # ensure the service is up
   $service_name                        = $::pingfederate::params::service_name,
   $service_ensure                      = $::pingfederate::params::service_ensure,
+  # log4j2 logging:
+  $log_retain_days                     = $::pingfederate::params::log_retain_days,
+  $log_files                           = $::pingfederate::params::log_files,
+  $log_levels                          = $::pingfederate::params::log_levels,
   # license key file: provide either the content or source file URL
   $license_content                     = $::pingfederate::params::license_content,
   $license_file                        = $::pingfederate::params::license_file,
   $owner                               = $::pingfederate::params::owner,
   $group                               = $::pingfederate::params::group,
-  # log4j2 logging:
-  $log_retain_days                     = $::pingfederate::params::log_retain_days,
-  $log_httpclient                      = $::pingfederate::params::log_httpclient,
-  $log_org_sourceid                    = $::pingfederate::params::log_org_sourceid,  
   # various run.properties (there are a few more; add them as you need them):
   $admin_https_port                    = $::pingfederate::params::admin_https_port,
   $admin_hostname                      = $::pingfederate::params::admin_hostname,
