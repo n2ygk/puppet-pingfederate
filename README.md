@@ -313,6 +313,14 @@ These are the native SAML2 IdP settings used for native *console_authentication*
 ##### `wsfed_local_realm`
   (string) Default: `"${facts['hostname']}-ping:urn:wsfed"`
 
+##### `http_forwarded_for_header`
+  (string) HTTP header identifying the IP address of the end-host when coming in via proxy.
+  Default: undefined. Example: `X-Forwarded-For`
+
+##### `http_forwarded_host_header`
+  (string) HTTP header identifying the name of the end-host when coming in via proxy.
+  Default: undefined. Example: `X-Forwarded-Host`
+
 #### SAML 2.0 SP Configuration
   N.B. The current capability of this module is to configure PingFederate as an SP so as to
   federate a SAML 2.0 IdP for purposes of the OAuth 2.0 authorization code flow. 

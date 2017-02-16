@@ -75,6 +75,8 @@ class pingfederate::params {
   $saml2_local_entityID                = "${facts['hostname']}-ping:urn:saml2"
   $saml1_local_issuerID                = "${facts['hostname']}-ping:urn:saml1"
   $wsfed_local_realm                   = "${facts['hostname']}-ping:urn:wsfed"
+  $http_forwarded_for_header           = undef
+  $http_forwarded_host_header          = undef
   $saml2_sp_auth_policy_name           = undef
   $saml2_sp_auth_policy_core_attrs     = ['subject']
   $saml2_sp_auth_policy_extd_attrs     = []

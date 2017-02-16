@@ -79,6 +79,8 @@ class pingfederate (
   $saml2_local_entityID                = $::pingfederate::params::saml2_local_entityID,
   $saml1_local_issuerID                = $::pingfederate::params::saml1_local_issuerID,
   $wsfed_local_realm                   = $::pingfederate::params::wsfed_local_realm,
+  $http_forwarded_for_header           = $::pingfederate::params::http_forwarded_for_header,
+  $http_forwarded_host_header          = $::pingfederate::params::http_forwarded_host_header,
   # API: authenticationPolicyContracts (SAML2 SP configuration)
   $saml2_sp_auth_policy_name           = $::pingfederate::params::saml2_sp_auth_policy_name,
   $saml2_sp_auth_policy_core_attrs     = $::pingfederate::params::saml2_sp_auth_policy_core_attrs,
