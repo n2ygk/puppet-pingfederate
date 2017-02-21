@@ -21,7 +21,6 @@
   1. [OAuth Access Token Managers](#oauth-access-token-managers)
   1. [OAuth OpenID Connect Policy Contracts](#oauth-openid-connect-policy-contracts)
   1. [Social Identity Adapters](#social-identity-adapters)
-1. [Reference - Parameters](#reference)
 1. [Limitations - OS compatibility, etc.](#limitations)
 1. [Development - Guide for contributing to the module](#development)
 
@@ -44,11 +43,8 @@ manual steps.
 The module installs PingFederate and performs basic static configuration of the
 server, that is, things that are changed prior to starting it up. These include the 
 `run.properties` and various configuration XML files, and installation of the license key.
-Future versions will include more advanced administrative configuraton, that is, things that
-you configure once the basic system is up and running.
-
-In addition, the beginnings of support for configuring post-startup features via the administrative
-REST API are in place, specifically for configuring JDBC datastores.
+More advanced administrative configuraton is also done to the point of being able to
+build a completely configuration-as-code PingFederate instance that does real work.
 
 If you have access to the RPMs (custom-built; not distributed by PingIdentity),
 this module will install them, if not, install it the usual way by downloading and unzipping; you can still
@@ -123,19 +119,23 @@ to set a number of the following parameters.
   (string) Service name. Default: `'pingfederate'`
 
 ##### `service_ensure`
-  (boolean).
-  Ensure it is running. Default: `true`
+  (string).
+  Ensure it is running. Values are the same as those used by the
+  [service resource](https://docs.puppet.com/puppet/latest/types/service.html#service-attribute-ensure).
+  Default: `true`
 
 #### Logging
 ##### `log_retain_days`
   (integer) Number of days to retain log files. Default: `30`
 
 ##### `log_files`
-  (Array[map]) List of log4j RollingFile overrides. Map elements:
+  (Array[map]) List of log4j RollingFile overrides. Map keys:
   - name: name of the logger
   - fileName: log file name.
   - filePattern: pattern for the rotated log file name
+
   Default: []
+
   Example:
   ```
   pingfederate::log_files:
@@ -156,7 +156,9 @@ to set a number of the following parameters.
   (Array[map]) List of log4j log level overrides. Map elements:
   - name: name of the logger
   - level: log level (`DEBUG`, `INFO`, etc.)
+
   Default: []
+
   Example:
   ```
   pingfederate::log_levels:
@@ -296,7 +298,7 @@ for an explanation. The defaults are as distributed by PingIdentity.
 
 #### Cross-Origin Resource Sharing (CORS)
 CORS needs to be enabled as otherwise Javascript Oauth clients will throw an XHR error
-when attempting XMLHttpRequest (XHR).
+when attempting [XMLHttpRequest (XHR)](https://en.wikipedia.org/wiki/XMLHttpRequest).
 
 ##### `cors_allowedOrigins`
   (string)
@@ -313,27 +315,29 @@ when attempting XMLHttpRequest (XHR).
 #### OGNL expressions
 ##### `ognl_expressions_enable`
   (boolean)
-  Enable OGNL scripting. Default `true`
+  Enable [OGNL](https://en.wikipedia.org/wiki/OGNL) scripting. Default `true`
 
 #### Administration
 
 ##### `adm_user`
-  (string) Initial administrator user. Default: `'Administrator'`
+  (string) Initial administrator user. Default: `'Administrator'` (and seems to be required).
 
 ##### `adm_pass`
-  (string) Administrator user's password. Default: `'p@Ssw0rd'`
+  (string) Administrator user's password. The `adm_pass` and `adm_hash`
+  must match. Default: `'p@Ssw0rd'` 
 
 ##### `adm_hash`
   (string) Hash of administrator user's password. Must match the password. (*I don't
-  currently know how to generate this, so make sure to copy it wheh you change
-  the passowrd*)
+  currently know how to generate this, so make sure to copy it when you change
+  the password*)
 
 ##### `adm_api_baseURL`
   (string) Base URL of the pf-admin-api.
   Default: `"https://${facts['fqdn']}:${admin_https_port}/pf-admin-api/v1"`
 
 ##### `service_api_baseURL`
-  (string) Base URL for the various services.
+  (string) Base URL for the various services. Set this to your load-balancer's URL.
+
   Default: `"https://${facts['fqdn']}:${https_port}"`
   
 #### Native SAML2 IdP
@@ -355,6 +359,8 @@ These are the native SAML2 IdP settings used for native *console_authentication*
 
 ##### `http_forwarded_for_header`
   (string) HTTP header identifying the IP address of the end-host when coming in via proxy.
+  You should set these if using a load-balancer, otherwise the source IP address logged will
+  be that of the load-balancer rather than the actual client.
   Default: undefined. Example: `X-Forwarded-For`
 
 ##### `http_forwarded_host_header`
@@ -393,7 +399,7 @@ These are the native SAML2 IdP settings used for native *console_authentication*
 
 ##### `saml2_idp_contact`
   (map)
-  Contact info for the IdP operator. DefaultL `{'firstName' => '', 'lastName' => '', 'email' => ''}`
+  Contact info for the IdP operator. Default: `{'firstName' => '', 'lastName' => '', 'email' => ''}`
 
 ##### `saml2_idp_profiles`
   (Array[string])
@@ -739,18 +745,40 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
 
 ##### `windowslive_package_ensure`
 
-## Reference
-
 ## Limitations
 
+### Operating System Support
+
 This has only been tested on EL 6 with Java 1.8. It might work elsewhere. Let me know!
+
+### Known Issues
+
+Changes to certain configuration variables after an initial Puppet run 
+do not properly get reflected in the PingFederate server state. The best way
+to resolve these is to wipe PingFederate off the system and re-run Puppet:
+```
+$ sudo service pingfederate stop
+$ sudo yum -y erase pingfederate-server
+$ sudo rm -rf /opt/pingfederate*
+$ sudo puppet agent -t ...
+```
+
+Known issues include:
+- Changing `pingfederate::service_api_baseURL` does not properly remove references to the old URL.
+- Setting a social media adapter like `pingfederate::facebook_adapter: true` and then setting it
+`false` fails to properly remove the adapter references.
+- A failed JDBC connection at initial configuration (e.g. database not running or no permission)
+will not get fixed later, even if the database access is fixed.
+- If you set some `pingfederate::log_levels` and then remove them, the last settings remain;
+original values are not restored.
 
 ## Development
 
 The package was built to use PingFederate as an OAuth2 Server with SAML and social identity federation for the
 authorization code flow. PingFederate has many other features which are not yet configured here. 
 
-Please fork and submit PRs on [github](https://github.com/n2ygk/puppet-pingfederate) as you add features.
+Please fork and submit PRs on [github](https://github.com/n2ygk/puppet-pingfederate) as you add
+fixes and features.
 
 ### Using Augeas to edit XML configuration files
 

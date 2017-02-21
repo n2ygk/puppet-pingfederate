@@ -174,6 +174,8 @@ class pingfederate::server_settings inherits ::pingfederate {
       logoutput   => true,
     }
   }
+  # TODO: make sure an adapter wasn't previously defined and is now removed. Removal happens
+  # in the reverse order of addition!
   if str2bool($::pingfederate::facebook_adapter) {
     $fba = "idp/adapters"
     $fbaf = "idp_adapters_facebook"
