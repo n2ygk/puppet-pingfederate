@@ -97,6 +97,7 @@ class pingfederate::params {
   $saml2_oauth_token_map               = undef
   $cors_allowedOrigins                 = '*'
   $cors_allowedMethods                 = 'GET,OPTIONS,POST'
+  $cors_allowedHeaders                 = 'X-Requested-With,Content-Type,Accept,Origin,Authorization'
   $cors_filter_mapping                 = '/*'
   $ognl_expressions_enable             = true
   $oauth_jdbc_type                     = undef

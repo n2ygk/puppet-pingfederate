@@ -144,6 +144,7 @@ class pingfederate::config inherits ::pingfederate {
   }
 
   # enable CORS
+  # This adds a CrossOriginFilter and enables the OPTIONS method in the security-constraint
   if $::pingfederate::cors_allowedOrigins {
       $cors_file = "$::pingfederate::install_dir/etc/webdefault.xml"
       augeas{$cors_file:
@@ -156,8 +157,11 @@ class pingfederate::config inherits ::pingfederate {
                     "set web-app/filter/init-param[1]/param-value/#text \"${::pingfederate::cors_allowedOrigins}\"",
                     'set web-app/filter/init-param[2]/param-name/#text "allowedMethods"',
                     "set web-app/filter/init-param[2]/param-value/#text \"${::pingfederate::cors_allowedMethods}\"",
+                    'set web-app/filter/init-param[3]/param-name/#text "allowedHeaders"',
+                    "set web-app/filter/init-param[3]/param-value/#text \"${::pingfederate::cors_allowedHeaders}\"",
                     'set web-app/filter-mapping/filter-name/#text "cross-origin"',
-                    "set web-app/filter-mapping/url-pattern/#text \"${::pingfederate::cors_filter_mapping}\""]
+                    "set web-app/filter-mapping/url-pattern/#text \"${::pingfederate::cors_filter_mapping}\"",
+                    'set web-app/security-constraint/web-resource-collection[url-pattern="/*"]/http-method#text "OPTIONS"']
       }
   }
 
