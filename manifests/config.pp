@@ -83,6 +83,8 @@ class pingfederate::config inherits ::pingfederate {
       group   => $::pingfederate::group,
     }
   }
+  # add a warning to every Augeas-managed file
+  $aug_comment = 'set #comment[preceding-sibling::*][1] " THIS FILE IS MANAGED BY PUPPET. DO NOT EDIT BY HAND. "'
   # create initial administrator user so that we can invoke the rest APIs
   $adm_file = "$::pingfederate::install_dir/server/default/data/pingfederate-admin-user.xml"
   augeas{$adm_file:
@@ -108,7 +110,8 @@ class pingfederate::config inherits ::pingfederate {
                 'set adm:administrative-users/adm:user/adm:crypto-manager/#text "true"',
                 'set adm:administrative-users/adm:user/adm:auditor/#text "false"',
                 'set adm:administrative-users/adm:user/adm:active/#text "true"',
-                'set adm:administrative-users/adm:user/adm:password-change-required/#text "false"']
+                'set adm:administrative-users/adm:user/adm:password-change-required/#text "false"',
+                $aug_comment]
   }
 
   # Create local built-in SAML2 IdP so the adm_user can login
@@ -130,6 +133,7 @@ class pingfederate::config inherits ::pingfederate {
      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/WsFedID \"${::pingfederate::wsfed_local_realm}\"",
      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/CustomGlobalHttpHeaderName \"${::pingfederate::http_forwarded_for_header}\"",
      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ForwardedHostHeaderName \"${::pingfederate::http_forwarded_host_header}\"",
+     $aug_comment
      ]
   }
 
@@ -140,10 +144,14 @@ class pingfederate::config inherits ::pingfederate {
     incl    => $ognl_file,
     context => "/files/${ognl_file}",
     changes => ['set config/item/#attribute/name/ "evaluateExpressions"',
-                "set config/item/#text \"${::pingfederate::ognl_expressions_enable}\""]
+                "set config/item/#text \"${::pingfederate::ognl_expressions_enable}\"",
+                $aug_comment]
   }
 
   # enable CORS
+  # This adds a new CrossOriginFilter and enables the OPTIONS method in the security-constraint
+  # Adding OPTIONS involves appending a new entry to web-resource-collection for url-pattern="/*"
+  # and changing the documentation of that node to indicate OPTIONS is now permitted.
   if $::pingfederate::cors_allowedOrigins {
       $cors_file = "$::pingfederate::install_dir/etc/webdefault.xml"
       augeas{$cors_file:
@@ -156,8 +164,14 @@ class pingfederate::config inherits ::pingfederate {
                     "set web-app/filter/init-param[1]/param-value/#text \"${::pingfederate::cors_allowedOrigins}\"",
                     'set web-app/filter/init-param[2]/param-name/#text "allowedMethods"',
                     "set web-app/filter/init-param[2]/param-value/#text \"${::pingfederate::cors_allowedMethods}\"",
+                    'set web-app/filter/init-param[3]/param-name/#text "allowedHeaders"',
+                    "set web-app/filter/init-param[3]/param-value/#text \"${::pingfederate::cors_allowedHeaders}\"",
                     'set web-app/filter-mapping/filter-name/#text "cross-origin"',
-                    "set web-app/filter-mapping/url-pattern/#text \"${::pingfederate::cors_filter_mapping}\""]
+                    "set web-app/filter-mapping/url-pattern/#text \"${::pingfederate::cors_filter_mapping}\"",
+                    'set web-app/security-constraint/web-resource-collection/url-pattern[./#text="/*"]/../http-method[last()+1]/#text "OPTIONS"',
+                    'set web-app/security-constraint/web-resource-collection/url-pattern[./#text="/*"]/../web-resource-name/#text "Enable all methods except for TRACE (OPTIONS was added for OAuth 2.0 XHR)"',
+                    $aug_comment
+                    ]
       }
   }
 
@@ -168,7 +182,8 @@ class pingfederate::config inherits ::pingfederate {
       lens    => 'Xml.lns',
       incl    => $hive_file,
       context => "/files/${hive_file}",
-      changes => ['set module/service-point[#attribute/id="ClientManager"][#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]/invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerJdbcImpl']
+      changes => ['set module/service-point[#attribute/id="ClientManager"][#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]/invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerJdbcImpl',
+                  $aug_comment]
     }
   }
   else {                        # (revert JDBC back to) XML file implementation
@@ -176,7 +191,8 @@ class pingfederate::config inherits ::pingfederate {
       lens    => 'Xml.lns',
       incl    => $hive_file,
       context => "/files/${hive_file}",
-      changes => ['set module/service-point[#attribute/id="ClientManager"][#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]/invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerXmlFileImpl"']
+      changes => ['set module/service-point[#attribute/id="ClientManager"][#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]/invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerXmlFileImpl"',
+                  $aug_comment]
     }
   }
 
@@ -226,7 +242,8 @@ class pingfederate::config inherits ::pingfederate {
      "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/#attribute/filePattern \${sys:pf.log.dir}/${i['filePattern']}",
      "rm Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/Policies",
      "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/CronTriggeringPolicy/#attribute/schedule \"0 0 0 * * ?\"",
-     "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/DefaultRolloverStrategy/#attribute/max ${::pingfederate::log_retain_days}"
+     "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/DefaultRolloverStrategy/#attribute/max ${::pingfederate::log_retain_days}",
+     $aug_comment
     ]
   }
 
@@ -288,7 +305,8 @@ class pingfederate::config inherits ::pingfederate {
     lens    => 'Xml.lns',
     incl    => $jetty_adm_file,
     context => "/files/${jetty_adm_file}",
-    changes => [ "set ${adm_cfg} ${::pingfederate::log_retain_days}" ]
+    changes => [ "set ${adm_cfg} ${::pingfederate::log_retain_days}",
+                 $aug_comment ]
   }
   # now do the same for the runtime file
   $run_cfg = @(EoF/L)
@@ -308,6 +326,7 @@ class pingfederate::config inherits ::pingfederate {
     lens    => 'Xml.lns',
     incl    => $jetty_run_file,
     context => "/files/${jetty_run_file}",
-    changes => [ "set ${run_cfg} ${::pingfederate::log_retain_days}" ]
+    changes => [ "set ${run_cfg} ${::pingfederate::log_retain_days}",
+                 $aug_comment ]
   }
 }

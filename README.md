@@ -297,17 +297,24 @@ for an explanation. The defaults are as distributed by PingIdentity.
   (integer) Default `7500`
 
 #### Cross-Origin Resource Sharing (CORS)
-CORS needs to be enabled as otherwise Javascript Oauth clients will throw an XHR error
+CORS needs to be enabled as otherwise Javascript OAuth clients will throw an XHR error
 when attempting [XMLHttpRequest (XHR)](https://en.wikipedia.org/wiki/XMLHttpRequest).
+Most of these settings should be left as defaulted.
 
 ##### `cors_allowedOrigins`
   (string)
   Allowed origins for CORS. Default `*`
 
+  You might want to constrain the allowed origins (if you can figure out what the right list should be).
+
 ##### `cors_allowedMethods`
   (string)
   Allowed HTTP methods for CORS. Default `GET,OPTIONS,POST`
   
+##### `cors_allowedHeaders`
+  (string)
+  Allowed HTTP headers for CORS. Default `X-Requested-With,Content-Type,Accept,Origin,Authorization`
+
 ##### `cors_filter_mapping`
   (string)
   Allowed URL filter mappings for CORS. Default `/*`

@@ -104,6 +104,7 @@ class pingfederate (
   # XML: etc/webdefault.xml (Enable Cross-Origin Resource Sharing -- CORS)
   $cors_allowedOrigins                 = $::pingfederate::params::cors_allowedOrigins,
   $cors_allowedMethods                 = $::pingfederate::params::cors_allowedMethods,
+  $cors_allowedHeaders                 = $::pingfederate::params::cors_allowedHeaders,
   $cors_filter_mapping                 = $::pingfederate::params::cors_filter_mapping,
   # XML: server/default/data/config-store/org.sourceid.common.ExpressionManager.xml (OGNL expressions)
   $ognl_expressions_enable             = $::pingfederate::params::ognl_expressions_enable,
