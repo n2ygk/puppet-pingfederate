@@ -81,26 +81,13 @@ class pingfederate (
   $wsfed_local_realm                   = $::pingfederate::params::wsfed_local_realm,
   $http_forwarded_for_header           = $::pingfederate::params::http_forwarded_for_header,
   $http_forwarded_host_header          = $::pingfederate::params::http_forwarded_host_header,
-  # API: authenticationPolicyContracts (SAML2 SP configuration)
-  $saml2_sp_auth_policy_name           = $::pingfederate::params::saml2_sp_auth_policy_name,
-  $saml2_sp_auth_policy_core_attrs     = $::pingfederate::params::saml2_sp_auth_policy_core_attrs,
-  $saml2_sp_auth_policy_extd_attrs     = $::pingfederate::params::saml2_sp_auth_policy_extd_attrs,
+  # API: list of authenticationPolicyContracts (SAML2 SP configuration)
+  $auth_policy_contract                = $::pingfederate::params::auth_policy_contract,
+  $auth_policy_contract_default        = $::pingfederate::params::auth_policy_contract_default,
   # API: sp/idpConnections (SAML2 partner IdP)
-  $saml2_idp_url                       = $::pingfederate::params::saml2_idp_url,
-  $saml2_idp_post                      = $::pingfederate::params::saml2_idp_post,
-  $saml2_idp_redirect                  = $::pingfederate::params::saml2_idp_redirect,
-  $saml2_idp_entityID                  = $::pingfederate::params::saml2_idp_entityID,
-  $saml2_idp_name                      = $::pingfederate::params::saml2_idp_name,
-  $saml2_idp_contact                   = $::pingfederate::params::saml2_idp_contact,
-  $saml2_idp_profiles                  = $::pingfederate::params::saml2_idp_profiles,
-  $saml2_idp_id_mapping                = $::pingfederate::params::saml2_idp_id_mapping,
-  $saml2_idp_core_attrs                = $::pingfederate::params::saml2_idp_core_attrs,
-  $saml2_idp_extd_attrs                = $::pingfederate::params::saml2_idp_extd_attrs,
-  $saml2_idp_attr_map                  = $::pingfederate::params::saml2_idp_attr_map,
-  $saml2_idp_oauth_map                 = $::pingfederate::params::saml2_idp_oauth_map,
-  $saml2_idp_cert_file                 = $::pingfederate::params::saml2_idp_cert_file,
-  $saml2_idp_cert_content              = $::pingfederate::params::saml2_idp_cert_content,
-  $saml2_oauth_token_map               = $::pingfederate::params::saml2_oauth_token_map,
+  $saml2_idp                           = $::pingfederate::params::saml2_idp,
+  #  defaults for missing values in the map(s)
+  $saml2_idp_default                   = $::pingfederate::params::saml2_idp_default,
   # XML: etc/webdefault.xml (Enable Cross-Origin Resource Sharing -- CORS)
   $cors_allowedOrigins                 = $::pingfederate::params::cors_allowedOrigins,
   $cors_allowedMethods                 = $::pingfederate::params::cors_allowedMethods,

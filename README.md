@@ -62,7 +62,7 @@ Install PingFederate per the [installation manual](https://documentation.pingide
 ```
   class {'pingfederate':
     install_dir    => '/usr/local/pingfederate-1',
-	package_ensure => false,
+    package_ensure => false,
   }
 ```
 
@@ -163,9 +163,9 @@ to set a number of the following parameters.
   ```
   pingfederate::log_levels:
     - name: org.sourceid
-	  level: DEBUG
-	- name: com.pingidentity.appserver.jetty
-	  level: DEBUG
+      level: DEBUG
+    - name: com.pingidentity.appserver.jetty
+      level: DEBUG
   ```
 
 #### Providing the License Key
@@ -178,25 +178,25 @@ Provide either a license file or the content as a multiline string.
   (string) Content of the pflicense.lic file. Example:
   ```
   $lic = @(LICENSE)
-		 ID=12345
-		 Organization=Columbia University
-		 Product=PingFederate
-		 Version=8.2
-		 IssueDate=2016-11-3
-		 EnforcementType=3
-		 ExpirationDate=2016-12-3
-		 Tier=Free
-		 SaasProvisioning=true
-		 WSTrustSTS=true
-		 OAuth=true
-		 SignCode=FF07
-		 Signature=302C02141B733A755996FB354FAEDC5211E14E3BC2B4964602144EFBD282F20EF2B77AA8A87DCB17BE533A539720
-		 | LICENSE
+         ID=12345
+         Organization=Columbia University
+         Product=PingFederate
+         Version=8.2
+         IssueDate=2016-11-3
+         EnforcementType=3
+         ExpirationDate=2016-12-3
+         Tier=Free
+         SaasProvisioning=true
+         WSTrustSTS=true
+         OAuth=true
+         SignCode=FF07
+         Signature=302C02141B733A755996FB354FAEDC5211E14E3BC2B4964602144EFBD282F20EF2B77AA8A87DCB17BE533A539720
+         | LICENSE
 
   class {'pingfederate':
     ...
     license_content => $lic,
-	...
+    ...
   }
 ```
 
@@ -377,118 +377,138 @@ These are the native SAML2 IdP settings used for native *console_authentication*
 #### SAML 2.0 SP Configuration
   N.B. The current capability of this module is to configure PingFederate as an SP so as to
   federate a SAML 2.0 IdP for purposes of the OAuth 2.0 authorization code flow. 
+
 ##### Authentication Policy Contracts
-###### `saml2_sp_auth_policy_name` (string)
-###### `saml2_sp_auth_policy_core_attrs` (Array[string])
-###### `saml2_sp_auth_policy_extd_attrs` (Array[string])
+  `auth_policy_contract` (Array[map]) List of authentication policy contracts with these map keys:
+
+###### `name` (string)
+###### `core_attrs` (Array[string])
+###### `extd_attrs` (Array[string])
 
 #### SAML 2.0 Partner IdP Configuration
-  Currently only a single partner IdP can be configure by this module.
-##### `saml2_idp_url`
+  `saml2_idp`: (Array[map]) Multiple partner IdPs can be configure by this module. Each array item has multiple map  keys:
+
+##### `url`
   (string)
   URL for the SAML2 IDP. For example: `https://shibboleth.example.com`
 
-##### `saml2_idp_post`
+##### `post`
   (string)
-  URL-portion for the POST method. Concatenated to the `saml2_idp_url`. Default: `idp/profile/SAML2/POST/SSO`
+  URL-portion for the POST method. Concatenated to the `url`. Default: `idp/profile/SAML2/POST/SSO`
 
-##### `saml2_idp_redirect`
+##### `redirect`
   (string)
-  URL-portion for the redirect. Concatenated to the `saml2_idp_url`. Default: `idp/profile/SAML2/Redirect/SSO`
+  URL-portion for the redirect. Concatenated to the `url`. Default: `idp/profile/SAML2/Redirect/SSO`
 
-##### `saml2_idp_entityID`
+##### `entityID`
   (string)
   Entity ID for the SAML2 IDP. For example: `urn:mace:incommon:example.com` or `https://shibboleth.example.com/idp/shibboleth`
 
-##### `saml2_idp_name`
+##### `name`
   (string)
   User-friendly name for the IdP. Displayed in the authentication selector screen.
 
-##### `saml2_idp_contact`
+##### `virtual`
+  (string)
+  Virtual server entityID for the PingFederate SP. Used to override `saml2_local_entityID`.
+  For example: `columbia-ping-mfa:urn:saml2`
+
+##### `contact`
   (map)
   Contact info for the IdP operator. Default: `{'firstName' => '', 'lastName' => '', 'email' => ''}`
 
-##### `saml2_idp_profiles`
+##### `profiles`
   (Array[string])
   List of allowed SAML2 IdP profiles. Default: `['SP_INITIATED_SSO']`
 
-##### `saml2_idp_id_mapping`
+##### `auth_policy_contract`
+  (string)
+  Name of the Authentication Policy Contract to use.
+
+##### `id_mapping`
   (string)
   How IdP gets mapped (RTFM). Default: `'ACCOUNT_MAPPING'`
 
-##### `saml2_idp_core_attrs`
+##### `core_attrs`
   (Array[string])
   List of core attributes. Default: `['SAML_SUBJECT']`
 
-##### `saml2_idp_extd_attrs`
+##### `extd_attrs`
   (Array[string])
   List of extended attributes. Default: `[]`
 
-##### `saml2_idp_attr_map`
+##### `attr_map`
   (Array[map])
   List of attribute mappings with keys _name_, _type_, _value_. Default: `[]`
   Example: 
   ```
-  pingfederate::saml2_idp_attr_map:
-    - name: pingAffiliation
-      type: EXPRESSION
-      value: >-
-		#result = #this.get(\"urn:oid:1.3.6.1.4.1.5923.1.1.1.1.9\"),
-		#result = (#result? #result.toString() : \"\")
-		.replace(\"[\", \"[\\\"\")
-		.replace(\"]\", \"\\\"]\")
-		.replace(\",\", \"\\\",\\\"\")
-		.replace(\" \", \"\")
-	- name: subject
-	  type: ASSERTION
-	  value: SAML_SUBJECT
+  pingfederate::saml2_idp:
+    - ...
+      attr_map:
+        - name: pingAffiliation
+          type: EXPRESSION
+          value: >-
+            #result = #this.get(\"urn:oid:1.3.6.1.4.1.5923.1.1.1.1.9\"),
+            #result = (#result? #result.toString() : \"\")
+            .replace(\"[\", \"[\\\"\")
+            .replace(\"]\", \"\\\"]\")
+            .replace(\",\", \"\\\",\\\"\")
+            .replace(\" \", \"\")
+        - name: subject
+          type: ASSERTION
+          value: SAML_SUBJECT
   ```
 
-##### `saml2_idp_oauth_map`
+##### `oauth_map`
   (Array[map])
   List of attribute mappings from SAML2 to Oauth with keys _name_, _type_, _value_. Default: `[]`
   Example:
   ```
-  pingfederate::saml2_idp_oauth_map:
-	- name: USER_KEY
-	  type: ASSERTION
-	  value: SAML_SUBJECT
-	- name: USER_NAME
-	  type: ASSERTION
-	  value: SAML_SUBJECT
+  pingfederate::saml2_idp:
+    - ...
+      oauth_map:
+        - name: USER_KEY
+          type: ASSERTION
+          value: SAML_SUBJECT
+        - name: USER_NAME
+          type: ASSERTION
+          value: SAML_SUBJECT
   ```
 
-##### `saml2_idp_cert_file`
+##### `cert_file`
   (string)
   File path to IdP certificate. NOT IMPLEMENTED.
 
-##### `saml2_idp_cert_content`
+##### `cert_content`
   (string)
   String containing IdP certificate. Example:
   ```
-  pingfederate::saml2_idp_cert_content: |
-	-----BEGIN CERTIFICATE-----
-	MIIDRzCCAi+gAwIBAgIUAb+rsLUvjwiVA2iVgiHAFGrtCPgwDQYJKoZIhvcNAQEF
-	BQAwIjEgMB4GA1UEAxMXc2hpYmJvbGV0aC5jb2x1bWJpYS5lZHUwHhcNMTMwODIy
-	MTQ1MzUzWhcNMzMwODIyMTQ1MzUzWjAiMSAwHgYDVQQDExdzaGliYm9sZXRoLmNv
-    ...
-	-----END CERTIFICATE-----
+  pingfederate::saml2_idp:
+    - ...
+      cert_content: |
+		-----BEGIN CERTIFICATE-----
+		MIIDRzCCAi+gAwIBAgIUAb+rsLUvjwiVA2iVgiHAFGrtCPgwDQYJKoZIhvcNAQEF
+		BQAwIjEgMB4GA1UEAxMXc2hpYmJvbGV0aC5jb2x1bWJpYS5lZHUwHhcNMTMwODIy
+		MTQ1MzUzWhcNMzMwODIyMTQ1MzUzWjAiMSAwHgYDVQQDExdzaGliYm9sZXRoLmNv
+		...
+		-----END CERTIFICATE-----
   ```
 
 ##### `saml2_oauth_token_map`
   (Array[map])
   Mapping of OAuth attributes to fields in the access token(?). Example:
   ```
-  pingfederate::saml2_oauth_token_map:
-	- name: username
-	  type: OAUTH_PERSISTENT_GRANT
-	  value: USER_KEY
-	- name: group
-	  type: OAUTH_PERSISTENT_GRANT
-	  value: group
-	- name: uid
-	  type: OAUTH_PERSISTENT_GRANT
-	  value: USER_KEY
+    - ...
+	  saml2_oauth_token_map:
+		- name: username
+		  type: OAUTH_PERSISTENT_GRANT
+		  value: USER_KEY
+		- name: group
+		  type: OAUTH_PERSISTENT_GRANT
+		  value: group
+		- name: uid
+		  type: OAUTH_PERSISTENT_GRANT
+		  value: USER_KEY
   ```
 
 #### OAuth JDBC configuration
@@ -638,8 +658,8 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
     - name: readwrite
       description: Can read and write stuff
       scopes:
-	    - read
-	    - write
+        - read
+        - write
   ```
 
 ##### `oauth_svc_grant_core_attrs`

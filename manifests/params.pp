@@ -77,24 +77,32 @@ class pingfederate::params {
   $wsfed_local_realm                   = "${facts['hostname']}-ping:urn:wsfed"
   $http_forwarded_for_header           = undef
   $http_forwarded_host_header          = undef
-  $saml2_sp_auth_policy_name           = undef
-  $saml2_sp_auth_policy_core_attrs     = ['subject']
-  $saml2_sp_auth_policy_extd_attrs     = []
-  $saml2_idp_url                       = undef
-  $saml2_idp_post                      = 'idp/profile/SAML2/POST/SSO'
-  $saml2_idp_redirect                  = 'idp/profile/SAML2/Redirect/SSO'
-  $saml2_idp_name                      = undef
-  $saml2_idp_entityID                  = undef
-  $saml2_idp_contact                   = {'firstName' => '', 'lastName' => '', 'email' => ''}
-  $saml2_idp_profiles                  = ['SP_INITIATED_SSO']
-  $saml2_idp_id_mapping                = 'ACCOUNT_MAPPING'
-  $saml2_idp_core_attrs                = ['SAML_SUBJECT']
-  $saml2_idp_extd_attrs                = []
-  $saml2_idp_attr_map                  = []
-  $saml2_idp_oauth_map                 = []
-  $saml2_idp_cert_file                 = undef
-  $saml2_idp_cert_content                  = undef
-  $saml2_oauth_token_map               = undef
+  $auth_policy_contract                = []
+  $auth_policy_contract_default        = {
+    'name' => undef,
+    'core_attrs' => ['subject'],
+    'extd_attrs' => []
+  }
+  $saml2_idp                           = []
+  $saml2_idp_default                   = {
+    'url' => undef,
+    'post' => 'idp/profile/SAML2/POST/SSO',
+    'redirect' => 'idp/profile/SAML2/Redirect/SSO',
+    'name' => undef,
+    'virtual' => undef,
+    'entityID' => undef,
+    'contact' => {'firstName' => '', 'lastName' => '', 'email' => ''},
+    'profiles' => ['SP_INITIATED_SSO'],
+    'sp_auth_policy_name' => undef,
+    'id_mapping' => 'ACCOUNT_MAPPING',
+    'core_attrs' => ['SAML_SUBJECT'],
+    'extd_attrs' => [],
+    'attr_map' => [],
+    'oauth_map' => [],
+    'cert_file' => undef,
+    'cert_content' => undef,
+    'oauth_token_map' => undef
+  }
   $cors_allowedOrigins                 = '*'
   $cors_allowedMethods                 = 'GET,OPTIONS,POST'
   $cors_allowedHeaders                 = 'X-Requested-With,Content-Type,Accept,Origin,Authorization'
