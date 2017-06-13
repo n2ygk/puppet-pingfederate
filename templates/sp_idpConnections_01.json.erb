@@ -1,18 +1,18 @@
 {
-  "entityId": "<%= @a['entityID'] -%>",
-  "name": "<%= @a['name'] -%>", 
+  "entityId": "<%= @b['entityID'] -%>",
+  "name": "<%= @b['name'] -%>", 
   "active": true, 
   "contactInfo": {
-    "firstName": "<%= @a['contact']['firstName'] -%>",
-    "lastName": "<%= @a['contact']['lastName'] -%>",
-    "email": "<%= @a['contact']['email'] -%>"
+    "firstName": "<%= @b['contact']['firstName'] -%>",
+    "lastName": "<%= @b['contact']['lastName'] -%>",
+    "email": "<%= @b['contact']['email'] -%>"
   }, 
   "type": "IDP",
   "idpBrowserSso": {
     "protocol": "SAML20", 
     "enabledProfiles": [
-<% @a['profiles'].each_with_index do |val, i| -%>
-    "<%= val -%>"<%= ',' if i < (@a['profiles'].size - 1) %>
+<% @b['profiles'].each_with_index do |val, i| -%>
+    "<%= val -%>"<%= ',' if i < (@b['profiles'].size - 1) %>
 <% end -%>
     ],
     "incomingBindings": [
@@ -21,30 +21,30 @@
     ],
     "ssoServiceEndpoints": [
       {
-        "url": "<%= @a['url'] -%>/<%= @a['post'] -%>", 
+        "url": "<%= @b['url'] -%>/<%= @b['post'] -%>", 
         "binding": "POST"
       }, 
       {
-        "url": "<%= @a['url'] -%>/<%= @a['redirect'] -%>", 
+        "url": "<%= @b['url'] -%>/<%= @b['redirect'] -%>", 
         "binding": "REDIRECT"
       }
     ], 
-    "idpIdentityMapping": "<%= @a['id_mapping'] -%>", 
+    "idpIdentityMapping": "<%= @b['id_mapping'] -%>", 
     "attributeContract": {<%# list of attributes sent in the IdP assertion %>
       "coreAttributes": [
-<% @a['core_attrs'].each_with_index do |val, i| -%>
+<% @b['core_attrs'].each_with_index do |val, i| -%>
         {
           "name": "<%= val -%>", 
           "masked": false
-        }<%= ',' if i < (@a['core_attrs'].size - 1) %>
+        }<%= ',' if i < (@b['core_attrs'].size - 1) %>
 <% end -%>
       ], 
       "extendedAttributes": [
-<% @a['extd_attrs'].each_with_index do |val, i| -%>
+<% @b['extd_attrs'].each_with_index do |val, i| -%>
         {
           "name": "<%= val -%>", 
           "masked": false
-        }<%= ',' if i < (@a['extd_attrs'].size - 1) %>
+        }<%= ',' if i < (@b['extd_attrs'].size - 1) %>
 <% end -%>
       ]
     }, 

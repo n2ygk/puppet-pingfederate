@@ -1,15 +1,15 @@
 <%# turn the the core and extended attribute arrays into JSON. -%>
 <%# A little ugly since JSON doesn't allow final commas in lists -%>
 {
-  "name": "<%= @a['name'] -%>",
+  "name": "<%= @b["name"] -%>",
   "coreAttributes": [
-<% @a['core_attr'].each_with_index do |val, i| -%>
-    { "name": "<%= val -%>" }<%= ',' if i < (@a['core_attr'].size - 1) %>
+<% @b["core_attrs"].each_with_index do |val, i| -%>
+    { "name": "<%= val -%>" }<%= ',' if i < (@b["core_attrs"].size - 1) %>
 <% end -%>
   ], 
   "extendedAttributes": [
-<% @a['extd_attr'].each_with_index  do |val, i| -%>
-    { "name": "<%= val -%>" }<%= ',' if i < (@a['extd_attr'].size - 1) %>
+<% @b["extd_attrs"].each_with_index  do |val, i| -%>
+    { "name": "<%= val -%>" }<%= ',' if i < (@b["extd_attrs"].size - 1) %>
 <% end -%>
   ]
 }

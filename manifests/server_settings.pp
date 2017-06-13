@@ -1,6 +1,11 @@
 # Class pingfederate::server_settings
 #
-# Configure the server settings via the admin API
+# Configure the server settings via the admin API. For documentation, see
+# https://<server>:9999/pf-admin-api/api-docs
+#
+# This is not so easy as one would hope as many of the APIs require referencing a system-generated
+# 'id' parameter that was created as the result of an earlier POST. These are written out of a file
+# named *.id and then pulled in using 'concat'.
 #
 class pingfederate::server_settings inherits ::pingfederate {
   $pfapi = "${::pingfederate::install_dir}/local/bin/pf-admin-api"
@@ -41,15 +46,11 @@ class pingfederate::server_settings inherits ::pingfederate {
   # the JSON filename in order to find the 'id' to link by.
   $apc = "authenticationPolicyContracts"
   $::pingfederate::auth_policy_contract.each |$a| {
-    if !defined($a['name']) {
+    if !has_key($a,'name') {
       fail('auth_policy_contract must have a name')
     }
     # need to check for existence of each key and replace missing values with defaults
-    $::pingfederate::auth_policy_contract_default.each |$k,$v| {
-      if !has_key($a,$k) {
-        $a[$k] = $v
-      }
-    }
+    $b = deep_merge($::pingfederate::auth_policy_contract_default,$a)
 
     file { "${etc}/${apc}_${a['name']}.json":
       ensure   => 'present',
@@ -64,14 +65,14 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
-    
+  
     $apcm = 'oauth/authenticationPolicyContractMappings'
     $apcmf = "oauth_authenticationPolicyContractMappings"
     $apcm_frag01 = "${apcmf}_01"
     $apcm_frag03 = "${apcmf}_03"
     $apcm_frag05 = "${apcmf}_05"
     $apcm_frag07 = "${apcmf}_07"
-    Exec["pf-admin-api POST ${apcmf}_${a['name']}"] ->
+    Exec["pf-admin-api POST ${apc}_${a['name']}"] ->
     concat {"${etc}/${apcmf}_${a['name']}.json":
       ensure  => present,
       mode    => 'a=r',
@@ -113,14 +114,14 @@ class pingfederate::server_settings inherits ::pingfederate {
       content => template("pingfederate/${apcm_frag07}.json.erb"),
       order   => '07',
     }
-    exec {"pf-admin-api POST ${apcm}_${a['name']}":
-      subscribe   => Concat["${etc}/${apcmf}.json"],
+    exec { "pf-admin-api POST ${apcm}_${a['name']}":
+      subscribe   => Concat["${etc}/${apcmf}_${a['name']}.json"],
       command     => "${pfapi} -m POST -j ${etc}/${apcmf}_${a['name']}.json -r ${etc}/${apcmf}_${a['name']}.json.out -i ${etc}/${apcmf}_${a['name']}.id ${apcm}", # || rm -f ${apcmf}_${a['name']}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
-  }
+  } # end $::pingfederate::auth_policy_contract.each
 
   $oas = "oauth/authServerSettings"
   $oasf = "oauth_authServerSettings"
@@ -155,7 +156,8 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
-  }
+  } # endif $::pingfederate::oauth_svc_acc_tok_mgr_id
+
   if $::pingfederate::oauth_oidc_policy_id {
     $oip = "oauth/openIdConnect/policies"
     $oipf = "oauth_openIdConnect_policies"
@@ -187,45 +189,20 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
-  }
-  # TODO: make sure an adapter wasn't previously defined and is now removed. Removal happens
-  # in the reverse order of addition!
-  if str2bool($::pingfederate::facebook_adapter) {
-    $fba = "idp/adapters"
-    $fbaf = "idp_adapters_facebook"
-    file {"${etc}/${fbaf}.json":
-      ensure   => 'present',
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
-      content  => template("pingfederate/${fbaf}.json.erb"),
-    } ~> 
-    exec {"pf-admin-api POST ${fbaf}":
-      command     => "${pfapi} -m POST -j ${etc}/${fbaf}.json -r ${etc}/${fbaf}.json.out ${fba}", # || rm -f ${fbaf}.json",
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
-  }
-  # TO DO: additional social adapters. Can probably parameterize and reuse the facebook stuff,
+  } # endif $::pingfederate::oauth_oidc_policy_id
 
   # need to iterate, fill in defaults, use auth_policy_contract as filename component for $apc_*.id
   # move this up closer to the apc stuff?
-  # fill in missing values from defaults
   $::pingfederate::saml2_idp.each |$a| {
-    $::pingfederate::saml2_idp_default.each |$k,$v| {
-      if !has_key($a,$k) {
-        $a[$k] = $v
-      }
-    }
+    $b = deep_merge($::pingfederate::saml2_idp_default,$a)
     $spidp = 'sp/idpConnections'
     $spidpf = 'sp_idpConnections'
     $spidp_frag01 = "${spidpf}_01"
     $spidp_frag03 = "${spidpf}_03"
     $spidp_frag05 = "${spidpf}_05"
-    $a['x509_string'] = regsubst($a['cert_content'],'\n','\\n','G')
+    $x509_string = regsubst($b['cert_content'],'\n','\\n','G')
 
-    Exec["pf-admin-api POST ${spidpf}_${a['name']}"] ->
+    Exec["pf-admin-api POST ${apc}_${a['name']}"] ->
     concat {"${etc}/${spidpf}_${a['name']}.json":
       ensure   => present,
       mode     => 'a=r',
@@ -264,7 +241,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
-  xxx continue iteration
+
     $oatsp = 'oauth/accessTokenMappings'
     $oatspf = 'oauth_accessTokenMappings_saml2'
     $oatsp_frag01 = "${oatspf}_01"
@@ -272,60 +249,80 @@ class pingfederate::server_settings inherits ::pingfederate {
     $oatsp_frag05 = "${oatspf}_05"
     $oatsp_frag07 = "${oatspf}_07"
 
-    Exec["pf-admin-api POST ${spidp}"] ->
-    concat {"${etc}/${oatspf}.json":
+    Exec["pf-admin-api POST ${oatsp}_${a['name']}"] ->
+    concat {"${etc}/${oatspf}_${a['name']}.json":
       ensure  => present,
       mode    => 'a=r',
       owner   => $::pingfederate::owner,
       group   => $::pingfederate::group,
     }
-    concat::fragment {"${oatsp_frag01}":
-      target  => "${etc}/${oatspf}.json",
+    concat::fragment {"${oatsp_frag01}_${a['name']}":
+      target  => "${etc}/${oatspf}_${a['name']}.json",
       content => template("pingfederate/${oatsp_frag01}.json.erb"),
       order   => '01',
     }
-    concat::fragment {"${spidpf}.id ${oatsp} 02":
-      target => "${etc}/${oatspf}.json",
-      source => "${etc}/${spidpf}.id",
+    concat::fragment {"${spidpf}_${a['name']}.id ${oatsp}_${a['name']} 02":
+      target => "${etc}/${oatspf}_${a['name']}.json",
+      source => "${etc}/${spidpf}_${a['name']}.id",
       order  => '02',
     }
-    concat::fragment {"${oatsp_frag03}":
-      target  => "${etc}/${oatspf}.json",
+    concat::fragment {"${oatsp_frag03}_${a['name']}":
+      target  => "${etc}/${oatspf}_${a['name']}.json",
       content => template("pingfederate/${oatsp_frag03}.json.erb"),
       order   => '03',
     }
-    concat::fragment {"${spidpf}.id ${oatsp} 04":
-      target => "${etc}/${oatspf}.json",
-      source => "${etc}/${spidpf}.id",
+    concat::fragment {"${spidpf}_${a['name']}.id ${oatsp}_${a['name']} 04":
+      target => "${etc}/${oatspf}_${a['name']}.json",
+      source => "${etc}/${spidpf}_${a['name']}.id",
       order  => '04',
     }
-    concat::fragment {"${oatsp_frag05}":
-      target  => "${etc}/${oatspf}.json",
+    concat::fragment {"${oatsp_frag05}_${a['name']}":
+      target  => "${etc}/${oatspf}_${a['name']}.json",
       content => template("pingfederate/${oatsp_frag05}.json.erb"),
       order   => '05',
     } 
-    concat::fragment {"${spidpf}.id ${oatsp} 06":
-      target => "${etc}/${oatspf}.json",
-      source => "${etc}/${spidpf}.id",
+    concat::fragment {"${spidpf}_${a['name']}.id ${oatsp}_${a['name']} 06":
+      target => "${etc}/${oatspf}_${a['name']}.json",
+      source => "${etc}/${spidpf}_${a['name']}.id",
       order  => '06',
     }
-    concat::fragment {"${oatsp_frag07}":
-      target  => "${etc}/${oatspf}.json",
+    concat::fragment {"${oatsp_frag07}_${a['name']}":
+      target  => "${etc}/${oatspf}_${a['name']}.json",
       content => template("pingfederate/${oatsp_frag07}.json.erb"),
       order   => '07',
     } 
-    exec {"pf-admin-api POST ${oatsp}/saml2":
-      subscribe   => Concat["${etc}/${oatspf}.json"],
-      command     => "${pfapi} -m POST -j ${etc}/${oatspf}.json -r ${etc}/${oatspf}.json.out -i ${etc}/${oatspf}.id ${oatsp}", # || rm -f ${oatspf}.json",
+    exec {"pf-admin-api POST ${oatsp}/saml2_${a['name']}":
+      subscribe   => Concat["${etc}/${oatspf}_${a['name']}.json"],
+      command     => "${pfapi} -m POST -j ${etc}/${oatspf}_${a['name']}.json -r ${etc}/${oatspf}_${a['name']}.json.out -i ${etc}/${oatspf}_${a['name']}.id ${oatsp}", # || rm -f ${oatspf}_${a['name']}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
   }
 
-  # add social oauth adapters
+  ###
+  # SOCIAL OAUTH ADAPTERS
+  ###
 
+  # TODO: make sure an adapter wasn't previously defined and is now removed. Removal happens
+  # in the reverse order of addition!
   if str2bool($::pingfederate::facebook_adapter) {
+    $fba = "idp/adapters"
+    $fbaf = "idp_adapters_facebook"
+    file {"${etc}/${fbaf}.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${fbaf}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${fbaf}":
+      command     => "${pfapi} -m POST -j ${etc}/${fbaf}.json -r ${etc}/${fbaf}.json.out ${fba}", # || rm -f ${fbaf}.json",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+
     $fbi = "oauth/idpAdapterMappings"
     $fbif = "oauth_idpAdapterMappings_facebook"
     file {"${etc}/${fbif}.json":
@@ -362,4 +359,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       logoutput   => true,
     }
   }    
+
+  # TO DO: additional social adapters. Can probably parameterize and reuse the facebook stuff
+
 }
