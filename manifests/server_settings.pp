@@ -202,7 +202,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     $spidp_frag05 = "${spidpf}_05"
     $x509_string = regsubst($b['cert_content'],'\n','\\n','G')
 
-    if !has_key($b,'auth_policy_contact') {
+    if !has_key($b,'auth_policy_contract') or $b['auth_policy_contract'] == undef {
       fail("saml2_idp[${b['name']}] => 'auth_policy_contract' is missing")
     }
 
@@ -253,7 +253,8 @@ class pingfederate::server_settings inherits ::pingfederate {
     $oatsp_frag05 = "${oatspf}_05"
     $oatsp_frag07 = "${oatspf}_07"
 
-    Exec["pf-admin-api POST ${oatsp}/saml2_${b['name']}"] ->
+    ##Exec["pf-admin-api POST ${oatsp}/saml2_${b['name']}"] ->
+    Exec["pf-admin-api POST ${apc}_${b['auth_policy_contract']}"] ->
     concat {"${etc}/${oatspf}_${b['name']}.json":
       ensure  => present,
       mode    => 'a=r',
