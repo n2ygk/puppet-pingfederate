@@ -46,21 +46,22 @@ class pingfederate::server_settings inherits ::pingfederate {
   # the JSON filename in order to find the 'id' to link by.
   $apc = "authenticationPolicyContracts"
   $::pingfederate::auth_policy_contract.each |$a| {
-    if !has_key($a,'name') {
-      fail('auth_policy_contract must have a name')
-    }
     # need to check for existence of each key and replace missing values with defaults
     $b = deep_merge($::pingfederate::auth_policy_contract_default,$a)
-
-    file { "${etc}/${apc}_${a['name']}.json":
+    if !has_key($b,'name') {
+      fail('auth_policy_contract must have a name')
+    }
+    $n=$b['name']
+    $un=uriescape($n)
+    file { "${etc}/${apc}_${un}.json":
       ensure   => 'present',
       mode     => 'a=r',
       owner    => $::pingfederate::owner,
       group    => $::pingfederate::group,
       content  => template("pingfederate/${apc}.json.erb"),
     } ~>
-    exec { "pf-admin-api POST ${apc}_${a['name']}":
-      command     => "${pfapi} -m POST -j ${etc}/${apc}_${a['name']}.json -r ${etc}/${apc}_${a['name']}.json.out -i ${etc}/${apc}_${a['name']}.id ${apc}", # || rm -f ${apc}_${a['name']}.json,
+    exec { "pf-admin-api POST ${apc}_${un}":
+      command     => "${pfapi} -m POST -j ${etc}/${apc}_${un}.json -r ${etc}/${apc}_${un}.json.out -i ${etc}/${apc}_${un}.id ${apc}", # || rm -f ${apc}_${un}.json,
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -72,51 +73,51 @@ class pingfederate::server_settings inherits ::pingfederate {
     $apcm_frag03 = "${apcmf}_03"
     $apcm_frag05 = "${apcmf}_05"
     $apcm_frag07 = "${apcmf}_07"
-    Exec["pf-admin-api POST ${apc}_${a['name']}"] ->
-    concat {"${etc}/${apcmf}_${a['name']}.json":
+    Exec["pf-admin-api POST ${apc}_${un}"] ->
+    concat {"${etc}/${apcmf}_${un}.json":
       ensure  => present,
       mode    => 'a=r',
       owner   => $::pingfederate::owner,
       group   => $::pingfederate::group,
     }
-    concat::fragment {"${apcm_frag01}_${a['name']}":
-      target  => "${etc}/${apcmf}_${a['name']}.json",
+    concat::fragment {"${apcm_frag01}_${un}":
+      target  => "${etc}/${apcmf}_${un}.json",
       content => template("pingfederate/${apcm_frag01}.json.erb"),
       order   => '01',
     }
-    concat::fragment {"${apc}_${a['name']}.id ${apcm}_${a['name']} 02":
-      target => "${etc}/${apcmf}_${a['name']}.json",
-      source => "${etc}/${apc}_${a['name']}.id",
+    concat::fragment {"${apc}_${un}.id ${apcm}_${un} 02":
+      target => "${etc}/${apcmf}_${un}.json",
+      source => "${etc}/${apc}_${un}.id",
       order  => '02',
     }
-    concat::fragment {"${apcm_frag03}_${a['name']}":
-      target  => "${etc}/${apcmf}_${a['name']}.json",
+    concat::fragment {"${apcm_frag03}_${un}":
+      target  => "${etc}/${apcmf}_${un}.json",
       content => template("pingfederate/${apcm_frag03}.json.erb"),
       order   => '03',
     }
-    concat::fragment {"${apc}_${a['name']}.id ${apcm}_${a['name']} 04":
-      target => "${etc}/${apcmf}_${a['name']}.json",
-      source => "${etc}/${apc}_${a['name']}.id",
+    concat::fragment {"${apc}_${un}.id ${apcm}_${un} 04":
+      target => "${etc}/${apcmf}_${un}.json",
+      source => "${etc}/${apc}_${un}.id",
       order  => '04',
     }
-    concat::fragment {"${apcm_frag05}_${a['name']}":
-      target  => "${etc}/${apcmf}_${a['name']}.json",
+    concat::fragment {"${apcm_frag05}_${un}":
+      target  => "${etc}/${apcmf}_${un}.json",
       content => template("pingfederate/${apcm_frag05}.json.erb"),
       order   => '05',
     }
-    concat::fragment {"${apc}_${a['name']}.id ${apcm}_${a['name']} 06":
-      target => "${etc}/${apcmf}_${a['name']}.json",
-      source => "${etc}/${apc}_${a['name']}.id",
+    concat::fragment {"${apc}_${un}.id ${apcm}_${un} 06":
+      target => "${etc}/${apcmf}_${un}.json",
+      source => "${etc}/${apc}_${un}.id",
       order  => '06',
     }
-    concat::fragment {"${apcm_frag07}_${a['name']}":
-      target  => "${etc}/${apcmf}_${a['name']}.json",
+    concat::fragment {"${apcm_frag07}_${un}":
+      target  => "${etc}/${apcmf}_${un}.json",
       content => template("pingfederate/${apcm_frag07}.json.erb"),
       order   => '07',
     }
-    exec { "pf-admin-api POST ${apcm}_${a['name']}":
-      subscribe   => Concat["${etc}/${apcmf}_${a['name']}.json"],
-      command     => "${pfapi} -m POST -j ${etc}/${apcmf}_${a['name']}.json -r ${etc}/${apcmf}_${a['name']}.json.out -i ${etc}/${apcmf}_${a['name']}.id ${apcm}", # || rm -f ${apcmf}_${a['name']}.json",
+    exec { "pf-admin-api POST ${apcm}_${un}":
+      subscribe   => Concat["${etc}/${apcmf}_${un}.json"],
+      command     => "${pfapi} -m POST -j ${etc}/${apcmf}_${un}.json -r ${etc}/${apcmf}_${un}.json.out -i ${etc}/${apcmf}_${un}.id ${apcm}", # || rm -f ${apcmf}_${un}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -194,53 +195,58 @@ class pingfederate::server_settings inherits ::pingfederate {
   # need to iterate, fill in defaults, use auth_policy_contract as filename component for $apc_*.id
   # move this up closer to the apc stuff?
   $::pingfederate::saml2_idp.each |$a| {
-    $b = deep_merge($::pingfederate::saml2_idp_default,$a)
     $spidp = 'sp/idpConnections'
     $spidpf = 'sp_idpConnections'
     $spidp_frag01 = "${spidpf}_01"
     $spidp_frag03 = "${spidpf}_03"
     $spidp_frag05 = "${spidpf}_05"
+    $b = deep_merge($::pingfederate::saml2_idp_default,$a)
     $x509_string = regsubst($b['cert_content'],'\n','\\n','G')
 
-    if !has_key($b,'auth_policy_contract') or $b['auth_policy_contract'] == undef {
-      fail("saml2_idp[${b['name']}] => 'auth_policy_contract' is missing")
+    if !has_key($b,'auth_policy_contract') or !has_key($b,'name')
+       or $b['auth_policy_contract'] == undef or $b['name'] == undef {
+      fail("saml2_idp => 'name' and/or 'auth_policy_contract' is missing")
     }
+    $n=$b['name']
+    $un=uriescape($n)
+    $an=$b['auth_policy_contract']
+    $uan=uriescape($an)
 
-    Exec["pf-admin-api POST ${apc}_${b['auth_policy_contract']}"] ->
-    concat {"${etc}/${spidpf}_${b['name']}.json":
+    Exec["pf-admin-api POST ${apc}_${uan}"] ->
+    concat {"${etc}/${spidpf}_${un}.json":
       ensure   => present,
       mode     => 'a=r',
       owner    => $::pingfederate::owner,
       group    => $::pingfederate::group,
     }
-    concat::fragment {"${spidp_frag01}_${b['name']}":
-      target  => "${etc}/${spidpf}_${b['name']}.json",
+    concat::fragment {"${spidp_frag01}_${un}":
+      target  => "${etc}/${spidpf}_${un}.json",
       content => template("pingfederate/${spidp_frag01}.json.erb"),
       order   => '01',
     }
-    concat::fragment {"${apc}_${b['auth_policy_contract']}.id _${b['name']} 02":
-      target => "${etc}/${spidpf}_${b['name']}.json",
-      source => "${etc}/${apc}_${b['auth_policy_contract']}.id",
+    concat::fragment {"${apc}_${uan}.id _${un} 02":
+      target => "${etc}/${spidpf}_${un}.json",
+      source => "${etc}/${apc}_${uan}.id",
       order  => '02',
     }
-    concat::fragment {"${spidp_frag03}_${b['name']}":
-      target  => "${etc}/${spidpf}_${b['name']}.json",
+    concat::fragment {"${spidp_frag03}_${un}":
+      target  => "${etc}/${spidpf}_${un}.json",
       content => template("pingfederate/${spidp_frag03}.json.erb"),
       order   => '03',
     }
-    concat::fragment {"${apc}_${b['auth_policy_contract']}.id _${b['name']} 04":
-      target => "${etc}/${spidpf}_${b['name']}.json",
-      source => "${etc}/${apc}_${b['auth_policy_contract']}.id",
+    concat::fragment {"${apc}_${uan}.id _${un} 04":
+      target => "${etc}/${spidpf}_${un}.json",
+      source => "${etc}/${apc}_${uan}.id",
       order  => '04',
     }
-    concat::fragment {"${spidp_frag05}_${b['name']}":
-      target  => "${etc}/${spidpf}_${b['name']}.json",
+    concat::fragment {"${spidp_frag05}_${un}":
+      target  => "${etc}/${spidpf}_${un}.json",
       content => template("pingfederate/${spidp_frag05}.json.erb"),
       order   => '05',
     } 
-    exec {"pf-admin-api POST ${spidp}_${b['name']}":
-      subscribe   => Concat["${etc}/${spidpf}_${b['name']}.json"],
-      command     => "${pfapi} -m POST -j ${etc}/${spidpf}_${b['name']}.json -r ${etc}/${spidpf}_${b['name']}.json.out -i ${etc}/${spidpf}_${b['name']}.id ${spidp}", # || rm -f ${spidpf}_${b['name']}.json",
+    exec {"pf-admin-api POST ${spidp}_${un}":
+      subscribe   => Concat["${etc}/${spidpf}_${un}.json"],
+      command     => "${pfapi} -m POST -j ${etc}/${spidpf}_${un}.json -r ${etc}/${spidpf}_${un}.json.out -i ${etc}/${spidpf}_${un}.id ${spidp}", # || rm -f ${spidpf}_${un}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -253,57 +259,56 @@ class pingfederate::server_settings inherits ::pingfederate {
     $oatsp_frag05 = "${oatspf}_05"
     $oatsp_frag07 = "${oatspf}_07"
 
-    ##Exec["pf-admin-api POST ${oatsp}/saml2_${b['name']}"] ->
-    Exec["pf-admin-api POST ${apc}_${b['auth_policy_contract']}"] ->
-    concat {"${etc}/${oatspf}_${b['name']}.json":
+    Exec["pf-admin-api POST ${apc}_${uan}"] ->
+    concat {"${etc}/${oatspf}_${un}.json":
       ensure  => present,
       mode    => 'a=r',
       owner   => $::pingfederate::owner,
       group   => $::pingfederate::group,
     }
-    concat::fragment {"${oatsp_frag01}_${b['name']}":
-      target  => "${etc}/${oatspf}_${b['name']}.json",
+    concat::fragment {"${oatsp_frag01}_${un}":
+      target  => "${etc}/${oatspf}_${un}.json",
       content => template("pingfederate/${oatsp_frag01}.json.erb"),
       order   => '01',
     }
-    concat::fragment {"${spidpf}_${b['name']}.id ${oatsp}_${b['name']} 02":
-      target => "${etc}/${oatspf}_${b['name']}.json",
-      source => "${etc}/${spidpf}_${b['name']}.id",
+    concat::fragment {"${spidpf}_${un}.id ${oatsp}_${un} 02":
+      target => "${etc}/${oatspf}_${un}.json",
+      source => "${etc}/${spidpf}_${un}.id",
       order  => '02',
     }
-    concat::fragment {"${oatsp_frag03}_${b['name']}":
-      target  => "${etc}/${oatspf}_${b['name']}.json",
+    concat::fragment {"${oatsp_frag03}_${un}":
+      target  => "${etc}/${oatspf}_${un}.json",
       content => template("pingfederate/${oatsp_frag03}.json.erb"),
       order   => '03',
     }
-    concat::fragment {"${spidpf}_${b['name']}.id ${oatsp}_${b['name']} 04":
-      target => "${etc}/${oatspf}_${b['name']}.json",
-      source => "${etc}/${spidpf}_${b['name']}.id",
+    concat::fragment {"${spidpf}_${un}.id ${oatsp}_${un} 04":
+      target => "${etc}/${oatspf}_${un}.json",
+      source => "${etc}/${spidpf}_${un}.id",
       order  => '04',
     }
-    concat::fragment {"${oatsp_frag05}_${b['name']}":
-      target  => "${etc}/${oatspf}_${b['name']}.json",
+    concat::fragment {"${oatsp_frag05}_${un}":
+      target  => "${etc}/${oatspf}_${un}.json",
       content => template("pingfederate/${oatsp_frag05}.json.erb"),
       order   => '05',
     } 
-    concat::fragment {"${spidpf}_${b['name']}.id ${oatsp}_${b['name']} 06":
-      target => "${etc}/${oatspf}_${b['name']}.json",
-      source => "${etc}/${spidpf}_${b['name']}.id",
+    concat::fragment {"${spidpf}_${un}.id ${oatsp}_${un} 06":
+      target => "${etc}/${oatspf}_${un}.json",
+      source => "${etc}/${spidpf}_${un}.id",
       order  => '06',
     }
-    concat::fragment {"${oatsp_frag07}_${b['name']}":
-      target  => "${etc}/${oatspf}_${b['name']}.json",
+    concat::fragment {"${oatsp_frag07}_${un}":
+      target  => "${etc}/${oatspf}_${un}.json",
       content => template("pingfederate/${oatsp_frag07}.json.erb"),
       order   => '07',
     } 
-    exec {"pf-admin-api POST ${oatsp}/saml2_${b['name']}":
-      subscribe   => Concat["${etc}/${oatspf}_${b['name']}.json"],
-      command     => "${pfapi} -m POST -j ${etc}/${oatspf}_${b['name']}.json -r ${etc}/${oatspf}_${b['name']}.json.out -i ${etc}/${oatspf}_${b['name']}.id ${oatsp}", # || rm -f ${oatspf}_${b['name']}.json",
+    exec {"pf-admin-api POST ${oatsp}/saml2_${un}":
+      subscribe   => Concat["${etc}/${oatspf}_${un}.json"],
+      command     => "${pfapi} -m POST -j ${etc}/${oatspf}_${un}.json -r ${etc}/${oatspf}_${un}.json.out -i ${etc}/${oatspf}_${un}.id ${oatsp}", # || rm -f ${oatspf}_${un}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
-  }
+  } #end $::pingfederate.saml2_idp.each
 
   ###
   # SOCIAL OAUTH ADAPTERS
