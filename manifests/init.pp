@@ -110,7 +110,8 @@ class pingfederate (
   $oauth_jdbc_pass                     = $::pingfederate::params::oauth_jdbc_pass,
   $oauth_jdbc_validate                 = $::pingfederate::params::oauth_jdbc_validate,
   $oauth_jdbc_create_cmd               = $::pingfederate::params::oauth_jdbc_create_cmd,
-  $oauth_jdbc_ddl_cmd                  = $::pingfederate::params::oauth_jdbc_ddl_cmd,
+  $oauth_jdbc_client_ddl_cmd           = $::pingfederate::params::oauth_jdbc_client_ddl_cmd,
+  $oauth_jdbc_access_ddl_cmd           = $::pingfederate::params::oauth_jdbc_access_ddl_cmd,
   # drag in acct linking datastore while we are at it...
   $acct_jdbc_linking_ddl_cmd           = $::pingfederate::params::acct_jdbc_linking_ddl_cmd,
   # API: passwordCredentialValidators (for OAuth client manager)

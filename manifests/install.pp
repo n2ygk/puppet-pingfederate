@@ -18,7 +18,7 @@ class pingfederate::install inherits ::pingfederate {
   }
   if $pingfederate::package_ensure {
     ensure_packages($pingfederate::package_list,{'ensure' => $pingfederate::package_ensure})
-    $pf_pkgs = Package[$::pingfederate_package_list] # dependency used below
+    $pf_pkgs = Package[$::pingfederate::package_list] # dependency used below
   }
   else {
     $pf_pkgs = undef
@@ -118,7 +118,7 @@ class pingfederate::install inherits ::pingfederate {
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
-      before      => File[$ds],
+      before      => File["${::pingfederate::install_dir}/local/etc/dataStores.json"],
     } ~>
     exec {"oauth_jdbc_client DDL ${::pingfederate::o_url}": # define tables for oauth client management
       command => $::pingfederate::o_c_cmd,
