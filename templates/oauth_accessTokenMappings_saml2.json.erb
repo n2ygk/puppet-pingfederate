@@ -1,4 +1,10 @@
-"
+{<%# SAML2 oauth token mapping %>
+  "id": "authz_req|idp.v2.@@id@@|<%= @oauth_svc_acc_tok_mgr_id -%>",
+  "context": {
+    "type": "IDP_CONNECTION", 
+    "contextRef": {
+      "id": "@@id@@",
+      "location": "<%= @adm_api_baseURL -%>/sp/idpConnections/@@id@@"
     }
   }, 
   "accessTokenManagerRef": {

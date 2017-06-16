@@ -72,6 +72,11 @@ parser.add_option('--verify',
                   action="store_true",
                   default=False,
                   help='verify SSL/TLS server certificate [default: %default]')
+parser.add_option('-s','--subst',
+                  type='string',
+                  action='append',
+                  default=None,
+                  help='--subst key=filename. Substitutes the given @@key@@ in the JSON document with the content of the named file. May be repeated to substitute multple keys.')
 
 (opt, arg) = parser.parse_args()
 
@@ -80,6 +85,18 @@ if len(arg) < 1 or opt.method not in ['GET','PUT','POST','PATCH','DELETE']:
   exit(1)
   
 resource = arg[0]
+
+# set up @@key@@ substitutions from "--subst key1=filename1 --subst key2=filename2..."
+# these are generally .id files from prior POSTs
+substitutions = {}
+if opt.subst:
+  for arg in opt.subst:
+    subs = arg.split('=')
+    if len(subs) != 2:
+      parser.print_usage()
+      exit(1)
+    with io.open(subs[1], 'rb') as file:
+      substitutions.update({subs[0]: file.read()})
 
 cfile = io.open(opt.config,'rb')
 cfg = json.load(cfile)
@@ -123,6 +140,11 @@ if opt.method == 'POST' and opt.response != '-' and data:
       opt.method = 'PUT'
       url = url + '/' + resp['id']
       print('Resource exists. Changing POST to PUT.',file=sys.stderr)
+
+# do @@key@@ substitutions, if any
+if dataString:
+  for k in substitutions:
+    dataString = dataString.replace('@@'+k+'@@',substitutions[k])
 
 response = do_req(opt.retries,opt.method,
                   url, 

@@ -1,4 +1,8 @@
-"
+{<%# oauth authentication policy contract mappings %>
+  "id": "@@id@@",
+  "authenticationPolicyContractRef": {
+    "id": "@@id@@", 
+    "location": "<%= @adm_api_baseURL -%>/authenticationPolicyContracts/@@id@@"
   },
   "attributeContractFulfillment": {
 <% @a['oauth_map'].each_with_index do |val, i| -%>
