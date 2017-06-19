@@ -41,49 +41,11 @@ class pingfederate::server_settings inherits ::pingfederate {
     logoutput   => true,
   }
 
+
   # authenticationPolicyContracts link sp/idpConnections and oauth/authenticationPolicyContractMappings
   # by the 'id' that is the result of a POST. We identify our contacts by the 'name' which is used in
-  # the JSON filename in order to find the 'id' to link by.
-  $apc = "authenticationPolicyContracts"
-  $::pingfederate::auth_policy_contract.each |$a| {
-    # need to check for existence of each key and replace missing values with defaults
-    $b = deep_merge($::pingfederate::auth_policy_contract_default,$a)
-    if !has_key($b,'name') {
-      fail('auth_policy_contract must have a name')
-    }
-    $n=$b['name']
-    $un=uriescape($n)
-    file { "${etc}/${apc}_${un}.json":
-      ensure   => 'present',
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
-      content  => template("pingfederate/${apc}.json.erb"),
-    } ~>
-    exec { "pf-admin-api POST ${apc}_${un}":
-      command     => "${pfapi} -m POST -j ${etc}/${apc}_${un}.json -r ${etc}/${apc}_${un}.json.out -i ${etc}/${apc}_${un}.id ${apc}", # || rm -f ${apc}_${un}.json,
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
-  
-    $apcm = 'oauth/authenticationPolicyContractMappings'
-    $apcmf = "oauth_authenticationPolicyContractMappings"
-
-    Exec["pf-admin-api POST ${apc}_${un}"] ->
-    file {"${etc}/${apcmf}_${un}.json":
-      ensure  => present,
-      mode    => 'a=r',
-      owner   => $::pingfederate::owner,
-      group   => $::pingfederate::group,
-    } ~>
-    exec { "pf-admin-api POST ${apcm}_${un}":
-      command     => "${pfapi} -m POST -j ${etc}/${apcmf}_${un}.json -s id=${etc}/${apc}_${un}.id -r ${etc}/${apcmf}_${un}.json.out -i ${etc}/${apcmf}_${un}.id ${apcm}", # || rm -f ${apcmf}_${un}.json",
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
-  } # end $::pingfederate::auth_policy_contract.each
+  # the JSON filename in order to find the 'id' to link by. oauth/authServerSettings comes first because
+  # if defines the persistentGrantContract attributes that are referenced by these.
 
   $oas = "oauth/authServerSettings"
   $oasf = "oauth_authServerSettings"
@@ -101,10 +63,54 @@ class pingfederate::server_settings inherits ::pingfederate {
     logoutput   => true,
   }
 
+  $apc = "authenticationPolicyContracts"
+  $::pingfederate::auth_policy_contract.each |$a| {
+    # need to check for existence of each key and replace missing values with defaults
+    $b = deep_merge($::pingfederate::auth_policy_contract_default,$a)
+    if !has_key($b,'name') {
+      fail('auth_policy_contract must have a name')
+    }
+    $n=$b['name']
+    $un=uriescape($n)
+    file { "${etc}/${apc}_${un}.json":
+      subscribe => Exec["pf-admin-api PUT ${oas}"],
+      ensure    => 'present',
+      mode      => 'a=r',
+      owner     => $::pingfederate::owner,
+      group     => $::pingfederate::group,
+      content   => template("pingfederate/${apc}.json.erb"),
+    } ~>
+    exec { "pf-admin-api POST ${apc}_${un}":
+      command     => "${pfapi} -m POST -j ${etc}/${apc}_${un}.json -r ${etc}/${apc}_${un}.json.out -i ${etc}/${apc}_${un}.id ${apc}", # || rm -f ${apc}_${un}.json,
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+  
+    $apcm = 'oauth/authenticationPolicyContractMappings'
+    $apcmf = "oauth_authenticationPolicyContractMappings"
+
+   
+    file {"${etc}/${apcmf}_${un}.json":
+      subscribe => [Exec["pf-admin-api PUT ${oas}"],Exec["pf-admin-api POST ${apc}_${un}"]],
+      ensure  => present,
+      mode    => 'a=r',
+      owner   => $::pingfederate::owner,
+      group   => $::pingfederate::group,
+      content => template("pingfederate/${apcmf}.json.erb"),
+    } ~>
+    exec { "pf-admin-api POST ${apcm}_${un}":
+      command     => "${pfapi} -m POST -j ${etc}/${apcmf}_${un}.json -s id=${etc}/${apc}_${un}.id -r ${etc}/${apcmf}_${un}.json.out -i ${etc}/${apcmf}_${un}.id ${apcm}", # || rm -f ${apcmf}_${un}.json",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+  } # end $::pingfederate::auth_policy_contract.each
+
   if $::pingfederate::oauth_svc_acc_tok_mgr_id {
     $atm = "oauth/accessTokenManagers"
     $atmf = "oauth_accessTokenManagers"
-    Exec["pf-admin-api PUT ${oas}"] ->
+    Exec["pf-admin-api PUT ${oas}"] ~>
     file {"${etc}/${atmf}.json":
       ensure   => 'present',
       mode     => 'a=r',
@@ -137,7 +143,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
-    } ->
+    } ~>
     file {"${etc}/${oisf}.json":
       ensure   => 'present',
       mode     => 'a=r',
@@ -168,12 +174,13 @@ class pingfederate::server_settings inherits ::pingfederate {
     $un=uriescape($n)
     $an=$b['auth_policy_contract']
     $uan=uriescape($an)
-    Exec["pf-admin-api POST ${apc}_${uan}"] ->
+    Exec["pf-admin-api POST ${apc}_${uan}"] ~>
     file {"${etc}/${spidpf}_${un}.json":
       ensure   => present,
       mode     => 'a=r',
       owner    => $::pingfederate::owner,
       group    => $::pingfederate::group,
+      content  => template("pingfederate/${spidpf}.json.erb"),
     } ~>
     exec {"pf-admin-api POST ${spidp}_${un}":
       command     => "${pfapi} -m POST -j ${etc}/${spidpf}_${un}.json -s id=${etc}/${apc}_${uan}.id -r ${etc}/${spidpf}_${un}.json.out -i ${etc}/${spidpf}_${un}.id ${spidp}", # || rm -f ${spidpf}_${un}.json",
@@ -184,7 +191,7 @@ class pingfederate::server_settings inherits ::pingfederate {
 
     $oatsp = 'oauth/accessTokenMappings'
     $oatspf = 'oauth_accessTokenMappings_saml2'
-    Exec["pf-admin-api POST ${apc}_${uan}"] ->
+    Exec["pf-admin-api POST ${apc}_${uan}"] ~>
     file {"${etc}/${oatspf}_${un}.json":
       ensure  => present,
       mode    => 'a=r',
@@ -245,7 +252,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     }
     $oatfb = 'oauth/accessTokenMappings'
     $oatfbf = 'oauth_accessTokenMappings_facebook'
-    Exec["pf-admin-api POST ${fbaf}"] ->
+    Exec["pf-admin-api POST ${fbaf}"] ~>
     file {"${etc}/${oatfbf}.json":
       ensure   => 'present',
       mode     => 'a=r',
