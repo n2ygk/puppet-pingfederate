@@ -73,12 +73,12 @@ class pingfederate::server_settings inherits ::pingfederate {
     $n=$b['name']
     $un=uriescape($n)
     file { "${etc}/${apc}_${un}.json":
-      subscribe => Exec["pf-admin-api PUT ${oas}"],
-      ensure    => 'present',
-      mode      => 'a=r',
-      owner     => $::pingfederate::owner,
-      group     => $::pingfederate::group,
-      content   => template("pingfederate/${apc}.json.erb"),
+      require => Exec["pf-admin-api PUT ${oas}"],
+      ensure  => 'present',
+      mode    => 'a=r',
+      owner   => $::pingfederate::owner,
+      group   => $::pingfederate::group,
+      content => template("pingfederate/${apc}.json.erb"),
     } ~>
     exec { "pf-admin-api POST ${apc}_${un}":
       command     => "${pfapi} -m POST -j ${etc}/${apc}_${un}.json -r ${etc}/${apc}_${un}.json.out -i ${etc}/${apc}_${un}.id ${apc}", # || rm -f ${apc}_${un}.json,
@@ -92,7 +92,7 @@ class pingfederate::server_settings inherits ::pingfederate {
 
    
     file {"${etc}/${apcmf}_${un}.json":
-      subscribe => [Exec["pf-admin-api PUT ${oas}"],Exec["pf-admin-api POST ${apc}_${un}"]],
+      require => [Exec["pf-admin-api PUT ${oas}"],Exec["pf-admin-api POST ${apc}_${un}"]],
       ensure  => present,
       mode    => 'a=r',
       owner   => $::pingfederate::owner,
