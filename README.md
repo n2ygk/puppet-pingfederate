@@ -409,9 +409,10 @@ These are the native SAML2 IdP settings used for native *console_authentication*
   User-friendly name for the IdP. Displayed in the authentication selector screen.
 
 ##### `virtual`
-  (string)
-  Virtual server entityID for the PingFederate SP. Used to override `saml2_local_entityID`.
-  For example: `columbia-ping-mfa:urn:saml2`
+  (Array[string])
+  Lost of virtual server entityIDs for the PingFederate SP. Used to override `saml2_local_entityID`.
+  For example: `columbia-ping-mfa:urn:saml2`. The first entityID in the list becomes the
+  defaultVirtualEntityID. Default: `[]`
 
 ##### `contact`
   (map)

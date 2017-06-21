@@ -8,6 +8,14 @@
     "email": "<%= @b['contact']['email'] -%>"
   }, 
   "type": "IDP",
+<% if (@b['virtual'].size) -%>
+  "defaultVirtualEntityId": "<%= @b['virtual'][0] %>",
+  "virtualEntityIds": [
+<% @b['virtual'].each_with_index do |val, i| -%>
+    "<%= val -%>"<%= ',' if i < (@b['virtual'].size - 1) %>
+<% end -%>
+  ],
+<% end -%>
   "idpBrowserSso": {
     "protocol": "SAML20", 
     "enabledProfiles": [

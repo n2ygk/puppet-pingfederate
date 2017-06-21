@@ -89,7 +89,7 @@ class pingfederate::params {
     'post' => 'idp/profile/SAML2/POST/SSO',
     'redirect' => 'idp/profile/SAML2/Redirect/SSO',
     'name' => undef,
-    'virtual' => undef,
+    'virtual' => [],
     'entityID' => undef,
     'contact' => {'firstName' => '', 'lastName' => '', 'email' => ''},
     'profiles' => ['SP_INITIATED_SSO'],
