@@ -64,9 +64,7 @@ class pingfederate::server_settings inherits ::pingfederate {
   }
 
   $apc = "authenticationPolicyContracts"
-  notify { "checking for ::pingfederate::auth_policy_contract": }
   $::pingfederate::auth_policy_contract.each |$a| {
-    notify { "apc: ${a}": }
     # need to check for existence of each key and replace missing values with defaults
     $b = deep_merge($::pingfederate::auth_policy_contract_default,$a)
     if !has_key($b,'name') {
@@ -163,9 +161,7 @@ class pingfederate::server_settings inherits ::pingfederate {
 
   # need to iterate, fill in defaults, use auth_policy_contract as filename component for $apc_*.id
   # move this up closer to the apc stuff?
-  notify { "checking for ::pingfederate::saml2_idp": }
   $::pingfederate::saml2_idp.each |$a| {
-    notify { "saml2_idp ${a}": }
     $spidp = 'sp/idpConnections'
     $spidpf = 'sp_idpConnections'
     $b = deep_merge($::pingfederate::saml2_idp_default,$a)
