@@ -64,6 +64,8 @@ class pingfederate::server_settings inherits ::pingfederate {
   }
 
   $apc = "authenticationPolicyContracts"
+  notify { "checking for pingfederate::auth_policy_contract": }
+  notify { $pingfederate::auth_policy_contract: }
   $::pingfederate::auth_policy_contract.each |$a| {
     # need to check for existence of each key and replace missing values with defaults
     $b = deep_merge($::pingfederate::auth_policy_contract_default,$a)
