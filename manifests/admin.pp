@@ -21,7 +21,7 @@ class pingfederate::admin inherits ::pingfederate {
     }
     if $::pingfederate::operational_mode == 'CLUSTERED_CONSOLE' {
       exec {'pf-admin-api cluster replicate':
-        subscribe => Exec[$restart],
+        subscribe => [Exec[$restart],Class['::pingfederate::server_settings']],
         command => "${::pingfederate::install_dir}/local/bin/pf-admin-api cluster/status | grep -q '\"replicationRequired\": false' || ${::pingfederate::install_dir}/local/bin/pf-admin-api -m POST --timeout=60 cluster/replicate",
         user        =>  $::pingfederate::owner,
         logoutput   => true,
