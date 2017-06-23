@@ -113,12 +113,11 @@ class pingfederate::install inherits ::pingfederate {
       owner  => $::pingfederate::owner,
       group  => $::pingfederate::group,
     } ~>
-    exec {"oauth_jdbc CREATE ${::pingfederate::o_url}": # database has to exist before adding the dataStore
+    exec {"oauth_jdbc CREATE ${::pingfederate::o_url}":
       command => $::pingfederate::o_create,
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
-      before      => File["${::pingfederate::install_dir}/local/etc/dataStores.json"],
     } ~>
     exec {"oauth_jdbc_client DDL ${::pingfederate::o_url}": # define tables for oauth client management
       command => $::pingfederate::o_c_cmd,
@@ -126,7 +125,7 @@ class pingfederate::install inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     } ~>
-    exec {"oauth_jdbc_access DDL ${::pingfederate::o_url}": # define tables for sml2 access management
+    exec {"oauth_jdbc_access DDL ${::pingfederate::o_url}": # define tables for saml2 access management
       command => $::pingfederate::o_a_cmd,
       refreshonly => true,
       user        => $::pingfederate::owner,
