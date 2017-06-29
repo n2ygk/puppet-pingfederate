@@ -17,6 +17,10 @@ class pingfederate::params {
   $google_adapter                      = false
   $google_package_list                 = 'pingfederate-google-adapter'
   $google_package_ensure               = 'installed'
+  $google_app_id                       = undef
+  $google_app_secret                   = undef
+  $google_oauth_idp_map                = []
+  $google_oauth_token_map              = []
   $linkedin_adapter                    = false
   $linkedin_package_list               = 'pingfederate-linkedin-adapter'
   $linkedin_package_ensure             = 'installed'

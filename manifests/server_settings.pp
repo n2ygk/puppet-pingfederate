@@ -214,6 +214,10 @@ class pingfederate::server_settings inherits ::pingfederate {
 
   # TODO: make sure an adapter wasn't previously defined and is now removed. Removal happens
   # in the reverse order of addition!
+
+  ###
+  # FACEBOOK
+  ###
   if str2bool($::pingfederate::facebook_adapter) {
     $fba = "idp/adapters"
     $fbaf = "idp_adapters_facebook"
@@ -250,6 +254,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
+
     $oatfb = 'oauth/accessTokenMappings'
     $oatfbf = 'oauth_accessTokenMappings_facebook'
     Exec["pf-admin-api POST ${fbaf}"] ~>
@@ -262,6 +267,64 @@ class pingfederate::server_settings inherits ::pingfederate {
     } ~> 
     exec {"pf-admin-api POST ${oatfb}/Facebook":
       command     => "${pfapi} -m POST -j ${etc}/${oatfbf}.json -r ${etc}/${oatfbf}.json.out -i ${etc}/${oatfbf}.id ${oatfb}", # || rm -f ${oatfbf}.json",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+  }    
+
+  ###
+  # GOOGLE
+  ###
+  if str2bool($::pingfederate::google_adapter) {
+    $goa = "idp/adapters"
+    $goaf = "idp_adapters_google"
+    file {"${etc}/${goaf}.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${goaf}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${goaf}":
+      command     => "${pfapi} -m POST -j ${etc}/${goaf}.json -r ${etc}/${goaf}.json.out ${goa}", # || rm -f ${goaf}.json",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+
+    $goi = "oauth/idpAdapterMappings"
+    $goif = "oauth_idpAdapterMappings_google"
+    file {"${etc}/${goif}.json":
+      require    => [
+                     Exec["pf-admin-api POST ${goaf}"], # need idp/apapters/Google
+                     Exec["pf-admin-api POST ${atm}"],  # need oauth/accessTokenManagers/{id}
+                     ],
+      ensure     => 'present',
+      mode       => 'a=r',
+      owner      => $::pingfederate::owner,
+      group      => $::pingfederate::group,
+      content    => template("pingfederate/${goif}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${goif}":
+      command     => "${pfapi} -m POST -j ${etc}/${goif}.json -r ${etc}/${goif}.json.out ${goi}", # || rm -f ${goif}.json",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+
+    $oatgo = 'oauth/accessTokenMappings'
+    $oatgof = 'oauth_accessTokenMappings_google'
+    Exec["pf-admin-api POST ${goaf}"] ~>
+    file {"${etc}/${oatgof}.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${oatgof}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${oatgo}/Google":
+      command     => "${pfapi} -m POST -j ${etc}/${oatgof}.json -r ${etc}/${oatgof}.json.out -i ${etc}/${oatgof}.id ${oatgo}", # || rm -f ${oatgof}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,

@@ -1,0 +1,94 @@
+<%# This is a complex adapter. The "right" way to configure it is
+    GET idp/adapters/descriptors/com.pingidentity.adapters.idp.google.GoogleAuthenticationAdapter
+    and configure the following based on it. For now, just use what we have from our initial example
+    and circle back later as needed. %>
+{
+  "id": "Google",<%# just hardcode it %>
+  "name": "Google",
+  "attributeMapping": {
+    "attributeContractFulfillment": {
+      "email": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "email"
+      }
+    } 
+  }, 
+  "attributeContract": {
+    "coreAttributes": [
+      {
+        "pseudonym": true, 
+        "name": "email", 
+        "masked": false
+      }
+    ], 
+    "maskOgnlValues": false, 
+    "extendedAttributes": []
+  }, 
+  "pluginDescriptorRef": {
+    "id": "com.pingidentity.adapter.idp.google.GoogleAuthenticationAdapter", 
+    "location": "<%= @adm_api_baseURL-%>/idp/adapters/descriptors/com.pingidentity.adapter.idp.google.GoogleAuthenticationAdapter"
+  }, 
+  "configuration": {
+    "tables": [], 
+    "fields": [
+      {
+        "name": "Attribute Retrieval", 
+        "value": "0"
+      }, 
+      {
+        "name": "Client ID", 
+	"value": "<%= @google_app_id -%>"
+      }, 
+      {
+        "name": "Client Secret", 
+	"value": "<%= @google_app_secret -%>"
+      }, 
+      {
+        "name": "Refresh Token", 
+        "value": ""
+      }, 
+      {
+        "name": "PingFederate Base URL", 
+        "value": "<%= @service_api_baseURL -%>"
+      }, 
+      {
+        "name": "Error Redirect URL", 
+        "value": ""
+      }, 
+      {
+        "name": "Unauthorized Redirect URL", 
+        "value": ""
+      }, 
+      {
+        "name": "Authentication URL", 
+        "value": "https://accounts.google.com/o/oauth2/auth"
+      }, 
+      {
+        "name": "Access Token URL", 
+        "value": "https://accounts.google.com/o/oauth2/token"
+      }, 
+      {
+        "name": "Logout URL", 
+        "value": "https://accounts.google.com/Logout?hl=en"
+      }, 
+      {
+        "name": "Basic Profile Data URL", 
+        "value": "https://www.googleapis.com/plus/v1/people/me/openIdConnect"
+      }, 
+      {
+        "name": "Extended Profile Data URL", 
+        "value": "https://www.googleapis.com/admin/directory/v1/users"
+      }, 
+      {
+        "name": "Certificate URL", 
+        "value": "https://www.googleapis.com/oauth2/v3/certs"
+      }, 
+      {
+        "name": "Require Form Adapter Cancellation", 
+        "value": "false"
+      }
+    ]
+  }
+}

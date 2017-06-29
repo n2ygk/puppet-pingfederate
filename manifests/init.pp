@@ -148,6 +148,13 @@ class pingfederate (
   $google_adapter                      = $::pingfederate::params::google_adapter,
   $google_package_list                 = $::pingfederate::params::google_package_list,
   $google_package_ensure               = $::pingfederate::params::google_package_ensure,
+  # API: idp/adapters
+  $google_app_id                       = $::pingfederate::params::google_app_id,
+  $google_app_secret                   = $::pingfederate::params::google_app_secret,
+  # API: oauth/idpAdapterMappings
+  $google_oauth_idp_map                = $::pingfederate::params::google_oauth_idp_map,
+  # API: oauth/accessTokenMappings
+  $google_oauth_token_map              = $::pingfederate::params::google_oauth_token_map,
   # linkedin
   $linkedin_adapter                    = $::pingfederate::params::linkedin_adapter,
   $linkedin_package_list               = $::pingfederate::params::linkedin_package_list,
