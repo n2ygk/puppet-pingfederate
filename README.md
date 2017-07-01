@@ -671,6 +671,28 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   (array[string])
   Oauth server persistent grant contract extended attributes.
 
+#### OAuth scope selectors
+  Authentication scope selectors are used to match provided oauth scopes in order to trigger
+  an authentication workflow (e.g. which identity provider to use for the Authorization Code flow).
+
+##### `oauth_scope_selectors`
+  (Array[map]) with keys _name_ and _scopes_, where _scopes_ is a list of one or more scopes defined
+  in `oauth_svc_scopes` and `oauth_svc_scope_groups` that must match to trigger the given Authentication
+  Selector.
+  Default: `[]` Example:
+  ```
+  pingfederate::oauth_scope_selectors:
+	- name: facebookSelector
+	  scopes:
+		- auth-facebook
+	- name: googleSelector
+	  scopes:
+		- auth-google
+	- name: columbiaSelector
+	  scopes:
+		- auth-columbia
+  ```
+
 #### OAuth Access Token Managers
 ##### `oauth_svc_acc_tok_mgr_id`
   (string)

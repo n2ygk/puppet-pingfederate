@@ -1,0 +1,26 @@
+<%# All known scopes are listed for each autheticationSelector and then a true/false value if that scope
+is required for the selector by virtue of being in its scopes list. -%>
+{
+  "id": "<%= @s['name'] -%>",
+  "name": "<%= @s['name'] -%>",
+  "pluginDescriptorRef": {
+    "id": "com.pingidentity.pf.selectors.oauthscope.OAuthScopeAdapterSelector",
+    "location": "<%= @adm_api_baseURL -%>/authenticationSelectors/descriptors/com.pingidentity.pf.selectors.oauthscope.OAuthScopeAdapterSelector"
+  },
+  "configuration": {
+    "tables": [],
+    "fields": [
+<%  @scopes.each_with_index do |val, i| -%>
+      {
+        "name": "<%= val['name'] -%>",
+<%    if @s['scopes'].include? val['name'] -%>
+        "value": "true"
+<%    else -%>
+        "value": "false"
+<%    end -%>
+      }<%= ',' if i < (@scopes.size - 1) %>
+<%   end -%>
+    ]
+  },
+  "attributeContract": {}
+}

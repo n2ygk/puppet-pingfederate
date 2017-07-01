@@ -139,6 +139,7 @@ class pingfederate::params {
   $oauth_svc_scope_groups              = []
   $oauth_svc_grant_core_attrs          = ['USER_KEY','USER_NAME']
   $oauth_svc_grant_extd_attrs          = []
+  $oauth_scope_selectors               = []
   $oauth_svc_acc_tok_mgr_id            = undef
   $oauth_svc_acc_tok_mgr_core_attrs    = []
   $oauth_svc_acc_tok_mgr_extd_attrs    = []
