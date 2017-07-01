@@ -63,30 +63,6 @@ class pingfederate::server_settings inherits ::pingfederate {
     logoutput   => true,
   }
 
-  # authenticationSelectors check for presence of scopes which are defined in oauth/authServerSettings.
-  $asel = "authenticationSelectors"
-  $::pingfederate::oauth_scope_selectors.each |$s| {
-    if !has_key($s,'name') {
-      fail('oauth_scope_selectors must have a name')
-    }
-    $n = $s['name']
-    $scopes = $::pingfederate::oauth_svc_scopes + $::pingfederate::oauth_svc_scope_groups
-    file {"${etc}/${asel}_${n}.json":
-      subscribe => Exec["pf-admin-api PUT ${oas}"],
-      ensure   => 'present',
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
-      content  => template("pingfederate/${asel}.json.erb"),
-    } ~> 
-    exec {"pf-admin-api POST ${asel}_${n}":
-      command     => "${pfapi} -m POST -j ${etc}/${asel}_${n}.json -r ${etc}/${asel}_${n}.json.out ${asel}", # || rm -f ${asel}_${n}.json",
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
-  }
-
   $apc = "authenticationPolicyContracts"
   $::pingfederate::auth_policy_contract.each |$a| {
     # need to check for existence of each key and replace missing values with defaults
@@ -356,5 +332,53 @@ class pingfederate::server_settings inherits ::pingfederate {
   }    
 
   # TO DO: additional social adapters. Can probably parameterize and reuse the facebook stuff
+
+  # authenticationSelectors check for presence of scopes which are defined in oauth/authServerSettings.
+  $asel = "authenticationSelectors"
+  $::pingfederate::oauth_scope_selectors.each |$s| {
+    if !has_key($s,'name') {
+      fail('oauth_scope_selectors must have a name')
+    }
+    $n = $s['name']
+    $scopes = $::pingfederate::oauth_svc_scopes + $::pingfederate::oauth_svc_scope_groups
+    file {"${etc}/${asel}_${n}.json":
+      subscribe => Exec["pf-admin-api PUT ${oas}"],
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${asel}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${asel}_${n}":
+      command     => "${pfapi} -m POST -j ${etc}/${asel}_${n}.json -r ${etc}/${asel}_${n}.json.out ${asel}", # || rm -f ${asel}_${n}.json",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+  }
+
+  # authenticationPolicies/settings chooses to enable IdP and/or SP authentication selection.
+  # For now we just hardcode to use IdP selection if there are scope selectors defined.
+  if !empty($::pingfederate::oauth_scope_selectors) {
+    $aps = "authenticationPolicies/settings"
+    $apsf = "authenticationPolicies_settings"
+    file {"${etc}/${apsf}.json":
+      subscribe => Exec["pf-admin-api PUT ${oas}"],
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${apsf}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api PUT ${apsf}":
+      command     => "${pfapi} -m PUT -j ${etc}/${apsf}.json -r ${etc}/${apsf}.json.out ${aps}", # || rm -f ${apsf}.json",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+    # authenticationPolicies/defaults uses the authenticationSelectors defined above to choose IdPs.
+    # XXX todo - turn facebook, etc. adapters into a list, and add selectors to the list.
+
+  }
 
 }
