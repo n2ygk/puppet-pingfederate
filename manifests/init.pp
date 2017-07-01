@@ -159,6 +159,13 @@ class pingfederate (
   $linkedin_adapter                    = $::pingfederate::params::linkedin_adapter,
   $linkedin_package_list               = $::pingfederate::params::linkedin_package_list,
   $linkedin_package_ensure             = $::pingfederate::params::linkedin_package_ensure,
+  # API: idp/adapters
+  $linkedin_app_id                     = $::pingfederate::params::linkedin_app_id,
+  $linkedin_app_secret                 = $::pingfederate::params::linkedin_app_secret,
+  # API: oauth/idpAdapterMappings
+  $linkedin_oauth_idp_map              = $::pingfederate::params::linkedin_oauth_idp_map,
+  # API: oauth/accessTokenMappings
+  $linkedin_oauth_token_map            = $::pingfederate::params::linkedin_oauth_token_map,
   # twitter
   $twitter_adapter                     = $::pingfederate::params::twitter_adapter,
   $twitter_package_list                = $::pingfederate::params::twitter_package_list,

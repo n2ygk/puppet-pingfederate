@@ -58,7 +58,7 @@ include pingfederate
 ```
 
 #### without RPMS
-Install PingFederate per the [installation manual](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#gettingStartedGuide/concept/gettingStarted.html) and disable RPM installation:
+Install PingFederate per the [installation manual](https://documentation.pingidentity.com/pingfederate/pf83/index.shtml#gettingStartedGuide/concept/gettingStarted.html) and disable RPM installation:
 ```
   class {'pingfederate':
     install_dir    => '/usr/local/pingfederate-1',
@@ -206,7 +206,7 @@ Provide either a license file or the content as a multiline string.
 #### Run.properties
 
 The following are used to configure `run.properties`. See the
-[PingFederate documentation](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/changingConfigurationParameters.html)
+[PingFederate documentation](https://documentation.pingidentity.com/pingfederate/pf83/index.shtml#adminGuide/concept/changingConfigurationParameters.html)
 for an explanation. The defaults are as distributed by PingIdentity.
 
 ##### `admin_https_port`
@@ -487,12 +487,12 @@ These are the native SAML2 IdP settings used for native *console_authentication*
   pingfederate::saml2_idp:
     - ...
       cert_content: |
-		-----BEGIN CERTIFICATE-----
-		MIIDRzCCAi+gAwIBAgIUAb+rsLUvjwiVA2iVgiHAFGrtCPgwDQYJKoZIhvcNAQEF
-		BQAwIjEgMB4GA1UEAxMXc2hpYmJvbGV0aC5jb2x1bWJpYS5lZHUwHhcNMTMwODIy
-		MTQ1MzUzWhcNMzMwODIyMTQ1MzUzWjAiMSAwHgYDVQQDExdzaGliYm9sZXRoLmNv
-		...
-		-----END CERTIFICATE-----
+        -----BEGIN CERTIFICATE-----
+        MIIDRzCCAi+gAwIBAgIUAb+rsLUvjwiVA2iVgiHAFGrtCPgwDQYJKoZIhvcNAQEF
+        BQAwIjEgMB4GA1UEAxMXc2hpYmJvbGV0aC5jb2x1bWJpYS5lZHUwHhcNMTMwODIy
+        MTQ1MzUzWhcNMzMwODIyMTQ1MzUzWjAiMSAwHgYDVQQDExdzaGliYm9sZXRoLmNv
+        ...
+        -----END CERTIFICATE-----
   ```
 
 ##### `saml2_oauth_token_map`
@@ -500,16 +500,16 @@ These are the native SAML2 IdP settings used for native *console_authentication*
   Mapping of OAuth attributes to fields in the access token(?). Example:
   ```
     - ...
-	  saml2_oauth_token_map:
-		- name: username
-		  type: OAUTH_PERSISTENT_GRANT
-		  value: USER_KEY
-		- name: group
-		  type: OAUTH_PERSISTENT_GRANT
-		  value: group
-		- name: uid
-		  type: OAUTH_PERSISTENT_GRANT
-		  value: USER_KEY
+      saml2_oauth_token_map:
+        - name: username
+          type: OAUTH_PERSISTENT_GRANT
+          value: USER_KEY
+        - name: group
+          type: OAUTH_PERSISTENT_GRANT
+          value: group
+        - name: uid
+          type: OAUTH_PERSISTENT_GRANT
+          value: USER_KEY
   ```
 
 #### OAuth JDBC configuration
@@ -518,7 +518,7 @@ If it is `undef` then the default internal XML-based datastore will be used.
 
 ##### `oauth_jdbc_type`
   (string) Type of JDBC
-  [OAuth Client Datastore](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#concept_definingOauthClientDataStore.html)
+  [OAuth Client Datastore](https://documentation.pingidentity.com/pingfederate/pf83/index.shtml#concept_definingOauthClientDataStore.html)
   connector. One of `undef`, `mysql`,`sqlserver`,`oracle`,`other`. Default: `undef`. If `other`, you'll need to fill in the following as well.
   Otherwise they default to expected values for the given *oauth_jdbc_type* but can still be used to override the defaults. 
   N.B. currently only fully implemented for `mysql`.
@@ -720,58 +720,151 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   ```
 
 #### Social Identity Adapters
-##### `facebook_adapter`
+##### Facebook Cloud Identity Connector
+  Configures the [Facebook Cloud Identity Connector](https://documentation.pingidentity.com/display/FBCIC13/  PingFederate+Facebook+Cloud+Identity+Connector+1.3).
+  Here's an example:
+  ```
+  pingfederate::facebook_adapter: true
+  pingfederate::facebook_package_ensure: 1.3.2-5.el6
+  pingfederate::facebook_app_id: 12345678912456789
+  pingfederate::facebook_app_secret: abcdefdeadbeef00ba4
+  pingfederate::facebook_oauth_token_map:
+    - name: username
+      type: ADAPTER
+      value: name
+    - name: group
+        type: TEXT
+        value: facebook
+    - name: uid
+      type: ADAPTER
+      value: id
+  pingfederate::facebook_oauth_idp_map:
+    - name: USER_KEY
+      type: ADAPTER
+      value: id
+    - name: USER_NAME
+      type: ADAPTER
+      value: name
+    - name: group
+      type: TEXT
+      value: facebook
+  ```
+###### `facebook_adapter`
   (boolean)
   Set to true to enable the Facebook CIC adapter. Default: `false`
 
-##### `facebook_package_list`
+###### `facebook_package_list`
   (array[string])
   Name of package(s) that contains the Facebook adapter.
   Default: `'pingfederate-facebook-adapter'`
   
-##### `facebook_package_ensure`
+###### `facebook_package_ensure`
   (string)
   Ensure that the package is installed.
   Default: `'installed'`
 
-##### `facebook_app_id`
+###### `facebook_app_id`
   (string)
   [Facebook](https://developers.facebook.com) app ID.
 
-##### `facebook_app_secret`
+###### `facebook_app_secret`
   (string)
   Facebook app secret.
 
-##### `facebook_oauth_token_map`
+###### `facebook_oauth_token_map`
   Mapping of Facebook attributes to oauth token attributes.
 
-##### `facebook_oauth_idp_map`
+###### `facebook_oauth_idp_map`
   Mapping of Facebook attributes to oauth token attributes.
 
-*And likewise for the following (configuration of these adapters not yet implemented):
-##### `google_adapter`
+##### Google Cloud Identity Connector
+  Configures the [Google Cloud Identity Connector](https://documentation.pingidentity.com/display/GCIC11/Installation+and+Configuration) with parameters similar to those listed above for Facebook.
+  Here's an example:
+  ```
+  pingfederate::google_adapter: true
+  pingfederate::google_package_ensure: 1.1.1-5.el6
+  pingfederate::google_app_id: 123456789-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com
+  pingfederate::google_app_secret: -ABCdefGHIjklmnopqrtuvwXYZ
+  pingfederate::google_oauth_token_map:
+	- name: username
+	  type: ADAPTER
+	  value: email
+	- name: group
+	  type: TEXT
+	  value: google
+	- name: uid
+	  type: ADAPTER
+	  value: email
+  pingfederate::google_oauth_idp_map:
+	- name: USER_KEY
+	  type: ADAPTER
+	  value: email
+	- name: USER_NAME
+	  type: ADAPTER
+	  value: email
+	- name: group
+	  type: TEXT
+	  value: google
+  ```
+###### `google_adapter`
 
-##### `google_package_list`
+###### `google_package_list`
 
-##### `google_package_ensure`
+###### `google_package_ensure`
 
-##### `linkedin_adapter`
+###### `google_oauth_token_map`
 
-##### `linkedin_package_list`
+###### `google_oauth_idp_map`
 
-##### `linkedin_package_ensure`
+##### LinkedIn Cloud Identity Connector
+  Configures the [LinkedIn Cloud Identity Connector](https://documentation.pingidentity.com/display/LICIC101/LinkedIn+Cloud+Identity+Connector+1.0.1)
+  with parameters similar to those listed above for Facebook. N.B. LinkedIn OpenID provisioning is currently
+  broken. Here's an example:
+  ```
+  ```
+###### `linkedin_adapter`
 
-##### `twitter_adapter`
+###### `linkedin_package_list`
 
-##### `twitter_package_list`
+###### `linkedin_package_ensure`
 
-##### `twitter_package_ensure`
+###### `linkedin_oauth_token_map`
 
-##### `windowslive_adapter`
+###### `linkedin_oauth_idp_map`
 
-##### `windowslive_package_list`
 
-##### `windowslive_package_ensure`
+##### Twitter Cloud Identity Connector
+  Configures the [Twitter Cloud Identity Connector](https://documentation.pingidentity.com/display/TCIC111/Twitter+Cloud+Identity+Connector+1.1.1)
+  with parameters similar to those listed above for Facebook. 
+  Here's an example:
+  ```
+  ```
+###### `twitter_adapter`
+
+###### `twitter_package_list`
+
+###### `twitter_package_ensure`
+
+###### `twitter_oauth_token_map`
+
+###### `twitter_oauth_idp_map`
+
+##### Windows Live Cloud Identity Connector
+  Configures the [Windows Live Cloud Identity Connector](https://documentation.pingidentity.com/display/WLCIC20/Windows+Live+Cloud+Identity+Connector)
+  with parameters similar to those listed above for Facebook. 
+  Here's an example:
+  ```
+  ```
+
+###### `windowslive_adapter`
+
+###### `windowslive_package_list`
+
+###### `windowslive_package_ensure`
+
+###### `windowslive_oauth_token_map`
+
+###### `windowslive_oauth_idp_map`
 
 ## Limitations
 
@@ -894,7 +987,7 @@ module to assemble JSON files that include both parameterized templates and incl
 
 ### Invoking the administrative REST API (pf-admin-api)
 Some configuration is done via the
-[PingFederate Administrative API](https://documentation.pingidentity.com/pingfederate/pf82/index.shtml#adminGuide/concept/pingFederateAdministrativeApi.html).
+[PingFederate Administrative API](https://documentation.pingidentity.com/pingfederate/pf83/index.shtml#adminGuide/concept/pingFederateAdministrativeApi.html).
 Unfortunately, some related configuration is done by editing XML files, using data returned from the API call. For example,
 the process for adding a mysql data store for oauth client management consists of:
 

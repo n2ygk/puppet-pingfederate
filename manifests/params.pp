@@ -24,6 +24,10 @@ class pingfederate::params {
   $linkedin_adapter                    = false
   $linkedin_package_list               = 'pingfederate-linkedin-adapter'
   $linkedin_package_ensure             = 'installed'
+  $linkedin_app_id                     = undef
+  $linkedin_app_secret                 = undef
+  $linkedin_oauth_idp_map              = []
+  $linkedin_oauth_token_map            = []
   $twitter_adapter                     = false
   $twitter_package_list                = 'pingfederate-twitter-adapter'
   $twitter_package_ensure              = 'installed'
