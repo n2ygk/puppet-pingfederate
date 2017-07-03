@@ -229,7 +229,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${fbaf}.json.erb"),
     } ~> 
     exec {"pf-admin-api POST ${fbaf}":
-      command     => "${pfapi} -m POST -j ${etc}/${fbaf}.json -r ${etc}/${fbaf}.json.out ${fba}", # || rm -f ${fbaf}.json",
+      command     => "${pfapi} -m POST -j ${etc}/${fbaf}.json -r ${etc}/${fbaf}.json.out -i ${etc}/${fbaf}.id ${fba}", # || rm -f ${fbaf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -287,7 +287,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${goaf}.json.erb"),
     } ~> 
     exec {"pf-admin-api POST ${goaf}":
-      command     => "${pfapi} -m POST -j ${etc}/${goaf}.json -r ${etc}/${goaf}.json.out ${goa}", # || rm -f ${goaf}.json",
+      command     => "${pfapi} -m POST -j ${etc}/${goaf}.json -r ${etc}/${goaf}.json.out -i ${etc}/${goaf}.id ${goa}", # || rm -f ${goaf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
@@ -336,10 +336,10 @@ class pingfederate::server_settings inherits ::pingfederate {
   # authenticationSelectors check for presence of scopes which are defined in oauth/authServerSettings.
   $asel = "authenticationSelectors"
   $::pingfederate::oauth_scope_selectors.each |$s| {
-    if !has_key($s,'name') {
-      fail('oauth_scope_selectors must have a name')
+    if !has_key($s,'adapter') {
+      fail('oauth_scope_selectors must have an adapter name')
     }
-    $n = $s['name']
+    $n = $s['adapter']
     $scopes = $::pingfederate::oauth_svc_scopes + $::pingfederate::oauth_svc_scope_groups
     file {"${etc}/${asel}_${n}.json":
       subscribe => Exec["pf-admin-api PUT ${oas}"],
@@ -369,7 +369,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       owner    => $::pingfederate::owner,
       group    => $::pingfederate::group,
       content  => template("pingfederate/${apsf}.json.erb"),
-    } ~> 
+    } ~>
     exec {"pf-admin-api PUT ${apsf}":
       command     => "${pfapi} -m PUT -j ${etc}/${apsf}.json -r ${etc}/${apsf}.json.out ${aps}", # || rm -f ${apsf}.json",
       refreshonly => true,
@@ -377,8 +377,37 @@ class pingfederate::server_settings inherits ::pingfederate {
       logoutput   => true,
     }
     # authenticationPolicies/defaults uses the authenticationSelectors defined above to choose IdPs.
+    # N.B. there are idpConnections (saml) and idpAdapters (social). Because the sp/idpConnections have
+    # a system-generated id, we have to pull the id in from the .id file. For consistency, do the same
+    # for the idpAdapters. We iteretate the list once here to build up the "@@id@@'s" and again in the
+    # ERB template which will reference those @@id@@'s.
     # XXX todo - turn facebook, etc. adapters into a list, and add selectors to the list.
+    $apd = "authenticationPolicies/defaults"
+    $apdf = "authenticationPolicies_defaults"
+    # iterate pingfederate::oauth_scope_selectors and create an "id=..." for each ID file.
+    $ids = $pingfederate::oauth_scope_selectors.map |$s|
+    {
+      $u=uriescape($s['adapter'])
+      $f=case $s['type'] {
+        'IDP_ADAPTER'   : { "${etc}/idp_adapters_${u}.id" }
+        'IDP_CONNECTOR' : { "${etc}/sp_idpConnections_${u}.id" }
+      }
+      "${u}=${f}"
+    }.join(',') # looks like 'facebook=Facebook,Columbia%20Univ=xyzzhfrbkwgjkfgke'
 
+    file {"${etc}/${apdf}.json":
+      subscribe => Exec["pf-admin-api PUT ${apsf}"],
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${apdf}.json.erb"),
+    } ~>
+    exec { "pf-admin-api PUT ${apd}":
+      command     => "${pfapi} -m PUT -j ${etc}/${apdf}.json -r ${etc}/${apdf}.json.out -i ${ids} ${apd}", # || rm -f ${apdf}.json",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
   }
-
 }

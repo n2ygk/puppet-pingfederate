@@ -1,6 +1,6 @@
 {
   "name": "n2ygk-pingfederate",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "author": "n2ygk",
   "summary": "Installs and configures PingFederate",
   "license": "Apache-2.0",

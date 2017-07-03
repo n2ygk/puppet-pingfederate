@@ -676,19 +676,24 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   an authentication workflow (e.g. which identity provider to use for the Authorization Code flow).
 
 ##### `oauth_scope_selectors`
-  (Array[map]) with keys _name_ and _scopes_, where _scopes_ is a list of one or more scopes defined
+  (Array[map]) with keys _adapter_, _type_ and _scopes_, where _adapter_ is an IdP Adapter or
+  IdP Connector name, _type_ is one of `IDP_ADAPTER` or `IDP_CONNECTOR` and
+  _scopes_ is a list of one or more scopes defined
   in `oauth_svc_scopes` and `oauth_svc_scope_groups` that must match to trigger the given Authentication
   Selector.
   Default: `[]` Example:
   ```
   pingfederate::oauth_scope_selectors:
-	- name: facebookSelector
+	- adapter: facebook
+	  type: IDP_ADAPTER
 	  scopes:
 		- auth-facebook
-	- name: googleSelector
+	- adapter: google
+	  type: IDP_ADAPTER
 	  scopes:
 		- auth-google
-	- name: columbiaSelector
+	- adapter: Columbia University Dev
+	  type: IDP_CONNECTOR
 	  scopes:
 		- auth-columbia
   ```

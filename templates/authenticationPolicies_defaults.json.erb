@@ -1,0 +1,59 @@
+{
+  "failIfNoSelection": false,
+  "authnSelectionTrees": [
+<% @oauth_scope_selectors.each_with_index do |val, i| -%>
+<% id = scope.call_function('uriescape',val['adapter']) -%>
+    {
+      "rootNode": {
+        "action": {
+          "type": "AUTHN_SELECTOR",
+          "authenticationSelectorRef": {
+            "id": "<%= id -%>",
+            "location": "<%= @adm_api_baseURL -%>/authenticationSelectors/<%= id -%>"
+          }
+        },
+        "children": [
+          {
+            "action": {
+              "type": "CONTINUE",
+              "context": "No"
+            }
+          },
+          {
+            "action": {
+              "type": "AUTHN_SOURCE",
+              "context": "Yes",
+              "authenticationSource": {
+                "type": "<%= val['type'] -%>",
+                "sourceRef": {
+                  "id": "@@<%= val['adapter'] -%>@@",
+<%              if val['type'] == 'IDP_CONNECTOR' -%>
+                  "location": "<%= @adm_api_baseURL -%>/sp/idpConnections/@@<%= id -%>@@"
+<%              elsif val['type'] == 'IDP_ADAPTER' -%>
+                  "location": "<%= @adm_api_baseURL -%>/idp/adapters/@@<%= id -%>@@"
+<%              end -%>
+                }
+              }
+            },
+            "children": [
+              {
+                "action": {
+                  "type": "DONE",
+                  "context": "Fail"
+                }
+              },
+              {
+                "action": {
+                  "type": "DONE",
+                  "context": "Success"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }<%= ',' if i < (@oauth_scope_selectors.size - 1) %>
+<% end -%>
+  ],
+  "defaultAuthenticationSources": []
+}
