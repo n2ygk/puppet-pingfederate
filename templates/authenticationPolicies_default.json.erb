@@ -2,32 +2,35 @@
   "failIfNoSelection": false,
   "authnSelectionTrees": [
 <% @oauth_scope_selectors.each_with_index do |val, i| -%>
-<% id = scope.call_function('uriescape',val['adapter']) -%>
+<%# substitution @@id@@ is uriescape'd -%>
+<% id = scope.call_function('uriescape',[val['adapter']]) -%>
+<%# authenticationSelector ID must be alphanumeric -%>
+<% selID = scope.call_function('regsubst',[val['adapter'],'[^0-9A-Za-z]+','','G']) -%>
     {
       "rootNode": {
         "action": {
           "type": "AUTHN_SELECTOR",
           "authenticationSelectorRef": {
-            "id": "<%= id -%>",
-            "location": "<%= @adm_api_baseURL -%>/authenticationSelectors/<%= id -%>"
+            "id": "<%= selID -%>",<%# name the selector the same as the adapter %>
+            "location": "<%= @adm_api_baseURL -%>/authenticationSelectors/<%= selID -%>"
           }
         },
         "children": [
           {
             "action": {
-              "type": "CONTINUE",
-              "context": "No"
+              "context": "No",
+              "type": "CONTINUE"
             }
           },
           {
             "action": {
-              "type": "AUTHN_SOURCE",
               "context": "Yes",
+              "type": "AUTHN_SOURCE",
               "authenticationSource": {
                 "type": "<%= val['type'] -%>",
                 "sourceRef": {
-                  "id": "@@<%= val['adapter'] -%>@@",
-<%              if val['type'] == 'IDP_CONNECTOR' -%>
+                  "id": "@@<%= id -%>@@",
+<%              if val['type'] == 'IDP_CONNECTION' -%>
                   "location": "<%= @adm_api_baseURL -%>/sp/idpConnections/@@<%= id -%>@@"
 <%              elsif val['type'] == 'IDP_ADAPTER' -%>
                   "location": "<%= @adm_api_baseURL -%>/idp/adapters/@@<%= id -%>@@"
@@ -38,14 +41,14 @@
             "children": [
               {
                 "action": {
-                  "type": "DONE",
-                  "context": "Fail"
+                  "context": "Fail",
+                  "type": "DONE"
                 }
               },
               {
                 "action": {
-                  "type": "DONE",
-                  "context": "Success"
+                  "context": "Success",
+                  "type": "DONE"
                 }
               }
             ]

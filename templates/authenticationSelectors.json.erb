@@ -1,8 +1,9 @@
 <%# All known scopes are listed for each autheticationSelector and then a true/false value if that scope
 is required for the selector by virtue of being in its scopes list. -%>
 {
-  "id": "<%= @s['name'] -%>",
-  "name": "<%= @s['name'] -%>",
+<%# ID must be alphanumeric -%>
+  "id": "<%= scope.call_function('regsubst',[@s['adapter'],'[^0-9A-Za-z]+','','G']) -%>",
+  "name": "<%= @s['adapter'] -%>",
   "pluginDescriptorRef": {
     "id": "com.pingidentity.pf.selectors.oauthscope.OAuthScopeAdapterSelector",
     "location": "<%= @adm_api_baseURL -%>/authenticationSelectors/descriptors/com.pingidentity.pf.selectors.oauthscope.OAuthScopeAdapterSelector"

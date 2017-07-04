@@ -18,6 +18,7 @@
   1. [OAuth JDBC configuration](#oauth-jdbc-configuration)
   1. [OAuth client manager](#oauth-client-manager)
   1. [OAuth server settings](#oauth-server-settings)
+  1. [OAuth scope selectors](#oauth-scope-selectors)
   1. [OAuth Access Token Managers](#oauth-access-token-managers)
   1. [OAuth OpenID Connect Policy Contracts](#oauth-openid-connect-policy-contracts)
   1. [Social Identity Adapters](#social-identity-adapters)
@@ -672,13 +673,14 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   Oauth server persistent grant contract extended attributes.
 
 #### OAuth scope selectors
-  Authentication scope selectors are used to match provided oauth scopes in order to trigger
-  an authentication workflow (e.g. which identity provider to use for the Authorization Code flow).
+  Authentication scope selectors are used to match requested oauth scopes to select
+  an authentication provider (e.g. which [social identity adapter](#social-identity-adapters)
+  or [IdP connection](#saml-20-partner-idp-configuration) to use for the Authorization Code flow).
 
 ##### `oauth_scope_selectors`
   (Array[map]) with keys _adapter_, _type_ and _scopes_, where _adapter_ is an IdP Adapter or
-  IdP Connector name, _type_ is one of `IDP_ADAPTER` or `IDP_CONNECTOR` and
-  _scopes_ is a list of one or more scopes defined
+  IdP Connection name, _type_ is one of `IDP_ADAPTER` or `IDP_CONNECTION` and
+  _scopes_ is a list of one or more [previosuly defined oauth scopes](#oauth-server-settings)
   in `oauth_svc_scopes` and `oauth_svc_scope_groups` that must match to trigger the given Authentication
   Selector.
   Default: `[]` Example:
@@ -693,7 +695,7 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
 	  scopes:
 		- auth-google
 	- adapter: Columbia University Dev
-	  type: IDP_CONNECTOR
+	  type: IDP_CONNECTION
 	  scopes:
 		- auth-columbia
   ```

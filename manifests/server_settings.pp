@@ -339,7 +339,10 @@ class pingfederate::server_settings inherits ::pingfederate {
     if !has_key($s,'adapter') {
       fail('oauth_scope_selectors must have an adapter name')
     }
-    $n = $s['adapter']
+    $n = uriescape($s['adapter'])
+    if !($s['type'] in ['IDP_ADAPTER','IDP_CONNECTION']) {
+      fail("oauth_scope_selectors type must be IDP_ADAPTER or IDP_CONNECTION, not ${s['type']}.")
+    }
     $scopes = $::pingfederate::oauth_svc_scopes + $::pingfederate::oauth_svc_scope_groups
     file {"${etc}/${asel}_${n}.json":
       subscribe => Exec["pf-admin-api PUT ${oas}"],
@@ -376,24 +379,26 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
-    # authenticationPolicies/defaults uses the authenticationSelectors defined above to choose IdPs.
+    # authenticationPolicies/default uses the authenticationSelectors defined above to choose IdPs.
     # N.B. there are idpConnections (saml) and idpAdapters (social). Because the sp/idpConnections have
     # a system-generated id, we have to pull the id in from the .id file. For consistency, do the same
     # for the idpAdapters. We iteretate the list once here to build up the "@@id@@'s" and again in the
     # ERB template which will reference those @@id@@'s.
     # XXX todo - turn facebook, etc. adapters into a list, and add selectors to the list.
-    $apd = "authenticationPolicies/defaults"
-    $apdf = "authenticationPolicies_defaults"
+    $apd = "authenticationPolicies/default"
+    $apdf = "authenticationPolicies_default"
     # iterate pingfederate::oauth_scope_selectors and create an "id=..." for each ID file.
+    # Make string like 'facebook=Facebook -s Columbia%20Univ=xyzzhfrbkwgjkfgke ... -s google=Google '
     $ids = $pingfederate::oauth_scope_selectors.map |$s|
     {
       $u=uriescape($s['adapter'])
       $f=case $s['type'] {
         'IDP_ADAPTER'   : { "${etc}/idp_adapters_${u}.id" }
-        'IDP_CONNECTOR' : { "${etc}/sp_idpConnections_${u}.id" }
+        'IDP_CONNECTION' : { "${etc}/sp_idpConnections_${u}.id" }
+        default         : { undef }
       }
       "${u}=${f}"
-    }.join(',') # looks like 'facebook=Facebook,Columbia%20Univ=xyzzhfrbkwgjkfgke'
+    }.join(' -s ') 
 
     file {"${etc}/${apdf}.json":
       subscribe => Exec["pf-admin-api PUT ${apsf}"],
@@ -404,7 +409,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${apdf}.json.erb"),
     } ~>
     exec { "pf-admin-api PUT ${apd}":
-      command     => "${pfapi} -m PUT -j ${etc}/${apdf}.json -r ${etc}/${apdf}.json.out -i ${ids} ${apd}", # || rm -f ${apdf}.json",
+      command     => "${pfapi} -m PUT -j ${etc}/${apdf}.json -r ${etc}/${apdf}.json.out -s ${ids} ${apd}", # || rm -f ${apdf}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
