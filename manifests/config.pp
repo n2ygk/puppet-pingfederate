@@ -168,7 +168,7 @@ class pingfederate::config inherits ::pingfederate {
                     "set web-app/filter/init-param[3]/param-value/#text \"${::pingfederate::cors_allowedHeaders}\"",
                     'set web-app/filter-mapping/filter-name/#text "cross-origin"',
                     "set web-app/filter-mapping/url-pattern/#text \"${::pingfederate::cors_filter_mapping}\"",
-                    'set web-app/security-constraint/web-resource-collection/url-pattern[./#text="/*"]/../http-method[last()+1]/#text "OPTIONS"',
+                    'set web-app/security-constraint/web-resource-collection/url-pattern[./#text="/*"]/../http-method[#text="OPTIONS" and (last()+1)]/#text "OPTIONS"',
                     'set web-app/security-constraint/web-resource-collection/url-pattern[./#text="/*"]/../web-resource-name/#text "Enable all methods except for TRACE (OPTIONS was added for OAuth 2.0 XHR)"',
                     $aug_comment
                     ]
