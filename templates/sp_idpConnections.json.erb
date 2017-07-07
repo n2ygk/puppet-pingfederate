@@ -2,6 +2,15 @@
   "entityId": "<%= @b['entityID'] -%>",
   "name": "<%= @b['name'] -%>", 
   "active": true, 
+<% if @b['metadata'] != '' -%>
+  "metadataReloadSettings": {
+    "enableAutoMetadataUpdate": true, 
+    "metadataUrlRef": {
+      "id": "@@metaId@@", 
+      "location": "<%= @adm_api_baseURL -%>/metadataUrls/@@metaId@@"
+    }
+  }, 
+<% end -%>
   "contactInfo": {
     "firstName": "<%= @b['contact']['firstName'] -%>",
     "lastName": "<%= @b['contact']['lastName'] -%>",

@@ -97,6 +97,7 @@ class pingfederate::params {
     'post' => 'idp/profile/SAML2/POST/SSO',
     'redirect' => 'idp/profile/SAML2/Redirect/SSO',
     'name' => undef,
+    'metadata' => '',           # apparently undef comes through in ERB templates as 'undef'!
     'virtual' => [],
     'entityID' => undef,
     'contact' => {'firstName' => '', 'lastName' => '', 'email' => ''},

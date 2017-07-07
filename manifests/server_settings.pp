@@ -174,6 +174,30 @@ class pingfederate::server_settings inherits ::pingfederate {
     $un=uriescape($n)
     $an=$b['auth_policy_contract']
     $uan=uriescape($an)
+    if $b['metadata'] != '' {
+      $md = 'metadataUrls'
+      
+      Exec["pf-admin-api POST ${apc}_${uan}"] ~>
+      file {"${etc}/${md}_${un}.json":
+        ensure   => present,
+        mode     => 'a=r',
+        owner    => $::pingfederate::owner,
+        group    => $::pingfederate::group,
+        content  => template("pingfederate/${md}.json.erb"),
+      } ~>
+      exec {"pf-admin-api POST ${md}_${un}":
+        notify      => File["${etc}/${spidpf}_${un}.json"],
+        command     => "${pfapi} -m POST -j ${etc}/${md}_${un}.json -r ${etc}/${md}_${un}.json.out -i ${etc}/${md}_${un}.id ${md}", # || rm -f ${md}_${un}.json",
+        refreshonly => true,
+        user        => $::pingfederate::owner,
+        logoutput   => true,
+      }
+      $mdsubst = "-s metaId=${etc}/${md}_${un}.id"
+    }
+    else {
+      $mdsubst = undef
+    }
+
     Exec["pf-admin-api POST ${apc}_${uan}"] ~>
     file {"${etc}/${spidpf}_${un}.json":
       ensure   => present,
@@ -183,7 +207,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       content  => template("pingfederate/${spidpf}.json.erb"),
     } ~>
     exec {"pf-admin-api POST ${spidp}_${un}":
-      command     => "${pfapi} -m POST -j ${etc}/${spidpf}_${un}.json -s id=${etc}/${apc}_${uan}.id -r ${etc}/${spidpf}_${un}.json.out -i ${etc}/${spidpf}_${un}.id ${spidp}", # || rm -f ${spidpf}_${un}.json",
+      command     => "${pfapi} -m POST -j ${etc}/${spidpf}_${un}.json -s id=${etc}/${apc}_${uan}.id ${mdsubst} -r ${etc}/${spidpf}_${un}.json.out -i ${etc}/${spidpf}_${un}.id ${spidp}", # || rm -f ${spidpf}_${un}.json",
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,

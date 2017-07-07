@@ -409,6 +409,10 @@ These are the native SAML2 IdP settings used for native *console_authentication*
   (string)
   User-friendly name for the IdP. Displayed in the authentication selector screen.
 
+##### `metadata`
+  (string)
+  SAML2 partner's metadata URL.
+
 ##### `virtual`
   (Array[string])
   Lost of virtual server entityIDs for the PingFederate SP. Used to override `saml2_local_entityID`.
