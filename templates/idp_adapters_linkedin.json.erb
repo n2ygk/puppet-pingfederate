@@ -7,6 +7,12 @@
   "name": "Linkedin", 
   "attributeMapping": {
     "attributeContractFulfillment": {
+      "formattedName": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "formattedName"
+      }, 
       "firstName": {
         "source": {
           "type": "ADAPTER"
@@ -36,6 +42,12 @@
           "type": "ADAPTER"
         }, 
         "value": "access-token"
+      }, 
+      "emailAddress": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "emailAddress"
       }, 
       "access-token-secret": {
         "source": {
@@ -90,7 +102,18 @@
       }
     ],    
     "maskOgnlValues": false, 
-    "extendedAttributes": []<%# look into adding formattedName %>
+    "extendedAttributes": [
+      {
+        "pseudonym": false, 
+        "name": "emailAddress", 
+        "masked": false
+      },
+      {
+        "pseudonym": false, 
+        "name": "formattedName", 
+        "masked": false
+      }
+    ]
   }, 
   "pluginDescriptorRef": {
     "id": "com.pingidentity.adapters.idp.linkedin.LinkedInAuthenticationAdapter", 
@@ -99,7 +122,32 @@
   "configuration": {
     "tables": [
       {
-        "rows": [], 
+        "rows": [
+          {
+            "fields": [
+              {
+                "name": "LinkedIn Attribute", 
+                "value": ""
+              }, 
+              {
+                "name": "Additional LinkedIn Attribute", 
+                "value": "formattedName"
+              }
+            ]
+          },
+          {
+            "fields": [
+              {
+                "name": "LinkedIn Attribute", 
+                "value": ""
+              }, 
+              {
+                "name": "Additional LinkedIn Attribute", 
+                "value": "emailAddress"
+              }
+            ]
+          }
+        ], 
         "name": "Attribute Selector"
       }
     ], 
