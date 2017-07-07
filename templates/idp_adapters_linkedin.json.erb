@@ -1,0 +1,145 @@
+<%# This is a complex adapter. The "right" way to configure it is
+    GET idp/adapters/descriptors/com.pingidentity.adapters.idp.linkedin.LinkedInAuthenticationAdapter
+    and configure the following based on it. For now, just use what we have from our initial example
+    and circle back later as needed. -%>
+{
+  "id": "Linkedin",<%# just hardcode it %>
+  "name": "Linkedin", 
+  "attributeMapping": {
+    "attributeContractFulfillment": {
+      "firstName": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "firstName"
+      }, 
+      "headline": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "headline"
+      }, 
+      "lastName": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "lastName"
+      }, 
+      "siteStandardProfileRequest": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "siteStandardProfileRequest"
+      }, 
+      "access-token": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "access-token"
+      }, 
+      "access-token-secret": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "access-token-secret"
+      }, 
+      "id": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "id"
+      }
+    }
+  }, 
+  "attributeContract": {
+    "coreAttributes": [
+      {
+        "pseudonym": false, 
+        "name": "lastName", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "firstName", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": true, 
+        "name": "id", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "access-token", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "siteStandardProfileRequest", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "headline", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "access-token-secret", 
+        "masked": false
+      }
+    ],    
+    "maskOgnlValues": false, 
+    "extendedAttributes": []<%# look into adding formattedName %>
+  }, 
+  "pluginDescriptorRef": {
+    "id": "com.pingidentity.adapters.idp.linkedin.LinkedInAuthenticationAdapter", 
+    "location": "<%= @adm_api_baseURL-%>/idp/adapters/descriptors/com.pingidentity.adapters.idp.linkedin.LinkedInAuthenticationAdapter"
+  }, 
+  "configuration": {
+    "tables": [
+      {
+        "rows": [], 
+        "name": "Attribute Selector"
+      }
+    ], 
+    "fields": [
+      {
+        "name": "API Key", 
+	"value": "<%= @linkedin_app_id -%>"
+      }, 
+      {
+        "name": "Secret Key", 
+	"value": "<%= @linkedin_app_secret -%>"
+      }, 
+      {
+        "name": "PingFederate Base URL", 
+        "value": "<%= @service_api_baseURL -%>"
+      }, 
+      {
+        "name": "Error Redirect URL", 
+        "value": ""
+      }, 
+      {
+        "name": "Unauthorized Redirect URL", 
+        "value": ""
+      }, 
+      {
+        "name": "Perform Logout", 
+        "value": "false"
+      }, 
+      {
+        "name": "LinkedIn Authentication URL", 
+        "value": "https://api.linkedin.com/uas/oauth/authenticate?oauth_token="
+      }, 
+      {
+        "name": "LinkedIn User Data URL", 
+        "value": "https://api.linkedin.com/v1/people/~"
+      }, 
+      {
+        "name": "LinkedIn Logout URL", 
+        "value": "https://www.linkedin.com/secure/login?session_full_logout=&trk=hb_signout"
+      }
+    ]
+  } 
+}

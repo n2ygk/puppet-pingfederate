@@ -329,9 +329,68 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
-  }    
+  }
+  ###
+  # LINKEDIN
+  ###
+  if str2bool($::pingfederate::linkedin_adapter) {
+    $lia = "idp/adapters"
+    $liaf = "idp_adapters_linkedin"
+    file {"${etc}/${liaf}.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${liaf}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${liaf}":
+      command     => "${pfapi} -m POST -j ${etc}/${liaf}.json -r ${etc}/${liaf}.json.out -i ${etc}/${liaf}.id ${lia}", # || rm -f ${liaf}.json",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
 
+    $lii = "oauth/idpAdapterMappings"
+    $liif = "oauth_idpAdapterMappings_linkedin"
+    file {"${etc}/${liif}.json":
+      require    => [
+                     Exec["pf-admin-api POST ${liaf}"], # need idp/apapters/Linkedin
+                     Exec["pf-admin-api POST ${atm}"],  # need oauth/accessTokenManagers/{id}
+                     ],
+      ensure     => 'present',
+      mode       => 'a=r',
+      owner      => $::pingfederate::owner,
+      group      => $::pingfederate::group,
+      content    => template("pingfederate/${liif}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${liif}":
+      command     => "${pfapi} -m POST -j ${etc}/${liif}.json -r ${etc}/${liif}.json.out ${lii}", # || rm -f ${liif}.json",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+
+    $oatli = 'oauth/accessTokenMappings'
+    $oatlif = 'oauth_accessTokenMappings_linkedin'
+    Exec["pf-admin-api POST ${liaf}"] ~>
+    file {"${etc}/${oatlif}.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${oatlif}.json.erb"),
+    } ~> 
+    exec {"pf-admin-api POST ${oatli}/Linkedin":
+      command     => "${pfapi} -m POST -j ${etc}/${oatlif}.json -r ${etc}/${oatlif}.json.out -i ${etc}/${oatlif}.id ${oatli}", # || rm -f ${oatlif}.json",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+  }
+
+  ###
   # TO DO: additional social adapters. Can probably parameterize and reuse the facebook stuff
+  ###
 
   # authenticationSelectors check for presence of scopes which are defined in oauth/authServerSettings.
   $asel = "authenticationSelectors"
