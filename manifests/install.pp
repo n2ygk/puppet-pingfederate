@@ -25,20 +25,13 @@ class pingfederate::install inherits ::pingfederate {
   }
 
   # TBD: Refactor to a list of adapters to add? Or to download from PingIdentity.com?
-  if str2bool($pingfederate::facebook_adapter) {
-    ensure_packages($pingfederate::facebook_package_list, {'ensure' => $pingfederate::facebook_package_ensure})
-  }
-  if str2bool($pingfederate::google_adapter) {
-    ensure_packages($pingfederate::google_package_list,{'ensure' => $pingfederate::google_package_ensure})
-  }
-  if str2bool($pingfederate::linkedin_adapter) {
-    ensure_packages($pingfederate::linkedin_package_list,{'ensure' => $pingfederate::linkedin_package_ensure})
-  }
-  if str2bool($pingfederate::twitter_adapter) {
-    ensure_packages($pingfederate::twitter_adapter_list,{'ensure' => $pingfederate::twitter_package_ensure})
-  }
-  if str2bool($pingfederate::windowslive_adapter) {
-    ensure_packages($pingfederate::windowslive_adapter_list,{'ensure' => $pingfederate::windowslive_package_ensure})
+  $::pingfederate::social_adapter.each |$a| {
+    $b = deep_merge($::pingfederate::social_adapter_default,$a)
+    if str2bool($b['enable']) {
+      $plist = if $b['package_list'] { $b['package_list'] } else { "pingfederate-${b['name']}-adapter" }
+      $ens = if $b['package_ensure'] { $b['package_ensure'] } else { 'installed' }
+      ensure_packages($plist, {'ensure' => $ens})
+    }
   }
   # python and augeas scripts are in templates/
   ensure_packages(['python','python-requests','python-libs','augeas'],{'ensure' => 'installed'})

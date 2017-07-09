@@ -387,7 +387,7 @@ These are the native SAML2 IdP settings used for native *console_authentication*
 ###### `extd_attrs` (Array[string])
 
 #### SAML 2.0 Partner IdP Configuration
-  `saml2_idp`: (Array[map]) Multiple partner IdPs can be configure by this module. Each array item has multiple map  keys:
+  `saml2_idp`: (Array[map]) Multiple partner IdPs can be configure by this module. Each array item has multiple map keys:
 
 ##### `url`
   (string)
@@ -752,152 +752,70 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   ...
   ```
 
-#### Social Identity Adapters
-##### Facebook Cloud Identity Connector
-  Configures the [Facebook Cloud Identity Connector](https://documentation.pingidentity.com/display/FBCIC13/  PingFederate+Facebook+Cloud+Identity+Connector+1.3).
-  Here's an example:
+#### `social_adapter`
+  (Array[map]) Social identity adapters (facebook, google, linkedin, etc.) have the following map keys.
+  Example:
   ```
-  pingfederate::facebook_adapter: true
-  pingfederate::facebook_package_ensure: 1.3.2-5.el6
-  pingfederate::facebook_app_id: 12345678912456789
-  pingfederate::facebook_app_secret: abcdefdeadbeef00ba4
-  pingfederate::facebook_oauth_token_map:
-    - name: username
-      type: ADAPTER
-      value: name
-    - name: group
+pingfederate::social_adapter:
+  - name: facebook
+    enable: true
+    package_ensure: 1.3.2-5.el6
+    app_id: 98765432112345
+    app_secret: xxf2b942ebb849f7abc629576bfe8
+    oauth_token_map:
+      - name: username
+        type: ADAPTER
+        value: name
+      - name: group
         type: TEXT
         value: facebook
-    - name: uid
-      type: ADAPTER
-      value: id
-  pingfederate::facebook_oauth_idp_map:
-    - name: USER_KEY
-      type: ADAPTER
-      value: id
-    - name: USER_NAME
-      type: ADAPTER
-      value: name
-    - name: group
-      type: TEXT
-      value: facebook
-  ```
-###### `facebook_adapter`
-  (boolean)
-  Set to true to enable the Facebook CIC adapter. Default: `false`
+      - name: uid
+        type: ADAPTER
+        value: id
+    oauth_idp_map:
+      - name: USER_KEY
+        type: ADAPTER
+        value: id
+      - name: USER_NAME
+        type: ADAPTER
+        value: name
+      - name: group
+        type: TEXT
+        value: facebook
+   ```
+###### `name`
+  (string)
+  Name of the adapter.
 
-###### `facebook_package_list`
+###### `enable`
+  (boolean)
+  Set to true to enable the CIC adapter. Default: `false`
+
+###### `package_list`
   (array[string])
-  Name of package(s) that contains the Facebook adapter.
-  Default: `'pingfederate-facebook-adapter'`
+  Name of package(s) that contains the adapter.
+  Default: `'pingfederate-<name>-adapter'`
   
-###### `facebook_package_ensure`
+###### `package_ensure`
   (string)
   Ensure that the package is installed.
   Default: `'installed'`
 
-###### `facebook_app_id`
+###### `app_id`
   (string)
-  [Facebook](https://developers.facebook.com) app ID.
+  application key or ID.
 
-###### `facebook_app_secret`
+###### `app_secret`
   (string)
-  Facebook app secret.
+  Application secret.
 
-###### `facebook_oauth_token_map`
-  Mapping of Facebook attributes to oauth token attributes.
+###### `oauth_token_map`
+  (Map) Mapping of attributes to oauth token attributes consisting of `name`,`type`,`value` triples.
+  `type` is one of ADAPTER, TEXT, EXPRESSION, ...
 
-###### `facebook_oauth_idp_map`
-  Mapping of Facebook attributes to oauth token attributes.
-
-##### Google Cloud Identity Connector
-  Configures the [Google Cloud Identity Connector](https://documentation.pingidentity.com/display/GCIC11/Installation+and+Configuration) with parameters similar to those listed above for Facebook.
-  Here's an example:
-  ```
-  pingfederate::google_adapter: true
-  pingfederate::google_package_ensure: 1.1.1-5.el6
-  pingfederate::google_app_id: 123456789-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com
-  pingfederate::google_app_secret: -ABCdefGHIjklmnopqrtuvwXYZ
-  pingfederate::google_oauth_token_map:
-	- name: username
-	  type: ADAPTER
-	  value: email
-	- name: group
-	  type: TEXT
-	  value: google
-	- name: uid
-	  type: ADAPTER
-	  value: email
-  pingfederate::google_oauth_idp_map:
-	- name: USER_KEY
-	  type: ADAPTER
-	  value: email
-	- name: USER_NAME
-	  type: ADAPTER
-	  value: email
-	- name: group
-	  type: TEXT
-	  value: google
-  ```
-###### `google_adapter`
-
-###### `google_package_list`
-
-###### `google_package_ensure`
-
-###### `google_oauth_token_map`
-
-###### `google_oauth_idp_map`
-
-##### LinkedIn Cloud Identity Connector
-  Configures the [LinkedIn Cloud Identity Connector](https://documentation.pingidentity.com/display/LICIC101/LinkedIn+Cloud+Identity+Connector+1.0.1)
-  with parameters similar to those listed above for Facebook. N.B. LinkedIn OpenID provisioning is currently
-  broken. Here's an example:
-  ```
-  ```
-###### `linkedin_adapter`
-
-###### `linkedin_package_list`
-
-###### `linkedin_package_ensure`
-
-###### `linkedin_oauth_token_map`
-
-###### `linkedin_oauth_idp_map`
-
-
-##### Twitter Cloud Identity Connector
-  Configures the [Twitter Cloud Identity Connector](https://documentation.pingidentity.com/display/TCIC111/Twitter+Cloud+Identity+Connector+1.1.1)
-  with parameters similar to those listed above for Facebook. 
-  Here's an example:
-  ```
-  ```
-###### `twitter_adapter`
-
-###### `twitter_package_list`
-
-###### `twitter_package_ensure`
-
-###### `twitter_oauth_token_map`
-
-###### `twitter_oauth_idp_map`
-
-##### Windows Live Cloud Identity Connector
-  Configures the [Windows Live Cloud Identity Connector](https://documentation.pingidentity.com/display/WLCIC20/Windows+Live+Cloud+Identity+Connector)
-  with parameters similar to those listed above for Facebook. 
-  Here's an example:
-  ```
-  ```
-
-###### `windowslive_adapter`
-
-###### `windowslive_package_list`
-
-###### `windowslive_package_ensure`
-
-###### `windowslive_oauth_token_map`
-
-###### `windowslive_oauth_idp_map`
+###### `oauth_idp_map`
+  (Map) Mapping of attributes to idp attributes consisting of `name`,`type`,`value` triples.
+  `type` is one of ADAPTER, TEXT, EXPRESSION, ...
 
 ## Limitations
 

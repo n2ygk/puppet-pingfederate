@@ -3,8 +3,8 @@
     and configure the following based on it. For now, just use what we have from our initial example
     and circle back later as needed. -%>
 {
-  "id": "Linkedin",<%# just hardcode it %>
-  "name": "Linkedin", 
+  "id": "linkedin",<%# just hardcode it %>
+  "name": "LinkedIn", 
   "attributeMapping": {
     "attributeContractFulfillment": {
       "formattedName": {
@@ -154,11 +154,11 @@
     "fields": [
       {
         "name": "API Key", 
-	"value": "<%= @linkedin_app_id -%>"
+	"value": "<%= @b['app_id'] -%>"
       }, 
       {
         "name": "Secret Key", 
-	"value": "<%= @linkedin_app_secret -%>"
+	"value": "<%= @b['app_secret'] -%>"
       }, 
       {
         "name": "PingFederate Base URL", 

@@ -234,187 +234,75 @@ class pingfederate::server_settings inherits ::pingfederate {
 
   ###
   # SOCIAL OAUTH ADAPTERS
+  # these adapters have a unique idp/adapters template and then common oauth/idpAdapterMappings
+  # and oauth/accessTokenMappings templates. The adapter 'name' must match the template filename.
+  # This will detect an incorrect adapter name by complaining about a missing template.
   ###
 
   # TODO: make sure an adapter wasn't previously defined and is now removed. Removal happens
   # in the reverse order of addition!
 
-  ###
-  # FACEBOOK
-  ###
-  if str2bool($::pingfederate::facebook_adapter) {
-    $fba = "idp/adapters"
-    $fbaf = "idp_adapters_facebook"
-    file {"${etc}/${fbaf}.json":
-      ensure   => 'present',
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
-      content  => template("pingfederate/${fbaf}.json.erb"),
-    } ~> 
-    exec {"pf-admin-api POST ${fbaf}":
-      command     => "${pfapi} -m POST -j ${etc}/${fbaf}.json -r ${etc}/${fbaf}.json.out -i ${etc}/${fbaf}.id ${fba}", # || rm -f ${fbaf}.json",
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
+  $::pingfederate::social_adapter.each |$a| {
+    $b = deep_merge($::pingfederate::social_adapter_default,$a)
+    $n=$b['name']
+    $un=uriescape($n)
+    if str2bool($b['enable']) {
+      $ida = "idp/adapters"
+      $idaf = "idp_adapters_${un}"
+      $subid = "-s aid=${etc}/${idaf}.id"
+      file {"${etc}/${idaf}.json":
+        ensure   => 'present',
+        mode     => 'a=r',
+        owner    => $::pingfederate::owner,
+        group    => $::pingfederate::group,
+        content  => template("pingfederate/${idaf}.json.erb"), # unique template per provider
+      } ~>
+      exec {"pf-admin-api POST ${idaf}":
+        command     => "${pfapi} -m POST -j ${etc}/${idaf}.json -r ${etc}/${idaf}.json.out -i ${etc}/${idaf}.id ${ida}", # || rm -f ${idaf}.json",
+        refreshonly => true,
+        user        => $::pingfederate::owner,
+        logoutput   => true,
+      }
 
-    $fbi = "oauth/idpAdapterMappings"
-    $fbif = "oauth_idpAdapterMappings_facebook"
-    file {"${etc}/${fbif}.json":
-      require    => [
-                     Exec["pf-admin-api POST ${fbaf}"], # need idp/apapters/Facebook
-                     Exec["pf-admin-api POST ${atm}"],  # need oauth/accessTokenManagers/{id}
-                     ],
-      ensure     => 'present',
-      mode       => 'a=r',
-      owner      => $::pingfederate::owner,
-      group      => $::pingfederate::group,
-      content    => template("pingfederate/${fbif}.json.erb"),
-    } ~> 
-    exec {"pf-admin-api POST ${fbif}":
-      command     => "${pfapi} -m POST -j ${etc}/${fbif}.json -r ${etc}/${fbif}.json.out ${fbi}", # || rm -f ${fbif}.json",
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
+      $oiam = "oauth/idpAdapterMappings"
+      $oiamf = "oauth_idpAdapterMappings"
+      $oiamfu = "oauth_idpAdapterMappings_${un}"
+      file {"${etc}/${oiamfu}.json":
+        subscribe  => [Exec["pf-admin-api POST ${idaf}"], # need idp/apapters/$un
+                       Exec["pf-admin-api POST ${atm}"]],  # need oauth/accessTokenManagers
+        ensure     => 'present',
+        mode       => 'a=r',
+        owner      => $::pingfederate::owner,
+        group      => $::pingfederate::group,
+        content    => template("pingfederate/${oiamf}.json.erb"),
+      } ~>
+      exec {"pf-admin-api POST ${oiamfu}":
+        command     => "${pfapi} -m POST -j ${etc}/${oiamf}.json ${subid} -r ${etc}/${oiamf}.json.out ${oiam}", # || rm -f ${oiamf}.json",
+        refreshonly => true,
+        user        => $::pingfederate::owner,
+        logoutput   => true,
+      }
 
-    $oatfb = 'oauth/accessTokenMappings'
-    $oatfbf = 'oauth_accessTokenMappings_facebook'
-    Exec["pf-admin-api POST ${fbaf}"] ~>
-    file {"${etc}/${oatfbf}.json":
-      ensure   => 'present',
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
-      content  => template("pingfederate/${oatfbf}.json.erb"),
-    } ~> 
-    exec {"pf-admin-api POST ${oatfb}/Facebook":
-      command     => "${pfapi} -m POST -j ${etc}/${oatfbf}.json -r ${etc}/${oatfbf}.json.out -i ${etc}/${oatfbf}.id ${oatfb}", # || rm -f ${oatfbf}.json",
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
-  }    
-
-  ###
-  # GOOGLE
-  ###
-  if str2bool($::pingfederate::google_adapter) {
-    $goa = "idp/adapters"
-    $goaf = "idp_adapters_google"
-    file {"${etc}/${goaf}.json":
-      ensure   => 'present',
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
-      content  => template("pingfederate/${goaf}.json.erb"),
-    } ~> 
-    exec {"pf-admin-api POST ${goaf}":
-      command     => "${pfapi} -m POST -j ${etc}/${goaf}.json -r ${etc}/${goaf}.json.out -i ${etc}/${goaf}.id ${goa}", # || rm -f ${goaf}.json",
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
-
-    $goi = "oauth/idpAdapterMappings"
-    $goif = "oauth_idpAdapterMappings_google"
-    file {"${etc}/${goif}.json":
-      require    => [
-                     Exec["pf-admin-api POST ${goaf}"], # need idp/apapters/Google
-                     Exec["pf-admin-api POST ${atm}"],  # need oauth/accessTokenManagers/{id}
-                     ],
-      ensure     => 'present',
-      mode       => 'a=r',
-      owner      => $::pingfederate::owner,
-      group      => $::pingfederate::group,
-      content    => template("pingfederate/${goif}.json.erb"),
-    } ~> 
-    exec {"pf-admin-api POST ${goif}":
-      command     => "${pfapi} -m POST -j ${etc}/${goif}.json -r ${etc}/${goif}.json.out ${goi}", # || rm -f ${goif}.json",
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
-
-    $oatgo = 'oauth/accessTokenMappings'
-    $oatgof = 'oauth_accessTokenMappings_google'
-    Exec["pf-admin-api POST ${goaf}"] ~>
-    file {"${etc}/${oatgof}.json":
-      ensure   => 'present',
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
-      content  => template("pingfederate/${oatgof}.json.erb"),
-    } ~> 
-    exec {"pf-admin-api POST ${oatgo}/Google":
-      command     => "${pfapi} -m POST -j ${etc}/${oatgof}.json -r ${etc}/${oatgof}.json.out -i ${etc}/${oatgof}.id ${oatgo}", # || rm -f ${oatgof}.json",
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
-  }
-  ###
-  # LINKEDIN
-  ###
-  if str2bool($::pingfederate::linkedin_adapter) {
-    $lia = "idp/adapters"
-    $liaf = "idp_adapters_linkedin"
-    file {"${etc}/${liaf}.json":
-      ensure   => 'present',
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
-      content  => template("pingfederate/${liaf}.json.erb"),
-    } ~> 
-    exec {"pf-admin-api POST ${liaf}":
-      command     => "${pfapi} -m POST -j ${etc}/${liaf}.json -r ${etc}/${liaf}.json.out -i ${etc}/${liaf}.id ${lia}", # || rm -f ${liaf}.json",
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
-
-    $lii = "oauth/idpAdapterMappings"
-    $liif = "oauth_idpAdapterMappings_linkedin"
-    file {"${etc}/${liif}.json":
-      require    => [
-                     Exec["pf-admin-api POST ${liaf}"], # need idp/apapters/Linkedin
-                     Exec["pf-admin-api POST ${atm}"],  # need oauth/accessTokenManagers/{id}
-                     ],
-      ensure     => 'present',
-      mode       => 'a=r',
-      owner      => $::pingfederate::owner,
-      group      => $::pingfederate::group,
-      content    => template("pingfederate/${liif}.json.erb"),
-    } ~> 
-    exec {"pf-admin-api POST ${liif}":
-      command     => "${pfapi} -m POST -j ${etc}/${liif}.json -r ${etc}/${liif}.json.out ${lii}", # || rm -f ${liif}.json",
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
-
-    $oatli = 'oauth/accessTokenMappings'
-    $oatlif = 'oauth_accessTokenMappings_linkedin'
-    Exec["pf-admin-api POST ${liaf}"] ~>
-    file {"${etc}/${oatlif}.json":
-      ensure   => 'present',
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
-      content  => template("pingfederate/${oatlif}.json.erb"),
-    } ~> 
-    exec {"pf-admin-api POST ${oatli}/Linkedin":
-      command     => "${pfapi} -m POST -j ${etc}/${oatlif}.json -r ${etc}/${oatlif}.json.out -i ${etc}/${oatlif}.id ${oatli}", # || rm -f ${oatlif}.json",
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
-  }
-
-  ###
-  # TO DO: additional social adapters. Can probably parameterize and reuse the facebook stuff
-  ###
+      $oatm = 'oauth/accessTokenMappings'
+      $oatmf = 'oauth_accessTokenMappings'
+      $oatmfu = "oauth_accessTokenMappings_${un}"
+      file {"${etc}/${oatmfu}.json":
+        subscribe  => [Exec["pf-admin-api POST ${idaf}"],
+                       Exec["pf-admin-api POST ${atm}"]],
+        ensure    => 'present',
+        mode      => 'a=r',
+        owner     => $::pingfederate::owner,
+        group     => $::pingfederate::group,
+        content   => template("pingfederate/${oatmf}.json.erb"),
+      } ~>
+      exec {"pf-admin-api POST ${oatmfu}":
+        command     => "${pfapi} -m POST -j ${etc}/${oatmf}.json  ${subid} -r ${etc}/${oatmf}.json.out -i ${etc}/${oatmf}.id ${oatm}", # || rm -f ${oatmf}.json",
+        refreshonly => true,
+        user        => $::pingfederate::owner,
+        logoutput   => true,
+      }
+    } # end enabled?
+  } # end $::pingfederate::social_adapter.each
 
   # authenticationSelectors check for presence of scopes which are defined in oauth/authServerSettings.
   $asel = "authenticationSelectors"

@@ -3,7 +3,7 @@
     and configure the following based on it. For now, just use what we have from our initial example
     and circle back later as needed. -%>
 {
-  "id": "Google",<%# just hardcode it %>
+  "id": "google",<%# just hardcode it %>
   "name": "Google",
   "attributeMapping": {
     "attributeContractFulfillment": {
@@ -39,11 +39,11 @@
       }, 
       {
         "name": "Client ID", 
-	"value": "<%= @google_app_id -%>"
+	"value": "<%= @b['app_id'] -%>"
       }, 
       {
         "name": "Client Secret", 
-	"value": "<%= @google_app_secret -%>"
+	"value": "<%= @b['app_secret'] -%>"
       }, 
       {
         "name": "Refresh Token", 

@@ -88,6 +88,9 @@ class pingfederate (
   $saml2_idp                           = $::pingfederate::params::saml2_idp,
   #  defaults for missing values in the map(s)
   $saml2_idp_default                   = $::pingfederate::params::saml2_idp_default,
+  # social media adapters
+  $social_adapter                      = $::pingfederate::params::social_adapter,
+  $social_adapter_default              = $::pingfederate::params::social_adapter_default,
   # XML: etc/webdefault.xml (Enable Cross-Origin Resource Sharing -- CORS)
   $cors_allowedOrigins                 = $::pingfederate::params::cors_allowedOrigins,
   $cors_allowedMethods                 = $::pingfederate::params::cors_allowedMethods,
@@ -134,48 +137,6 @@ class pingfederate (
   $oauth_oidc_policy_extd_map          = $::pingfederate::params::oauth_oidc_policy_extd_map,
   # API: oauth/authenticationPolicyContractMappings
   $oauth_authn_policy_map              = $::pingfederate::params::oauth_authn_policy_map,
-  # add-on packages: social media oauth adapters
-  # facebook
-  $facebook_adapter                    = $::pingfederate::params::facebook_adapter,
-  $facebook_package_list               = $::pingfederate::params::facebook_package_list,
-  $facebook_package_ensure             = $::pingfederate::params::facebook_package_ensure,
-  # API: idp/adapters
-  $facebook_app_id                     = $::pingfederate::params::facebook_app_id,
-  $facebook_app_secret                 = $::pingfederate::params::facebook_app_secret,
-  # API: oauth/idpAdapterMappings
-  $facebook_oauth_idp_map              = $::pingfederate::params::facebook_oauth_idp_map,
-  # API: oauth/accessTokenMappings
-  $facebook_oauth_token_map            = $::pingfederate::params::facebook_oauth_token_map,
-  # google
-  $google_adapter                      = $::pingfederate::params::google_adapter,
-  $google_package_list                 = $::pingfederate::params::google_package_list,
-  $google_package_ensure               = $::pingfederate::params::google_package_ensure,
-  # API: idp/adapters
-  $google_app_id                       = $::pingfederate::params::google_app_id,
-  $google_app_secret                   = $::pingfederate::params::google_app_secret,
-  # API: oauth/idpAdapterMappings
-  $google_oauth_idp_map                = $::pingfederate::params::google_oauth_idp_map,
-  # API: oauth/accessTokenMappings
-  $google_oauth_token_map              = $::pingfederate::params::google_oauth_token_map,
-  # linkedin
-  $linkedin_adapter                    = $::pingfederate::params::linkedin_adapter,
-  $linkedin_package_list               = $::pingfederate::params::linkedin_package_list,
-  $linkedin_package_ensure             = $::pingfederate::params::linkedin_package_ensure,
-  # API: idp/adapters
-  $linkedin_app_id                     = $::pingfederate::params::linkedin_app_id,
-  $linkedin_app_secret                 = $::pingfederate::params::linkedin_app_secret,
-  # API: oauth/idpAdapterMappings
-  $linkedin_oauth_idp_map              = $::pingfederate::params::linkedin_oauth_idp_map,
-  # API: oauth/accessTokenMappings
-  $linkedin_oauth_token_map            = $::pingfederate::params::linkedin_oauth_token_map,
-  # twitter
-  $twitter_adapter                     = $::pingfederate::params::twitter_adapter,
-  $twitter_package_list                = $::pingfederate::params::twitter_package_list,
-  $twitter_package_ensure              = $::pingfederate::params::twitter_package_ensure,
-  # windowslive
-  $windowslive_adapter                 = $::pingfederate::params::windowslive_adapter,
-  $windowslive_package_list            = $::pingfederate::params::windowslive_package_list,
-  $windowslive_package_ensure          = $::pingfederate::params::windowslive_package_ensure,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])

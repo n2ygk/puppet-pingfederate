@@ -3,7 +3,7 @@
     and configure the following based on it. For now, just use what we have from our initial example
     and circle back later as needed. -%>
 {
-  "id": "Facebook",<%# just hardcode it %>
+  "id": "facebook",<%# just hardcode it %>
   "name": "Facebook", 
   "attributeMapping": {
     "attributeContractFulfillment": {
@@ -274,11 +274,11 @@
     "fields": [
       {
 	"name": "Application ID", 
-	"value": "<%= @facebook_app_id -%>"
+	"value": "<%= @b['app_id'] -%>"
       }, 
       {
 	"name": "Application Secret", 
-	"value": "<%= @facebook_app_secret -%>"
+	"value": "<%= @b['app_secret'] -%>"
       }, 
       {
 	"name": "Site URL", 
