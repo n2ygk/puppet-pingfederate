@@ -265,18 +265,18 @@ class pingfederate::server_settings inherits ::pingfederate {
       }
 
       $oiam = "oauth/idpAdapterMappings"
-      $oiamf = "oauth_idpAdapterMappings"
-      $oiamfu = "oauth_idpAdapterMappings_${un}"
-      file {"${etc}/${oiamfu}.json":
+      $oiamt = "oauth_idpAdapterMappings"
+      $oiamf = "${oiamt}_${un}"
+      file {"${etc}/${oiamf}.json":
         subscribe  => [Exec["pf-admin-api POST ${idaf}"], # need idp/apapters/$un
                        Exec["pf-admin-api POST ${atm}"]],  # need oauth/accessTokenManagers
         ensure     => 'present',
         mode       => 'a=r',
         owner      => $::pingfederate::owner,
         group      => $::pingfederate::group,
-        content    => template("pingfederate/${oiamf}.json.erb"),
+        content    => template("pingfederate/${oiamt}.json.erb"),
       } ~>
-      exec {"pf-admin-api POST ${oiamfu}":
+      exec {"pf-admin-api POST ${oiamf}":
         command     => "${pfapi} -m POST -j ${etc}/${oiamf}.json ${subid} -r ${etc}/${oiamf}.json.out ${oiam}", # || rm -f ${oiamf}.json",
         refreshonly => true,
         user        => $::pingfederate::owner,
@@ -284,18 +284,18 @@ class pingfederate::server_settings inherits ::pingfederate {
       }
 
       $oatm = 'oauth/accessTokenMappings'
-      $oatmf = 'oauth_accessTokenMappings'
-      $oatmfu = "oauth_accessTokenMappings_${un}"
-      file {"${etc}/${oatmfu}.json":
+      $oatmt = "oauth_accessTokenMappings"
+      $oatmf = "${oatmt}_${un}"
+      file {"${etc}/${oatmf}.json":
         subscribe  => [Exec["pf-admin-api POST ${idaf}"],
                        Exec["pf-admin-api POST ${atm}"]],
         ensure    => 'present',
         mode      => 'a=r',
         owner     => $::pingfederate::owner,
         group     => $::pingfederate::group,
-        content   => template("pingfederate/${oatmf}.json.erb"),
+        content   => template("pingfederate/${oatmt}.json.erb"),
       } ~>
-      exec {"pf-admin-api POST ${oatmfu}":
+      exec {"pf-admin-api POST ${oatmf}":
         command     => "${pfapi} -m POST -j ${etc}/${oatmf}.json  ${subid} -r ${etc}/${oatmf}.json.out -i ${etc}/${oatmf}.id ${oatm}", # || rm -f ${oatmf}.json",
         refreshonly => true,
         user        => $::pingfederate::owner,
