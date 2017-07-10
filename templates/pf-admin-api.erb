@@ -154,8 +154,11 @@ response = do_req(opt.retries,opt.method,
                   timeout=opt.timeout,
                   verify=opt.verify)
 print((response.status_code,response.reason),file=sys.stderr)
-rjson = json.loads(response.text)
-resp = json.dumps(rjson,indent=2) # pretty-print it
+try:
+  rjson = json.loads(response.text)
+except:
+  rjson = None
+resp = json.dumps(rjson,indent=2) if rjson else 'None' # pretty-print it
 if response.status_code < 400:
   output = sys.stdout if opt.response == '-' else open(opt.response,'wb')
   print(resp,file=output)

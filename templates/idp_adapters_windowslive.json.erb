@@ -1,0 +1,86 @@
+{
+  "name": "WindowsLive", 
+  "id": "windowslive",
+  "attributeMapping": {
+    "attributeContractFulfillment": {
+      "access_token": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "access_token"
+      }, 
+      "email": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "email"
+      }
+    }, 
+    "issuanceCriteria": {
+      "conditionalCriteria": []
+    }, 
+    "attributeSources": []
+  }, 
+  "attributeContract": {
+    "coreAttributes": [
+      {
+        "pseudonym": false, 
+        "name": "access_token", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": true, 
+        "name": "email", 
+        "masked": false
+      }
+    ], 
+    "maskOgnlValues": false, 
+    "extendedAttributes": []
+  }, 
+  "pluginDescriptorRef": {
+    "id": "com.pingidentity.adapters.idp.LiveConnect.LiveConnectAuthenticationAdapter", 
+    "location": "<%= @adm_api_baseURL-%>/idp/adapters/descriptors/com.pingidentity.adapters.idp.LiveConnect.LiveConnectAuthenticationAdapter"
+  }, 
+  "configuration": {
+    "tables": [
+      {
+        "rows": [], 
+        "name": "Scopes"
+      }
+    ], 
+    "fields": [
+      {
+        "name": "Client ID", 
+        "value": "<%= @b['app_id'] -%>"
+      }, 
+      {
+        "name": "Client Secret", 
+        "value": "<%= @b['app_secret'] -%>"
+      }, 
+      {
+        "name": "PingFederate Base URL", 
+        "value": "<%= @adm_api_baseURL-%>"
+      }, 
+      {
+        "name": "Unauthorized Redirect URL", 
+        "value": ""
+      }, 
+      {
+        "name": "Error Redirect URL", 
+        "value": ""
+      }, 
+      {
+        "name": "Authorization URL", 
+        "value": "https://login.live.com/oauth20_authorize.srf"
+      }, 
+      {
+        "name": "Token URL", 
+        "value": "https://login.live.com/oauth20_token.srf"
+      }, 
+      {
+        "name": "User Attributes URL", 
+        "value": "https://apis.live.net/v5.0/me"
+      }
+    ]
+  }
+}
