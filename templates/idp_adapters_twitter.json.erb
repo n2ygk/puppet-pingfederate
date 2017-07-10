@@ -1,0 +1,214 @@
+<%# This is a complex adapter. The "right" way to configure it is
+    GET idp/adapters/descriptors/com.pingidentity.adapters.idp.twitter.TwitterAuthenticationAdapter
+    and configure the following based on it. For now, just use what we have from our initial example
+    and circle back later as needed. -%>
+{
+  "id": "twitter",
+  "name": "Twitter", 
+  "attributeMapping": {
+    "attributeContractFulfillment": {
+      "lang": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "lang"
+      }, 
+      "utc_offset": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "utc_offset"
+      }, 
+      "favourites_count": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "favourites_count"
+      }, 
+      "description": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "description"
+      }, 
+      "friends_count": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "friends_count"
+      }, 
+      "access_token": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "access_token"
+      }, 
+      "created_at": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "created_at"
+      }, 
+      "time_zone": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "time_zone"
+      }, 
+      "name": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "name"
+      }, 
+      "followers_count": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "followers_count"
+      }, 
+      "location": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "location"
+      }, 
+      "access_token_secret": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "access_token_secret"
+      }, 
+      "id": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "id"
+      }, 
+      "screen_name": {
+        "source": {
+          "type": "ADAPTER"
+        }, 
+        "value": "screen_name"
+      }
+    }
+  }, 
+  "attributeContract": {
+    "coreAttributes": [
+      {
+        "pseudonym": false, 
+        "name": "utc_offset", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "friends_count", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "favourites_count", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "description", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "created_at", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "time_zone", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "access_token", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "screen_name", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "followers_count", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "name", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "location", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": true, 
+        "name": "id", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "lang", 
+        "masked": false
+      }, 
+      {
+        "pseudonym": false, 
+        "name": "access_token_secret", 
+        "masked": false
+      }
+    ], 
+    "maskOgnlValues": false, 
+    "extendedAttributes": []
+  }, 
+  "pluginDescriptorRef": {
+    "id": "com.pingidentity.adapter.idp.twitter.TwitterAuthenticationAdapter", 
+    "location": "<%= @adm_api_baseURL-%>/idp/adapters/descriptors/com.pingidentity.adapter.idp.twitter.TwitterAuthenticationAdapter"
+  }, 
+  "configuration": {
+    "tables": [
+      {
+        "rows": [], 
+        "name": "Attribute Selector"
+      }
+    ], 
+    "fields": [
+      {
+        "name": "Consumer Key", 
+        "value": "<%= @b['app_id'] -%>"
+      }, 
+      {
+        "name": "Consumer Secret", 
+        "value": "<%= @b['app_secret'] -%>"
+      }, 
+      {
+        "name": "PingFederate Base URL", 
+        "value": "<%= @service_api_baseURL -%>"
+      }, 
+      {
+        "name": "Error Redirect URL", 
+        "value": ""
+      }, 
+      {
+        "name": "Unauthorized Redirect URL", 
+        "value": ""
+      }, 
+      {
+        "name": "Twitter Authentication URL", 
+        "value": "https://api.twitter.com/oauth/authenticate?oauth_token="
+      }, 
+      {
+        "name": "Twitter User Data URL", 
+        "value": "https://api.twitter.com/1.1/account/verify_credentials.json"
+      }
+    ]
+  }
+}
