@@ -32,6 +32,7 @@ class pingfederate::params {
   $secondary_https_port                = -1
   $engine_bind_address                 = '0.0.0.0'
   $monitor_bind_address                = '0.0.0.0'
+  $log_dir                             = "${install_dir}/pingfederate/log"
   $log_eventdetail                     = false
   $heartbeat_system_monitoring         = false
   $operational_mode                    = 'STANDALONE'

@@ -29,6 +29,7 @@ class pingfederate::config inherits ::pingfederate {
       'pf.secondary.https.port'                => $::pingfederate::secondary_https_port,
       'pf.engine.bind.address'                 => $::pingfederate::engine_bind_address,
       'pf.monitor.bind.address'                => $::pingfederate::monitor_bind_address,
+      'pf.log.dir'                             => $::pingfederate::log_dir,
       'pf.log.eventdetail'                     => $::pingfederate::log_eventdetail,
       'pf.heartbeat.system.monitoring'         => $::pingfederate::heartbeat_system_monitoring,
       'pf.operational.mode'                    => $::pingfederate::operational_mode,
@@ -48,6 +49,12 @@ class pingfederate::config inherits ::pingfederate {
     }
   }
   create_ini_settings($settings, $defaults)
+
+  mkdir::p {"${::pingfederate::log_dir}":
+    owner   => $::pingfederate::owner,
+    group   => $::pingfederate::group,
+    mode    => "0750",
+  }
 
   # install license acceptance file
   $license_accept =  @("ACCEPT")

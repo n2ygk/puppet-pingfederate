@@ -126,6 +126,9 @@ to set a number of the following parameters.
   Default: `true`
 
 #### Logging
+##### `log_dir`
+  (string) Directory for log files. Default: `${install_dir}/log`
+
 ##### `log_retain_days`
   (integer) Number of days to retain log files. Default: `30`
 

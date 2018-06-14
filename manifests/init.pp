@@ -31,6 +31,7 @@ class pingfederate (
   $service_name                        = $::pingfederate::params::service_name,
   $service_ensure                      = $::pingfederate::params::service_ensure,
   # log4j2 logging:
+  $log_dir                             = $::pingfederate::params::log_dir,
   $log_retain_days                     = $::pingfederate::params::log_retain_days,
   $log_files                           = $::pingfederate::params::log_files,
   $log_levels                          = $::pingfederate::params::log_levels,
