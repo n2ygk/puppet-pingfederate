@@ -1,5 +1,5 @@
 {
-  "failIfNoSelection": false,
+  "failIfNoSelection": <%= @oauth_scope_fail_no_selection -%>,
   "authnSelectionTrees": [
 <% @oauth_scope_selectors.each_with_index do |val, i| -%>
 <%# substitution @@id@@ is uriescape'd -%>

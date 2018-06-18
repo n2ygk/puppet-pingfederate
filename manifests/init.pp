@@ -128,6 +128,7 @@ class pingfederate (
   $oauth_svc_grant_extd_attrs          = $::pingfederate::params::oauth_svc_grant_extd_attrs,
   # API: authenticationSelectors
   $oauth_scope_selectors               = $::pingfederate::params::oauth_scope_selectors,
+  $oauth_scope_fail_no_selection       = $::pingfederate::params::oauth_scope_fail_no_selection,
   # API: oauth/accessTokenManagers
   $oauth_svc_acc_tok_mgr_id            = $::pingfederate::params::oauth_svc_acc_tok_mgr_id,
   $oauth_svc_acc_tok_mgr_core_attrs    = $::pingfederate::params::oauth_svc_acc_tok_mgr_core_attrs,

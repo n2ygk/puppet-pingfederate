@@ -707,6 +707,11 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
 		- auth-columbia
   ```
 
+##### `oauth_scope_fail_no_selection`
+  (boolean)
+  Fail to login if no `oauth_scope_selector` was selected. If `false` an menu of available authentication
+  options is presented to the user. If `false` no menu is presented. Default: `false`
+
 #### OAuth Access Token Managers
 ##### `oauth_svc_acc_tok_mgr_id`
   (string)

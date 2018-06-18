@@ -306,6 +306,9 @@ class pingfederate::server_settings inherits ::pingfederate {
 
   # authenticationSelectors check for presence of scopes which are defined in oauth/authServerSettings.
   $asel = "authenticationSelectors"
+  if !($::pingfederate::oauth_scope_fail_no_selection in [true,false,'true','false']) {
+    fail("oauth_scope_fail_no_selection must be one of 'true' or 'false'")
+  }
   $::pingfederate::oauth_scope_selectors.each |$s| {
     if !has_key($s,'adapter') {
       fail('oauth_scope_selectors must have an adapter name')
