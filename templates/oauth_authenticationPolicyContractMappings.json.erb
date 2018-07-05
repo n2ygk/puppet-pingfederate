@@ -5,13 +5,13 @@
     "location": "<%= @adm_api_baseURL -%>/authenticationPolicyContracts/@@id@@"
   },
   "attributeContractFulfillment": {
-<% @a['oauth_map'].each_with_index do |val, i| -%>
+<% @b['oauth_map'].each_with_index do |val, i| -%>
     "<%= val['name'] -%>": {
         "source": {
           "type": "<%= val['type'] -%>"
         },
         "value": "<%= val['value'] -%>"
-      }<%= ',' if i < (@a['oauth_map'].size - 1) %>
+      }<%= ',' if i < (@b['oauth_map'].size - 1) %>
 <% end -%>
   } 
 }

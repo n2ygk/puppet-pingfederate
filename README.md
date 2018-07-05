@@ -732,7 +732,7 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   (string)
   The ID of the policy. No default.
 
-##### `oauth_oidc_policy_core_attrs`
+##### `oauth_oidc_policy_core_map`
   (array of hashes) Mappings from token manager core attributes to OpenID Connect attributes.
   Each hash has the following keys:
   - name: Name of the source
@@ -740,7 +740,7 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   - value: Name of the attribute
   Default: `[{name => 'sub', type => 'TOKEN', value =>'sub'}]`
 
-##### `oauth_oidc_policy_extd_attrs`
+##### `oauth_oidc_policy_extd_map`
   (array of hashes) Mappings from token manager core attributes to OpenID Connect attributes.
   Default: `[]`. Here's an example:
   ```
