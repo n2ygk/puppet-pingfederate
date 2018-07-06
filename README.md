@@ -732,6 +732,10 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   (string)
   The ID of the policy. No default.
 
+##### `oauth_oidc_id_userinfo`
+  (boolean)
+  `true` to include `userinfo` in `id_token`. Default: `false`
+
 ##### `oauth_oidc_policy_core_map`
   (array of hashes) Mappings from token manager core attributes to OpenID Connect attributes.
   Each hash has the following keys:

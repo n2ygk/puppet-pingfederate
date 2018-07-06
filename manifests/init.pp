@@ -135,6 +135,7 @@ class pingfederate (
   $oauth_svc_acc_tok_mgr_extd_attrs    = $::pingfederate::params::oauth_svc_acc_tok_mgr_extd_attrs,
   # API: oauth/openIdConnect_policies
   $oauth_oidc_policy_id                = $::pingfederate::params::oauth_oidc_policy_id,
+  $oauth_oidc_id_userinfo              = $::pingfederate::params::oauth_oidc_id_userinfo,
   $oauth_oidc_policy_core_map          = $::pingfederate::params::oauth_oidc_policy_core_map,
   $oauth_oidc_policy_extd_map          = $::pingfederate::params::oauth_oidc_policy_extd_map,
   # API: oauth/authenticationPolicyContractMappings

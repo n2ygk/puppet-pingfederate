@@ -132,6 +132,7 @@ class pingfederate::params {
   $oauth_svc_acc_tok_mgr_extd_attrs    = []
   $oauth_authn_policy_map              = []
   $oauth_oidc_policy_id                = undef
+  $oauth_oidc_id_userinfo              = false
   $oauth_oidc_policy_core_map          = []
   $oauth_oidc_policy_extd_map          = []
 }

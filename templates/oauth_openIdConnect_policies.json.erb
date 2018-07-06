@@ -6,7 +6,7 @@
     "id": "<%= @oauth_svc_acc_tok_mgr_id -%>", 
     "location": "<%= @adm_api_baseURL -%>/oauth/accessTokenManagers/<%= @oauth_svc_acc_tok_mgr_id -%>"
   }, 
-  "includeUserInfoInIdToken": true,
+  "includeUserInfoInIdToken": <%= @oauth_oidc_id_userinfo %>,
   "attributeContract": {
     "coreAttributes": [
 <% @oauth_oidc_policy_core_map.each_with_index do |val, i| -%>
