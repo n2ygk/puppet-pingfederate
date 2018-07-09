@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.2.13 [July 9, 2018]
+- Make pf-admin-api default timeout=20
+
 ## 0.2.12 [July 6, 2018]
 - Add configurable `oauth_oidc_id_userinfo`
 

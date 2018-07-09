@@ -22,7 +22,7 @@ def do_req(retries,method,url,**kwargs):
   """
   do_req: invoke requests.request, handling connection retries.
   """
-  timeout = kwargs['timeout'] if 'timeout' in kwargs else 10
+  timeout = kwargs['timeout'] if 'timeout' in kwargs else 20
   for n in range(retries):
     try:
       response = requests.request(method,url,**kwargs)
@@ -62,7 +62,7 @@ parser.add_option('-i','--id',
                   help='write resource id to file [default: %default]')
 parser.add_option('--timeout',
                   type='int',
-                  default=10,
+                  default=20,
                   help='Seconds before timeout [default: %default]')
 parser.add_option('--retries',
                   type='int',
