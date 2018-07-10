@@ -140,6 +140,9 @@ class pingfederate (
   $oauth_oidc_policy_extd_map          = $::pingfederate::params::oauth_oidc_policy_extd_map,
   # API: oauth/authenticationPolicyContractMappings
   $oauth_authn_policy_map              = $::pingfederate::params::oauth_authn_policy_map,
+  # API: oauth/clients
+  $oauth_client                        = $::pingfederate::params::oauth_client,
+  $oauth_client_default                = $::pingfederate::params::oauth_client_default,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])

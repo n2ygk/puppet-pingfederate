@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.3.0 [July 10, 2018]
+- Add oauth client configuration
+
 ## 0.2.13 [July 9, 2018]
 - Make pf-admin-api default timeout=20
 

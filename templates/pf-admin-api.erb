@@ -6,8 +6,6 @@
 # Always prints HTTP status and reason to stderr
 # If HTTP status is succesful, prints response to --response file or to stderr if unsuccesful.
 #
-# TODO: Add an idempotent POST which tries a POST and, if the resource already exists,
-# does a PUT instead. Use the --response file to find the resource/{id}.
 from __future__ import print_function
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -60,6 +58,10 @@ parser.add_option('-i','--id',
                   type='string',
                   default=None,
                   help='write resource id to file [default: %default]')
+parser.add_option('-k','--idkey',
+                  type='string',
+                  default='id',
+                  help='resource id primary key [default: %default]')
 parser.add_option('--timeout',
                   type='int',
                   default=20,
@@ -128,17 +130,17 @@ if opt.method == 'POST' and opt.response != '-' and data:
   if rfile:
     rfile.close() 
 
-  if resp and 'id' in resp:
+  if resp and opt.idkey in resp:
     existing = do_req(opt.retries,'GET',
-                      url+'/'+resp['id'],
+                      url+'/'+resp[opt.idkey],
                       auth=requests.auth.HTTPBasicAuth(cfg['user'],cfg['pass']),
                       headers=header,
                       timeout=opt.timeout,
                       verify=opt.verify)
     if existing:
-      data.update({'id': resp['id']})
+      data.update({opt.idkey: resp[opt.idkey]})
       opt.method = 'PUT'
-      url = url + '/' + resp['id']
+      url = url + '/' + resp[opt.idkey]
       print('Resource exists. Changing POST to PUT.',file=sys.stderr)
 
 # do @@key@@ substitutions, if any
@@ -164,8 +166,8 @@ if response.status_code < 400:
   print(resp,file=output)
   if opt.id:
     id_out = open(opt.id,'wb')
-    if 'id' in rjson:
-      print(rjson['id'],file=id_out,end='')
+    if opt.idkey in rjson:
+      print(rjson[opt.idkey],file=id_out,end='')
   exit(0)
 else:
   print(resp,file=sys.stderr)

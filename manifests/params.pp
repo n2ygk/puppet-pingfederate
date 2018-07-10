@@ -135,4 +135,32 @@ class pingfederate::params {
   $oauth_oidc_id_userinfo              = false
   $oauth_oidc_policy_core_map          = []
   $oauth_oidc_policy_extd_map          = []
+  $oauth_client                        = []
+  $oauth_client_default                = {
+    'clientId' => '',
+    'redirectUris' => [],
+    'grantTypes' => [],
+    'name' => '',
+    'description' => '',
+    'logoUrl' => '',
+    'validateUsingAllEligibleAtms' => false,
+    'refreshRolling' => 'SERVER_DEFAULT',
+    'persistentGrantExpirationType' => 'SERVER_DEFAULT',
+    'persistentGrantExpirationTime' => 0,
+    'persistentGrantExpirationTimeUnit' => 'DAYS',
+    'bypassApprovalPage' => true,
+    'restrictScopes' => true,
+    'restrictedScopes' => [],
+    'oidcPolicy' => {
+      'grantAccessSessionRevocationApi' => false,
+      'pingAccessLogoutCapable' => false,
+      'logoutUris'  => [],
+    },
+    'clientAuth' => {
+      'type' => 'SECRET',
+      'secret' => '',
+      'clientCertIssuerDn'  => '',
+      'clientCertSubjectDn'  => '',
+    }
+  }
 }

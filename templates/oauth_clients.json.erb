@@ -1,0 +1,44 @@
+<%# Managed by Puppet. DO NOT EDIT -%>
+{
+  "clientId": "<%= @b['clientId'] -%>",
+  "redirectUris": [
+<% @b['redirectUris'].each_with_index do |val, i| -%>
+    "<%= val -%>"<%= ',' if i < (@b['redirectUris'].size - 1) %>
+<% end -%>
+  ],
+  "grantTypes": [
+<% @b['grantTypes'].each_with_index do |val, i| -%>
+    "<%= val -%>"<%= ',' if i < (@b['grantTypes'].size - 1) %>
+<% end -%>
+  ],
+  "name": "<%= @b['name'] -%>",
+  "description": "<%= @b['description'] -%>",
+  "logoUrl": "<%= @b['logoUrl'] -%>",
+  "validateUsingAllEligibleAtms": <%= @b['validateUsingAllEligibleAtms'] -%>,
+  "persistentGrantExpirationType": "<%= @b['persistentGrantExpirationType'] -%>",
+  "persistentGrantExpirationTime": <%= @b['persistentGrantExpirationTime'] -%>,
+  "persistentGrantExpirationTimeUnit": "<%= @b['persistentGrantExpirationTimeUnit'] -%>",
+  "bypassApprovalPage": <%= @b['bypassApprovalPage'] -%>,
+  "restrictScopes": <%= @b['restrictScopes'] -%>,
+  "restrictedScopes": [
+<% @b['restrictedScopes'].each_with_index do |val, i| -%>
+    "<%= val -%>"<%= ',' if i < (@b['restrictedScopes'].size - 1) %>
+<% end -%>
+  ],
+  "oidcPolicy": {
+    "grantAccessSessionRevocationApi": <%= @b['oidcPolicy']['grantAccessSessionRevocationApi'] -%>,
+    "pingAccessLogoutCapable": <%= @b['oidcPolicy']['pingAccessLogoutCapable'] -%>,
+    "logoutUris": [
+<% @b['oidcPolicy']['logoutUris'].each_with_index do |val, i| -%>
+    "<%= val -%>"<%= ',' if i < (@b['oidcPolicy']['logoutUris'].size - 1) %>
+<% end -%>
+    ]
+  },
+  "clientAuth": {
+    "type": "<%= @b['clientAuth']['type'] -%>",
+    "secret": "<%= @b['clientAuth']['secret'] -%>",
+    "encryptedSecret": "<%= @b['clientAuth']['encryptedSecret'] -%>",
+    "clientCertIssuerDn": "<%= @b['clientAuth']['clientCertIssuerDn'] -%>",
+    "clientCertSubjectDn": "<%= @b['clientAuth']['clientCertSubjectDn'] -%>"
+  }
+}
