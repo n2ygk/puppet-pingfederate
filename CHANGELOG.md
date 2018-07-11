@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.3.1 [July 11, 2018]
+- pf-admin-api POST -> PUT behavior
+
 ## 0.3.0 [July 10, 2018]
 - Add oauth client configuration
 

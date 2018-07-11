@@ -119,16 +119,21 @@ if not opt.verify:
   
 url = cfg['baseURL']+'/'+resource
 
-# try and make POST idempotent. A prior response file must already exist as that's the source of the 'id'.
+# try and make POST idempotent. Either:
+# 1) a prior response file must already exist as that's the source of the 'id'.
+# 2) the data file contains the 'id'
 # if it exists, add the 'id' to the JSON doc and change the POST to a PUT.
 if opt.method == 'POST' and opt.response != '-' and data:
   try:
     rfile = io.open(opt.response,'rb')
   except:
     rfile = None
-  resp = json.load(rfile) if rfile else None
-  if rfile:
-    rfile.close() 
+  if opt.idkey in data and data[opt.idkey]:  # for some resources, the ID is provided
+    resp = data
+  else:  # for others it is generated
+    resp = json.load(rfile) if rfile else None
+    if rfile:
+      rfile.close() 
 
   if resp and opt.idkey in resp:
     existing = do_req(opt.retries,'GET',

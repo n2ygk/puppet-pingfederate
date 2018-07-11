@@ -405,8 +405,8 @@ class pingfederate::server_settings inherits ::pingfederate {
       mode     => 'a=r',
       owner    => $::pingfederate::owner,
       group    => $::pingfederate::group,
-      content  => template("pingfederate/${oact}.json.erb"), # unique template per provider
-      # require => [] need something here
+      content  => template("pingfederate/${oact}.json.erb"),
+      require => Exec["pf-admin-api PUT ${oas}"]  # scopes have to be defined before they can be used.
     } ~>
     exec {"pf-admin-api POST ${oacf}":
       command     => "${pfapi} -m POST -j ${etc}/${oacf}.json -r ${etc}/${oacf}.json.out -k clientId -i ${etc}/${oacf}.id ${oac}", # || rm -f ${oacf}.json",

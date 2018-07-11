@@ -2,28 +2,173 @@
 
 #### Table of Contents
 
-1. [Description](#description)
-1. [Setup - The basics of getting started with pingfederate](#setup)
-    * [Beginning with pingfederate](#beginning-with-pingfederate)
-1. [Usage - Configuration options and additional functionality](#usage)
-  1. [Packaging](#packaging)
-  1. [Service](#service)
-  1. [License Key](#providing_the_license_key)
-  1. [Run.properties](#runproperties)
-  1. [Administration](#administration)
-  1. [Cross-Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors)
-  1. [OGNL expressions](#ognl-expressions)
-  1. [SAML 2.0 SP Configuration](#saml-20-sp-configuration)
-  1. [SAML 2.0 Partner IdP Configuration](#saml-20-partner-idp-configuration)
-  1. [OAuth JDBC configuration](#oauth-jdbc-configuration)
-  1. [OAuth client manager](#oauth-client-manager)
-  1. [OAuth server settings](#oauth-server-settings)
-  1. [OAuth scope selectors](#oauth-scope-selectors)
-  1. [OAuth Access Token Managers](#oauth-access-token-managers)
-  1. [OAuth OpenID Connect Policy Contracts](#oauth-openid-connect-policy-contracts)
-  1. [Social Identity Adapters](#social-identity-adapters)
-1. [Limitations - OS compatibility, etc.](#limitations)
-1. [Development - Guide for contributing to the module](#development)
+<!-- TOC generated with: `markdown-toc -i README.md` -->
+
+<!-- toc -->
+
+- [Description](#description)
+- [Setup](#setup)
+  * [Beginning with pingfederate](#beginning-with-pingfederate)
+- [Usage](#usage)
+  * [Basic Usage](#basic-usage)
+    + [with RPMS available](#with-rpms-available)
+    + [without RPMS](#without-rpms)
+  * [Parameters](#parameters)
+    + [Packaging](#packaging)
+      - [`install_dir`](#install_dir)
+      - [`owner`](#owner)
+      - [`group`](#group)
+      - [`package_list`](#package_list)
+      - [`package_ensure`](#package_ensure)
+      - [`package_java_ensure`](#package_java_ensure)
+      - [`package_java_redhat`](#package_java_redhat)
+      - [`package_java_centos`](#package_java_centos)
+    + [Service](#service)
+      - [`service_name`](#service_name)
+      - [`service_ensure`](#service_ensure)
+    + [Logging](#logging)
+      - [`log_dir`](#log_dir)
+      - [`log_retain_days`](#log_retain_days)
+      - [`log_files`](#log_files)
+      - [`log_levels`](#log_levels)
+    + [Providing the License Key](#providing-the-license-key)
+      - [`license_content`](#license_content)
+      - [`license_file`](#license_file)
+    + [Run.properties](#runproperties)
+      - [`admin_https_port`](#admin_https_port)
+      - [`admin_hostname`](#admin_hostname)
+      - [`console_bind_address`](#console_bind_address)
+      - [`console_title`](#console_title)
+      - [`console_session_timeout`](#console_session_timeout)
+      - [`console_login_mode`](#console_login_mode)
+      - [`console_authentication`](#console_authentication)
+      - [`admin_api_authentication`](#admin_api_authentication)
+      - [`http_port`](#http_port)
+      - [`https_port`](#https_port)
+      - [`secondary_https_port`](#secondary_https_port)
+      - [`engine_bind_address`](#engine_bind_address)
+      - [`monitor_bind_address`](#monitor_bind_address)
+      - [`log_event_detail`](#log_event_detail)
+      - [`heartbeat_system_monitoring`](#heartbeat_system_monitoring)
+      - [`operational_mode`](#operational_mode)
+      - [`cluster_node_index`](#cluster_node_index)
+      - [`cluster_auth_pwd`](#cluster_auth_pwd)
+      - [`cluster_encrypt`](#cluster_encrypt)
+      - [`cluster_bind_address`](#cluster_bind_address)
+      - [`cluster_bind_port`](#cluster_bind_port)
+      - [`cluster_failure_detection_bind_port`](#cluster_failure_detection_bind_port)
+      - [`cluster_transport_protocol`](#cluster_transport_protocol)
+      - [`cluster_mcast_group_address`](#cluster_mcast_group_address)
+      - [`cluster_mcast_group_port`](#cluster_mcast_group_port)
+      - [`cluster_tcp_discovery_initial_hosts`](#cluster_tcp_discovery_initial_hosts)
+      - [`cluster_diagnostics_enabled`](#cluster_diagnostics_enabled)
+      - [`cluster_diagnostics_addr`](#cluster_diagnostics_addr)
+      - [`cluster_diagnostics_port`](#cluster_diagnostics_port)
+    + [Cross-Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors)
+      - [`cors_allowedOrigins`](#cors_allowedorigins)
+      - [`cors_allowedMethods`](#cors_allowedmethods)
+      - [`cors_allowedHeaders`](#cors_allowedheaders)
+      - [`cors_filter_mapping`](#cors_filter_mapping)
+    + [OGNL expressions](#ognl-expressions)
+      - [`ognl_expressions_enable`](#ognl_expressions_enable)
+    + [Administration](#administration)
+      - [`adm_user`](#adm_user)
+      - [`adm_pass`](#adm_pass)
+      - [`adm_hash`](#adm_hash)
+      - [`adm_api_baseURL`](#adm_api_baseurl)
+      - [`service_api_baseURL`](#service_api_baseurl)
+    + [Native SAML2 IdP](#native-saml2-idp)
+      - [`saml2_local_entityID`](#saml2_local_entityid)
+      - [`saml1_local_issuerID`](#saml1_local_issuerid)
+      - [`wsfed_local_realm`](#wsfed_local_realm)
+      - [`http_forwarded_for_header`](#http_forwarded_for_header)
+      - [`http_forwarded_host_header`](#http_forwarded_host_header)
+    + [SAML 2.0 SP Configuration](#saml-20-sp-configuration)
+      - [Authentication Policy Contracts](#authentication-policy-contracts)
+        * [`name` (string)](#name-string)
+        * [`core_attrs` (Array[string])](#core_attrs-arraystring)
+        * [`extd_attrs` (Array[string])](#extd_attrs-arraystring)
+    + [SAML 2.0 Partner IdP Configuration](#saml-20-partner-idp-configuration)
+      - [`url`](#url)
+      - [`post`](#post)
+      - [`redirect`](#redirect)
+      - [`entityID`](#entityid)
+      - [`name`](#name)
+      - [`metadata`](#metadata)
+      - [`virtual`](#virtual)
+      - [`contact`](#contact)
+      - [`profiles`](#profiles)
+      - [`auth_policy_contract`](#auth_policy_contract)
+      - [`id_mapping`](#id_mapping)
+      - [`core_attrs`](#core_attrs)
+      - [`extd_attrs`](#extd_attrs)
+      - [`attr_map`](#attr_map)
+      - [`oauth_map`](#oauth_map)
+      - [`cert_file`](#cert_file)
+      - [`cert_content`](#cert_content)
+      - [`saml2_oauth_token_map`](#saml2_oauth_token_map)
+    + [OAuth JDBC configuration](#oauth-jdbc-configuration)
+      - [`oauth_jdbc_type`](#oauth_jdbc_type)
+      - [`oauth_jdbc_db`](#oauth_jdbc_db)
+      - [`oauth_jdbc_user`](#oauth_jdbc_user)
+      - [`oauth_jdbc_pass`](#oauth_jdbc_pass)
+      - [`oauth_jdbc_host`](#oauth_jdbc_host)
+      - [`oauth_jdbc_port`](#oauth_jdbc_port)
+      - [`oauth_jdbc_driver`](#oauth_jdbc_driver)
+      - [`oauth_jdbc_package_list`](#oauth_jdbc_package_list)
+      - [`oauth_jdbc_package_ensure`](#oauth_jdbc_package_ensure)
+      - [`oauth_jdbc_jar_dir`](#oauth_jdbc_jar_dir)
+      - [`oauth_jdbc_jar`](#oauth_jdbc_jar)
+      - [`oauth_jdbc_url`](#oauth_jdbc_url)
+      - [`oauth_jdbc_validate`](#oauth_jdbc_validate)
+      - [`oauth_jdbc_create_cmd`](#oauth_jdbc_create_cmd)
+      - [`oauth_jdbc_client_ddl_cmd`](#oauth_jdbc_client_ddl_cmd)
+      - [`oauth_jdbc_access_ddl_cmd`](#oauth_jdbc_access_ddl_cmd)
+      - [`acct_jdbc_linking_ddl_cmd`](#acct_jdbc_linking_ddl_cmd)
+    + [OAuth client manager](#oauth-client-manager)
+      - [`oauth_client_mgr_user`](#oauth_client_mgr_user)
+      - [`oauth_client_mgr_pass`](#oauth_client_mgr_pass)
+    + [OAuth server settings](#oauth-server-settings)
+      - [`oauth_svc_scopes`](#oauth_svc_scopes)
+      - [`oauth_svc_scope_groups`](#oauth_svc_scope_groups)
+      - [`oauth_svc_grant_core_attrs`](#oauth_svc_grant_core_attrs)
+      - [`oauth_svc_grant_extd_attrs`](#oauth_svc_grant_extd_attrs)
+    + [OAuth scope selectors](#oauth-scope-selectors)
+      - [`oauth_scope_selectors`](#oauth_scope_selectors)
+      - [`oauth_scope_fail_no_selection`](#oauth_scope_fail_no_selection)
+    + [OAuth Access Token Managers](#oauth-access-token-managers)
+      - [`oauth_svc_acc_tok_mgr_id`](#oauth_svc_acc_tok_mgr_id)
+      - [`oauth_svc_acc_tok_mgr_core_attrs`](#oauth_svc_acc_tok_mgr_core_attrs)
+      - [`oauth_svc_acc_tok_mgr_extd_attrs`](#oauth_svc_acc_tok_mgr_extd_attrs)
+    + [OAuth OpenID Connect Policy Contracts](#oauth-openid-connect-policy-contracts)
+      - [`oauth_oidc_policy_id`](#oauth_oidc_policy_id)
+      - [`oauth_oidc_id_userinfo`](#oauth_oidc_id_userinfo)
+      - [`oauth_oidc_policy_core_map`](#oauth_oidc_policy_core_map)
+      - [`oauth_oidc_policy_extd_map`](#oauth_oidc_policy_extd_map)
+      - [`oauth_authn_policy_map`](#oauth_authn_policy_map)
+    + [`social_adapter`](#social_adapter)
+        * [`name`](#name-1)
+        * [`enable`](#enable)
+        * [`package_list`](#package_list-1)
+        * [`package_ensure`](#package_ensure-1)
+        * [`app_id`](#app_id)
+        * [`app_secret`](#app_secret)
+        * [`oauth_token_map`](#oauth_token_map)
+        * [`oauth_idp_map`](#oauth_idp_map)
+    + [OAuth Clients](#oauth-clients)
+      - [`oauth_client_default`](#oauth_client_default)
+      - [`oauth_client`](#oauth_client)
+- [Limitations](#limitations)
+  * [Operating System Support](#operating-system-support)
+  * [Known Issues](#known-issues)
+- [Development](#development)
+  * [Using Augeas to edit XML configuration files](#using-augeas-to-edit-xml-configuration-files)
+  * [Using templates and concat to build JSON request files for the REST API.](#using-templates-and-concat-to-build-json-request-files-for-the-rest-api)
+  * [Invoking the administrative REST API (pf-admin-api)](#invoking-the-administrative-rest-api-pf-admin-api)
+    + [pf-admin-api idempotent REST API client](#pf-admin-api-idempotent-rest-api-client)
+    + [oauth_jdbc_augeas script](#oauth_jdbc_augeas-script)
+
+<!-- tocstop -->
 
 ## Description
 
@@ -828,6 +973,41 @@ pingfederate::social_adapter:
 ###### `oauth_idp_map`
   (Map) Mapping of attributes to idp attributes consisting of `name`,`type`,`value` triples.
   `type` is one of ADAPTER, TEXT, EXPRESSION, ...
+
+#### OAuth Clients
+##### `oauth_client_default`
+  (Map) Default values for each OAuth client. These values get overriden by the individual client
+  definitions with these defaults (which you can override as you see fit):
+  ```
+pingfederate::oauth_client_default:
+  clientId: ''
+  redirectUris: []
+  grantTypes: []
+  name: ''
+  description: ''
+  logoUrl: ''
+  validateUsingAllEligibleAtms: false
+  refreshRolling: SERVER_DEFAULT
+  persistentGrantExpirationType: SERVER_DEFAULT
+  persistentGrantExpirationTime: 0
+  persistentGrantExpirationTimeUnit: DAYS
+  bypassApprovalPage: true
+  restrictScopes: true
+  restrictedScopes: []
+  oidcPolicy:
+    grantAccessSessionRevocationApi: false
+    pingAccessLogoutCapable: false
+    logoutUris: []
+  clientAuth:
+    type: SECRET
+    secret: ''
+    clientCertIssuerDn: ''
+    clientCertSubjectDn: ''
+  ```
+
+##### `oauth_client`
+  (Array) List of maps for each OAuth client.
+  See the `oauth_client_default` description for details.
 
 ## Limitations
 
