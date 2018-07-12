@@ -90,8 +90,10 @@ class pingfederate::config inherits ::pingfederate {
       group   => $::pingfederate::group,
     }
   }
-  # add a warning to every Augeas-managed file
-  $aug_comment = 'set #comment[preceding-sibling::*][1] " THIS FILE IS MANAGED BY PUPPET. DO NOT EDIT BY HAND. "'
+  # Add a warning comment to every Augeas-managed file. 
+  # N.B. This comment appears to get edited to remove leading/trailing whitespace if Pingfederate edits the XML
+  # even though no "real" changes happen. This leads to the service being restarted, so remove the whitespace.
+  $aug_comment = 'set #comment[preceding-sibling::*][1] "THIS FILE IS MANAGED BY PUPPET. DO NOT EDIT BY HAND."'
   # create initial administrator user so that we can invoke the rest APIs
   $adm_file = "$::pingfederate::install_dir/server/default/data/pingfederate-admin-user.xml"
   augeas{$adm_file:

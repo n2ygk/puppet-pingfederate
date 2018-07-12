@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.3.2 [July 12, 2018]
+- pf editing puppet-managed XML was changing the "do not edit" comment, causing an unneccessary service restart in some cases.
+
 ## 0.3.1 [July 11, 2018]
 - pf-admin-api POST -> PUT behavior
 
