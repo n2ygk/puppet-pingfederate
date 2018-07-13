@@ -35,7 +35,8 @@ class pingfederate::oauth_jdbc_datastore inherits ::pingfederate {
       subscribe   => File["${::pingfederate::install_dir}/local/bin/oauth_jdbc_augeas"],
       command     => "${::pingfederate::install_dir}/local/bin/oauth_jdbc_augeas",
       refreshonly => true,
-      user        => $::pingfederate::owner,
+      # run as root to get around augeas xfer_attrs error that I don't understand.
+      # user        => $::pingfederate::owner,
       logoutput   => true,
     }
   }

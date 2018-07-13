@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.3.3 [July 13, 2018]
+- workaround mistmatch between pingfederate's gid in RPM vs. system which caused augtool to fail on xfer_attrs.
+
 ## 0.3.2 [July 12, 2018]
 - pf editing puppet-managed XML was changing the "do not edit" comment, causing an unneccessary service restart in some cases.
 
