@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.3.4 [July 13, 2018]
+- give up on trying to fix random toggling of embedded whitespace in XML comment.
+
 ## 0.3.3 [July 13, 2018]
 - workaround mistmatch between pingfederate's gid in RPM vs. system which caused augtool to fail on xfer_attrs.
 
