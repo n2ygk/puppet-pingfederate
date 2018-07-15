@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.3.6 [July 15, 2018]
+- correct oauth/clients creation to happen after oauth_jdbc configuration change.
+
 ## 0.3.4 [July 13, 2018]
 - give up on trying to fix random toggling of embedded whitespace in XML comment.
 

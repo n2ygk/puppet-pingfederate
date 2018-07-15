@@ -389,30 +389,4 @@ class pingfederate::server_settings inherits ::pingfederate {
       logoutput   => true,
     }
   }
-
-  ###
-  # OAUTH CLIENTS
-  ###
-  $::pingfederate::oauth_client.each |$a| {
-    $b = deep_merge($::pingfederate::oauth_client_default,$a)
-    $n=$b['clientId']
-    $un=uriescape($n)
-    $oac = "oauth/clients"
-    $oact = "oauth_clients"
-    $oacf = "${oact}_${un}"
-    file {"${etc}/${oacf}.json":
-      ensure   => 'present',
-      mode     => 'a=r',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
-      content  => template("pingfederate/${oact}.json.erb"),
-      require => Exec["pf-admin-api PUT ${oas}"]  # scopes have to be defined before they can be used.
-    } ~>
-    exec {"pf-admin-api POST ${oacf}":
-      command     => "${pfapi} -m POST -j ${etc}/${oacf}.json -r ${etc}/${oacf}.json.out -k clientId -i ${etc}/${oacf}.id ${oac}", # || rm -f ${oacf}.json",
-      refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
-    }
-  }
 }
