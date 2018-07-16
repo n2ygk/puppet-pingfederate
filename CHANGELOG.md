@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.3.7 [unreleased]
+- updates to README
+- change `oauth_jdbc_augeas` to use dataStores.id instead of parsing jndi from the JSON file.
+- PF version >= 9: configure CORS via oauth API instead of webdefault.xml
+
 ## 0.3.6 [July 15, 2018]
 - correct oauth/clients creation to happen after oauth_jdbc configuration change.
 

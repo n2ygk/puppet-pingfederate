@@ -7,6 +7,7 @@
 <!-- toc -->
 
 - [Description](#description)
+- [Compatibility](#compatibility)
 - [Setup](#setup)
   * [Beginning with pingfederate](#beginning-with-pingfederate)
 - [Usage](#usage)
@@ -163,7 +164,6 @@
   * [Known Issues](#known-issues)
 - [Development](#development)
   * [Using Augeas to edit XML configuration files](#using-augeas-to-edit-xml-configuration-files)
-  * [Using templates and concat to build JSON request files for the REST API.](#using-templates-and-concat-to-build-json-request-files-for-the-rest-api)
   * [Invoking the administrative REST API (pf-admin-api)](#invoking-the-administrative-rest-api-pf-admin-api)
     + [pf-admin-api idempotent REST API client](#pf-admin-api-idempotent-rest-api-client)
     + [oauth_jdbc_augeas script](#oauth_jdbc_augeas-script)
@@ -176,6 +176,10 @@ This module installs and configures the
 [PingFederate](https://www.pingidentity.com/en/products/pingfederate.html) server using
 Puppet instead of the more typical interactive shell-script approach.
 
+## Compatibility
+
+This module has been tested with PingFederate 8.x - 9.x and related social adapters (in progress).
+
 ## Setup
 
 ### Beginning with pingfederate
@@ -186,13 +190,16 @@ manual steps.
 
 ## Usage
 
-The module installs PingFederate and performs basic static configuration of the
-server, that is, things that are changed prior to starting it up. These include the 
-`run.properties` and various configuration XML files, and installation of the license key.
-More advanced administrative configuraton is also done to the point of being able to
+The module installs PingFederate, performs basic static configuration of the
+server, that is, things that are changed prior to starting it up, and post-startup administration.
+The static configuration includes the run.properties` and various configuration XML files, 
+and installation of the license key.
+
+The administrative configuraton is done to the point of being able to
 build a completely configuration-as-code PingFederate instance that does real work.
 
-If you have access to the RPMs (custom-built; not distributed by PingIdentity),
+If you have access to the RPMs (custom-built; not distributed by PingIdentity, but see
+[this example SPEC file](examples/pingfederate.spec) and [this init.d script](examples/pingfederate-init)),
 this module will install them, if not, install it the usual way by downloading and unzipping; you can still
 use this module to manage the configuration.
 
@@ -448,25 +455,31 @@ for an explanation. The defaults are as distributed by PingIdentity.
 #### Cross-Origin Resource Sharing (CORS)
 CORS needs to be enabled as otherwise Javascript OAuth clients will throw an XHR error
 when attempting [XMLHttpRequest (XHR)](https://en.wikipedia.org/wiki/XMLHttpRequest).
-Most of these settings should be left as defaulted.
+Most of these settings should be left with default values.
 
 ##### `cors_allowedOrigins`
   (string)
-  Allowed origins for CORS. Default `*`
+  Comma-separated list of allowed origins for CORS. Default `*`
 
   You might want to constrain the allowed origins (if you can figure out what the right list should be).
 
 ##### `cors_allowedMethods`
   (string)
   Allowed HTTP methods for CORS. Default `GET,OPTIONS,POST`
+
+  Deprecation: No longer applicable for PingFederate version >= 9.0
   
 ##### `cors_allowedHeaders`
   (string)
   Allowed HTTP headers for CORS. Default `X-Requested-With,Content-Type,Accept,Origin,Authorization`
 
+  Deprecation: No longer applicable for PingFederate version >= 9.0
+
 ##### `cors_filter_mapping`
   (string)
   Allowed URL filter mappings for CORS. Default `/*`
+
+  Deprecation: No longer applicable for PingFederate version >= 9.0
 
 #### OGNL expressions
 ##### `ognl_expressions_enable`
@@ -1035,6 +1048,7 @@ Known issues include:
 will not get fixed later, even if the database access is fixed.
 - If you set some `pingfederate::log_levels` and then remove them, the last settings remain;
 original values are not restored.
+- Facebook adapter 2.x configuration is broken.
 
 ## Development
 
@@ -1121,17 +1135,11 @@ it will all be run together with no indentation. Do not fear as this is still va
 See [these additional notes](notes.md) for more background on how to
 develop configuration puppet modules based on diffs of XML config files.
 
-### Using templates and concat to build JSON request files for the REST API.
-
-See the various [templates](./templates) and the [pingfederate::server_settings](manifests/server_settings.pp)
-class for examples of using ERB templates in conjunction with the [concat](https://forge.puppet.com/puppetlabs/concat)
-module to assemble JSON files that include both parameterized templates and inclusion of file fragements containing IDs.
-
-
 ### Invoking the administrative REST API (pf-admin-api)
-Some configuration is done via the
+Most configuration is done via the
 [PingFederate Administrative API](https://documentation.pingidentity.com/pingfederate/pf83/index.shtml#adminGuide/concept/pingFederateAdministrativeApi.html).
-Unfortunately, some related configuration is done by editing XML files, using data returned from the API call. For example,
+
+Unfortunately, one key configuration is done by editing XML files, using data returned from the API call. For example,
 the process for adding a mysql data store for oauth client management consists of:
 
 1. Install the appropriate JDBC connector jar file in `<pf-install>/server/default/lib`.
@@ -1145,13 +1153,12 @@ returned by the POST.
 
 #### pf-admin-api idempotent REST API client
 [pf-admin-api.erb](templates/pf-admin-api.erb) is a templated Python script which invokes the REST API.
-The script is templated to embed the default name of "this" server's configuration file.
+The script is templated to embed the default name of "this" server's configuration file as a default value.
 
 Input data for POSTs done by pf-admin-api are also templated. Installing the JSON file is the trigger 
 to Execing the pf-admin-api script. The script waits for the server to come up so can be used as 'waiter'
-when the service has to be restarted, which unfortunately is necessary at multiple points in the 
-configuration process (e.g. after adding a new JAR to the classpath, after editing some XML configuration
-files, and so on).
+when the service has to be restarted, which unfortunately is necessary at a point in the 
+configuration process (configuring the JDBC connector).
 
 ```
 Usage: pf-admin-api [options] resource
@@ -1166,8 +1173,14 @@ Options:
                         [default: GET]
   -j JSON, --json=JSON  JSON file to POST
   -i ID, --id=ID        write resource id to file [default: none]
+  -k IDKEY, --idkey=IDKEY
+                        resource id primary key [default: id]
   -r RESPONSE, --response=RESPONSE
                         write succesful JSON response to file [default: -]
+  -s SUBST, --subst=SUBST
+                        --subst key=filename. Substitutes the given @@key@@
+                        in the JSON document with the content of the named file.
+                        May be repeated to substitute multple keys.
   --timeout=TIMEOUT     Seconds before timeout [default: 10]
   --retries=RETRIES     Number of retries [default: 5]
   --verify              verify SSL/TLS server certificate [default: False]
@@ -1259,7 +1272,6 @@ into templated JSON or XML fragments.
 than having Puppet manage them. This is ugly but the only way to make it happen in one unit of work. (It's really the
 fault of the app for not having a clean set of APIs that do everything.) It's kinda ugly, using augeas three times:
 1. pulls the jndi-name out of the API result file created by pf-admin-api.
-2. Edits hivemodule.xml to switch from using built-in XML datastore to JDBC.
-3. Edits and org.sourceid.oauth20.domain.ClientManagerJdbcImpl.xml to stuff in the jndi-name.
+2. Edits several files in `<pf_install_dir>server/default/data/config-store`.
 
 There's also an `oauth_jdbc_revert_augeas` script that reverts back to the built-in non-JDBC datastore.

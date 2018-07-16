@@ -145,6 +145,7 @@ class pingfederate (
   $oauth_client_default                = $::pingfederate::params::oauth_client_default,
   ) inherits ::pingfederate::params {
 
+  notify {"pingfederate version 0.3.7":}  # don't forget to update this!
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])
   if $cluster_bind_address != 'NON_LOOPBACK' {
     validate_ip_address($cluster_bind_address)
