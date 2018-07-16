@@ -42,11 +42,10 @@ class pingfederate::server_settings inherits ::pingfederate {
   }
 
 
-  # authenticationPolicyContracts link sp/idpConnections and oauth/authenticationPolicyContractMappings
-  # by the 'id' that is the result of a POST. We identify our contacts by the 'name' which is used in
-  # the JSON filename in order to find the 'id' to link by. oauth/authServerSettings comes first because
-  # if defines the persistentGrantContract attributes that are referenced by these.
+  # Pingfederate version >= 9 sets oauth CORS via an oauth/authServerSettings instead of editing webdefault.xml
 
+  $allowed_origins = split($::pingfederate::cors_allowedOrigins, ',')
+  $pf_ver = $::pingfederate::package_ensure
   $oas = "oauth/authServerSettings"
   $oasf = "oauth_authServerSettings"
   file {"${etc}/${oasf}.json":
@@ -62,6 +61,11 @@ class pingfederate::server_settings inherits ::pingfederate {
     user        => $::pingfederate::owner,
     logoutput   => true,
   }
+
+  # authenticationPolicyContracts link sp/idpConnections and oauth/authenticationPolicyContractMappings
+  # by the 'id' that is the result of a POST. We identify our contacts by the 'name' which is used in
+  # the JSON filename in order to find the 'id' to link by. oauth/authServerSettings comes first because
+  # if defines the persistentGrantContract attributes that are referenced by these.
 
   $apc = "authenticationPolicyContracts"
   $::pingfederate::auth_policy_contract.each |$a| {

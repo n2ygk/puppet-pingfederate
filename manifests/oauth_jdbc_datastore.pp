@@ -17,8 +17,9 @@
 #
 class pingfederate::oauth_jdbc_datastore inherits ::pingfederate {
   if $::pingfederate::oauth_jdbc_type {
-    $ds = "${::pingfederate::install_dir}/local/etc/dataStores.json"
-    file { $ds:
+    $ds = "${::pingfederate::install_dir}/local/etc/dataStores"
+    $pfapi = "${::pingfederate::install_dir}/local/bin/pf-admin-api"
+    file { "${ds}.json":
       ensure   => 'present',
       mode     => 'u=r,go=',
       owner    => $::pingfederate::owner,
@@ -26,7 +27,7 @@ class pingfederate::oauth_jdbc_datastore inherits ::pingfederate {
       content  => template('pingfederate/dataStores.json.erb'),
     } ~>
     exec {'pf-admin-api POST dataStores':
-      command     => "${::pingfederate::install_dir}/local/bin/pf-admin-api -m POST -j ${ds} -r ${ds}.out dataStores", # || rm -f ${ds}
+      command     => "${pfapi} -m POST -j ${ds}.json -r ${ds}.out -i ${ds}.id dataStores", # || rm -f ${ds}
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,

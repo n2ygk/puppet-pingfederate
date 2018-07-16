@@ -148,11 +148,11 @@ class pingfederate::config inherits ::pingfederate {
                 "set config/item/#text \"${::pingfederate::ognl_expressions_enable}\""]
   }
 
-  # enable CORS
+  # enable CORS (for version < 9.0; in >= 9.0, this is now an oauth configuration setting)
   # This adds a new CrossOriginFilter and enables the OPTIONS method in the security-constraint
   # Adding OPTIONS involves appending a new entry to web-resource-collection for url-pattern="/*"
   # and changing the documentation of that node to indicate OPTIONS is now permitted.
-  if $::pingfederate::cors_allowedOrigins {
+  if $::pingfederate::cors_allowedOrigins and $::pingfederate::package_ensure < '9' {
       $cors_file = "$::pingfederate::install_dir/etc/webdefault.xml"
       augeas{$cors_file:
         lens    => 'Xml.lns',

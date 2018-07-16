@@ -1,4 +1,11 @@
 {
+<% if scope.function_versioncmp([@pf_ver, '9.0']) >= 0 -%>
+  "allowedOrigins": [
+<%   @allowed_origins.each_with_index do |val, i| -%>
+    "<%= val -%>"<%= ',' if i < (@allowed_origins.size - 1) %>
+  ],
+<%   end -%>
+<% end -%>
   "scopes": [
 <% @oauth_svc_scopes.each_with_index do |val, i| -%>
       {
