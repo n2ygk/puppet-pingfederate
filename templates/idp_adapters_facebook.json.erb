@@ -7,18 +7,75 @@
   "name": "Facebook", 
   "attributeMapping": {
     "attributeContractFulfillment": {
-      "bio": {
-	"source": {
-	  "type": "ADAPTER"
-	}, 
-	"value": "bio"
-      }, 
+<% if scope.function_versioncmp([@b['package_ensure'], '2.0']) < 0 -%>
       "about": {
 	"source": {
 	  "type": "ADAPTER"
 	}, 
 	"value": "about"
       }, 
+      "birthday": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "birthday"
+      }, 
+      "bio": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "bio"
+      }, 
+      "education": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "education"
+      }, 
+      "hometown": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "hometown"
+      }, 
+      "location": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "location"
+      }, 
+      "quotes": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "quotes"
+      }, 
+      "work": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "work"
+      }, 
+<% else -%>
+      "age_range": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "age_range"
+      }, 
+      "cover": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "cover"
+      }, 
+      "picture": {
+	"source": {
+	  "type": "ADAPTER"
+	}, 
+	"value": "picture"
+      }, 
+<% end -%>
       "last_name": {
 	"source": {
 	  "type": "ADAPTER"
@@ -49,18 +106,6 @@
 	}, 
 	"value": "locale"
       }, 
-      "hometown": {
-	"source": {
-	  "type": "ADAPTER"
-	}, 
-	"value": "hometown"
-      }, 
-      "work": {
-	"source": {
-	  "type": "ADAPTER"
-	}, 
-	"value": "work"
-      }, 
       "first_name": {
 	"source": {
 	  "type": "ADAPTER"
@@ -73,29 +118,11 @@
 	}, 
 	"value": "updated_time"
       }, 
-      "quotes": {
-	"source": {
-	  "type": "ADAPTER"
-	}, 
-	"value": "quotes"
-      }, 
-      "birthday": {
-	"source": {
-	  "type": "ADAPTER"
-	}, 
-	"value": "birthday"
-      }, 
       "link": {
 	"source": {
 	  "type": "ADAPTER"
 	}, 
 	"value": "link"
-      }, 
-      "location": {
-	"source": {
-	  "type": "ADAPTER"
-	}, 
-	"value": "location"
       }, 
       "email": {
 	"source": {
@@ -115,12 +142,6 @@
 	}, 
 	"value": "timezone"
       }, 
-      "education": {
-	"source": {
-	  "type": "ADAPTER"
-	}, 
-	"value": "education"
-      }, 
       "id": {
 	"source": {
 	  "type": "ADAPTER"
@@ -137,6 +158,14 @@
   }, 
   "attributeContract": {
     "coreAttributes": [
+<%# some core attributes are changed between 1.x and 2.x -%>
+<%# https://docs.pingidentity.com/bundle/fbcic20_sm_facebookCloudIdentityConnector/page/fbcic_c_adapterCoreAttribute.html#fbcic_adapterCoreAttribute -%>
+<% if scope.function_versioncmp([@b['package_ensure'], '2.0']) < 0 -%>
+      {
+	"pseudonym": false, 
+	"name": "about", 
+	"masked": false
+      }, 
       {
 	"pseudonym": false, 
 	"name": "birthday", 
@@ -144,7 +173,12 @@
       }, 
       {
 	"pseudonym": false, 
-	"name": "updated_time", 
+	"name": "bio", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "education", 
 	"masked": false
       }, 
       {
@@ -154,7 +188,39 @@
       }, 
       {
 	"pseudonym": false, 
-	"name": "education", 
+	"name": "location", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "quotes", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "work", 
+	"masked": false
+      }, 
+<% else -%>
+      {
+	"pseudonym": false, 
+	"name": "age_range", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "cover", 
+	"masked": false
+      }, 
+      {
+	"pseudonym": false, 
+	"name": "picture", 
+	"masked": false
+      }, 
+<% end -%>
+      {
+	"pseudonym": false, 
+	"name": "updated_time", 
 	"masked": false
       }, 
       {
@@ -169,27 +235,12 @@
       }, 
       {
 	"pseudonym": false, 
-	"name": "work", 
-	"masked": false
-      }, 
-      {
-	"pseudonym": false, 
-	"name": "about", 
-	"masked": false
-      }, 
-      {
-	"pseudonym": false, 
 	"name": "link", 
 	"masked": false
       }, 
       {
 	"pseudonym": false, 
 	"name": "verified", 
-	"masked": false
-      }, 
-      {
-	"pseudonym": false, 
-	"name": "bio", 
 	"masked": false
       }, 
       {
@@ -209,22 +260,12 @@
       }, 
       {
 	"pseudonym": false, 
-	"name": "quotes", 
-	"masked": false
-      }, 
-      {
-	"pseudonym": false, 
 	"name": "access_token", 
 	"masked": false
       }, 
       {
 	"pseudonym": true, 
 	"name": "name", 
-	"masked": false
-      }, 
-      {
-	"pseudonym": false, 
-	"name": "location", 
 	"masked": false
       }, 
       {
@@ -254,6 +295,9 @@
   "configuration": {
     "tables": [
       {
+<% if scope.function_versioncmp([@b['package_ensure'], '2.0']) >= 0 -%>
+        "rows": [],
+<% else -%>
 	"rows": [
 	  {
 	    "fields": [
@@ -268,6 +312,7 @@
 	    ]
 	  }
 	], 
+<% end -%>
 	"name": "Scope Permissions"
       }
     ], 
@@ -306,7 +351,11 @@
       }, 
       {
 	"name": "Facebook User Data URL", 
+<% if scope.function_versioncmp([@b['package_ensure'], '2.0']) >= 0 -%>
+	"value": "https://graph.facebook.com/me"
+<% else -%>
 	"value": "https://graph.facebook.com/v2.2/me"
+<% end -%>
       }
     ]
   }

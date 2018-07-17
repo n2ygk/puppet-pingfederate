@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## 0.3.7 [unreleased]
+## 0.3.8 [unreleased]
+- Support for Facebook cloud identity connector 2.0
+
+## 0.3.7 [July 16, 2018]
 - updates to README
 - change `oauth_jdbc_augeas` to use dataStores.id instead of parsing jndi from the JSON file.
 - PF version >= 9: configure CORS via oauth API instead of webdefault.xml
