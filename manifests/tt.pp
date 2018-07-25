@@ -1,5 +1,9 @@
-[{'name' => 'a'},{'name' => 'b'},{'name' => 'c'}].each |$a| {
-  $b = $a
-  notify { $b['name']: }
+$stuff = {
+  'a' => {'id' => 'A'},
+  'b' => {'id' => 'B'},
+}
+
+$stuff.each |$k, $v| {
+  notify { "${k}: ${v['id']}": }
 }
 

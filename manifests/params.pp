@@ -86,9 +86,8 @@ class pingfederate::params {
     'cert_content' => undef,
     'oauth_token_map' => undef
   }
-  $social_adapter                      = []
-  $social_adapter_default              = {
-    'name' => undef,
+  $social_adapter                      = {}  # hash of hashes keyed by adapter name
+  $social_adapter_default              = {   # default hash values
     'enable' => false,
     'package_list' => undef,
     'package_ensure' => undef,

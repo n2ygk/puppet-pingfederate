@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## 0.3.8 [unreleased]
+## 0.4.0 [unreleased]
+- Change social_adapter from array of hashes to hash of hashes keyed by adapter name (e.g. facebook)
+
+## 0.3.8 [July 17, 2018]
 - Support for Facebook cloud identity connector 2.0
 
 ## 0.3.7 [July 16, 2018]

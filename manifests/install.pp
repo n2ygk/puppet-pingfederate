@@ -25,10 +25,10 @@ class pingfederate::install inherits ::pingfederate {
   }
 
   # TBD: Refactor to a list of adapters to add? Or to download from PingIdentity.com?
-  $::pingfederate::social_adapter.each |$a| {
+  $::pingfederate::social_adapter.each |$name, $a| {
     $b = deep_merge($::pingfederate::social_adapter_default,$a)
     if str2bool($b['enable']) {
-      $plist = if $b['package_list'] { $b['package_list'] } else { "pingfederate-${b['name']}-adapter" }
+      $plist = if $b['package_list'] { $b['package_list'] } else { "pingfederate-${name}-adapter" }
       $ens = if $b['package_ensure'] { $b['package_ensure'] } else { 'installed' }
       ensure_packages($plist, {'ensure' => $ens})
     }

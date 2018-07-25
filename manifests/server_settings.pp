@@ -246,10 +246,10 @@ class pingfederate::server_settings inherits ::pingfederate {
   # TODO: make sure an adapter wasn't previously defined and is now removed. Removal happens
   # in the reverse order of addition!
 
-  $::pingfederate::social_adapter.each |$a| {
+  $::pingfederate::social_adapter.each |$name, $a| {
     $b = deep_merge($::pingfederate::social_adapter_default,$a)
-    $n=$b['name']
-    $un=uriescape($n)
+    $n = $name
+    $un = uriescape($n)
     if str2bool($b['enable']) {
       $ida = "idp/adapters"
       $idaf = "idp_adapters_${un}"
