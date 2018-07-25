@@ -23,12 +23,12 @@ class pingfederate::admin inherits ::pingfederate {
     # OAUTH CLIENTS need to be added *after* the oauth_jdbc_datastore is changed.
     # (I had to move this out of server_settings because of that.)
     ###
-    $::pingfederate::oauth_client.each |$a| {
+    $::pingfederate::oauth_client.each |$clientId, $a| {
       $pfapi = "${::pingfederate::install_dir}/local/bin/pf-admin-api"
       $etc = "${::pingfederate::install_dir}/local/etc"
 
       $b = deep_merge($::pingfederate::oauth_client_default,$a)
-      $n=$b['clientId']
+      $n=$clientId
       $un=uriescape($n)
       $oac = "oauth/clients"
       $oact = "oauth_clients"

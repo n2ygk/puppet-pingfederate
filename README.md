@@ -993,7 +993,6 @@ pingfederate::social_adapter:
   definitions with these defaults (which you can override as you see fit):
   ```
 pingfederate::oauth_client_default:
-  clientId: ''
   redirectUris: []
   grantTypes: []
   name: ''
@@ -1019,8 +1018,38 @@ pingfederate::oauth_client_default:
   ```
 
 ##### `oauth_client`
-  (Array) List of maps for each OAuth client.
+  (Map of maps) for each OAuth client, keyed by a unique client identifier.
   See the `oauth_client_default` description for details.
+
+  Example:
+  ```
+  demo_trusted_client:
+    name: demo_trusted_client
+    description: training demo trusted auth-none or auth-columbia client
+    grantTypes:
+      - IMPLICIT
+      - AUTHORIZATION_CODE
+      - CLIENT_CREDENTIALS
+      - REFRESH_TOKEN
+    bypassApprovalPage: false
+    redirectUris:
+      - http://localhost:5432/oauth2client
+      - https://www.getpostman.com/oauth2/callback
+    restrictedScopes:
+      - auth-none
+      - auth-columbia
+      - demo-netphone-admin
+      - create
+      - read
+      - update
+      - delete
+      - openid
+      - profile
+      - email
+    clientAuth:
+      type: SECRET
+      secret: 73a7176Ab322549FCBEF46554d3381d5
+  ```
 
 ## Limitations
 

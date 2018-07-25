@@ -1,6 +1,6 @@
 <%# Managed by Puppet. DO NOT EDIT -%>
 {
-  "clientId": "<%= @b['clientId'] -%>",
+  "clientId": "<%= @clientId -%>",
   "redirectUris": [
 <% @b['redirectUris'].each_with_index do |val, i| -%>
     "<%= val -%>"<%= ',' if i < (@b['redirectUris'].size - 1) %>
