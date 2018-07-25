@@ -923,7 +923,7 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   ```
 
 #### `social_adapter`
-  (Map of maps) Social identity adapters (facebook, google, linkedin, etc.) have the following map keys.
+  (Map of maps) Social identity adapters have the following map keys.
   Example:
   ```
 pingfederate::social_adapter:
@@ -955,7 +955,7 @@ pingfederate::social_adapter:
    ```
 ###### key
   (string)
-  Name of the adapter.
+  Name of the adapter. One of: facebook, google, twitter, linkedin, windowslive.
 
 ###### `enable`
   (boolean)
