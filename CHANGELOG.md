@@ -1,7 +1,9 @@
 # CHANGELOG
 
-## 0.4.0 [unreleased]
-- Change social_adapter from array of hashes to hash of hashes keyed by adapter name (e.g. facebook)
+## 0.4.0 [July 25, 2018]
+- Change several arrays of hashes to hash of hashes to facilitate [hiera yaml key merging](https://puppet.com/docs/puppet/5.0/hiera_merging.html):
+  - social_adapter
+  - oauth_client
 
 ## 0.3.8 [July 17, 2018]
 - Support for Facebook cloud identity connector 2.0
