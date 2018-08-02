@@ -134,6 +134,7 @@ class pingfederate::params {
   $oauth_oidc_id_userinfo              = false
   $oauth_oidc_policy_core_map          = []
   $oauth_oidc_policy_extd_map          = []
+  $oauth_oidc_policy_scope_attr_map    = {}
   $oauth_client                        = {}
   $oauth_client_default                = {
     'redirectUris' => [],

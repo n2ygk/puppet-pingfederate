@@ -6,6 +6,21 @@
     "id": "<%= @oauth_svc_acc_tok_mgr_id -%>", 
     "location": "<%= @adm_api_baseURL -%>/oauth/accessTokenManagers/<%= @oauth_svc_acc_tok_mgr_id -%>"
   }, 
+<% if scope.function_versioncmp([@pf_ver, '9.0']) >= 0 -%>
+  "scopeAttributeMappings": {
+<%  i = 0 -%>
+<%  @oauth_oidc_policy_scope_attr_map.each do |scope, claims| -%>
+     "<%= scope -%>": {
+         "values": [
+<%           claims.each_with_index do |claim, j| -%>
+	     "<%= claim -%>"<%= ',' if j < (claims.size - 1) %>
+<%            end -%>
+         ]
+     }<%= ',' if i < (@oauth_oidc_policy_scope_attr_map.size - 1) %>
+<%  i = i + 1 -%>
+<%  end -%>
+  },
+<% end -%>
   "includeUserInfoInIdToken": <%= @oauth_oidc_id_userinfo %>,
   "attributeContract": {
     "coreAttributes": [

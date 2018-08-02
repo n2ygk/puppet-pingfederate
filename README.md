@@ -911,6 +911,20 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   ...
   ```
 
+##### `oauth_oidc_policy_scope_attr_map`
+  (hash of hashes)(PingFederate version 9+ only) Mappings of OpenID scopes to claims returned for those scopes.
+  Default: `{}`. In PF versions before 9, mappings are fixed per the
+  [OpenID connect](http://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims) standard (for profile, address,
+  phone, and email scopes). Here's an example:
+  ```
+  oauth_oidc_policy_scope_attr_map  => {
+     'profile' => ['given_name', 'family_name', 'name'],
+     'email'   => ['email'],
+     'address' => ['address'],
+	 'https://apis.example.com/scope/group' => ['https://apis.example.com/claim/group'], # a custom claim and scope to select it
+  },
+  ```
+
 ##### `oauth_authn_policy_map`
   OAuth Authentication policy contract mappings. Default `[]`. Example:
   ```

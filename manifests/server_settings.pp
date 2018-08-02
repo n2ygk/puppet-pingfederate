@@ -130,6 +130,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     }
   } # endif $::pingfederate::oauth_svc_acc_tok_mgr_id
 
+  # TODO: refactor to iterate over a list of policies
   if $::pingfederate::oauth_oidc_policy_id {
     $oip = "oauth/openIdConnect/policies"
     $oipf = "oauth_openIdConnect_policies"

@@ -1,4 +1,6 @@
 # CHANGELOG
+## 0.4.1 [Auguest 2, 2018]
+- Added `oauth_oidc_policy_scope_attr_map` which allows customizing which claims are returned by given scopes
 
 ## 0.4.0 [July 25, 2018]
 - Change several arrays of hashes to hash of hashes to facilitate [hiera yaml key merging](https://puppet.com/docs/puppet/5.0/hiera_merging.html):
