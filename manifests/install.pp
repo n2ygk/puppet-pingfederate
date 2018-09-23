@@ -95,9 +95,19 @@ class pingfederate::install inherits ::pingfederate {
     content  => template('pingfederate/pf-admin-cfg.json.erb')
   }
   # If using an external JDBC database, install the JAR on the classpath and initialize the database.
-  if $::pingfederate::oauth_jdbc_type {  
+  if $::pingfederate::oauth_jdbc_type {    # sometimes the jar is in an RPM
     if $::pingfederate::oauth_jdbc_package_ensure {
       ensure_packages($::pingfederate::o_pkgs,{'ensure' => $::pingfederate::oauth_jdbc_package_ensure})
+    }
+    if $::pingfederate::oauth_jdbc_nexus { # other times the jar is in a nexus repo
+      archive::nexus { "${::pingfederate::o_jar_dir}/${::pingfederate::o_jar}":
+        url        => $::pingfederate::o_nexus['url'],
+        gav        => $::pingfederate::o_nexus['gav'],
+        repository => $::pingfederate::o_nexus['repo'],
+        packaging  => 'jar',
+        extract    => false,
+        before     => File["${::pingfederate::install_dir}/server/default/lib/${::pingfederate::o_jar}"],
+      }
     }
     file { "${::pingfederate::install_dir}/server/default/lib/${::pingfederate::o_jar}":
       ensure => 'present',

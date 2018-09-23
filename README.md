@@ -118,6 +118,7 @@
       - [`oauth_jdbc_driver`](#oauth_jdbc_driver)
       - [`oauth_jdbc_package_list`](#oauth_jdbc_package_list)
       - [`oauth_jdbc_package_ensure`](#oauth_jdbc_package_ensure)
+      - [`oauth_jdbc_nexus`](#oauth_jdbc_nexus)
       - [`oauth_jdbc_jar_dir`](#oauth_jdbc_jar_dir)
       - [`oauth_jdbc_jar`](#oauth_jdbc_jar)
       - [`oauth_jdbc_url`](#oauth_jdbc_url)
@@ -146,9 +147,10 @@
       - [`oauth_oidc_id_userinfo`](#oauth_oidc_id_userinfo)
       - [`oauth_oidc_policy_core_map`](#oauth_oidc_policy_core_map)
       - [`oauth_oidc_policy_extd_map`](#oauth_oidc_policy_extd_map)
+      - [`oauth_oidc_policy_scope_attr_map`](#oauth_oidc_policy_scope_attr_map)
       - [`oauth_authn_policy_map`](#oauth_authn_policy_map)
     + [`social_adapter`](#social_adapter)
-        * [`name`](#name-1)
+        * [key](#key)
         * [`enable`](#enable)
         * [`package_list`](#package_list-1)
         * [`package_ensure`](#package_ensure-1)
@@ -728,6 +730,18 @@ If it is `undef` then the default internal XML-based datastore will be used.
   (string)
   Ensure that the package is installed.
   Default: `'installed'`
+
+##### `oauth_jdbc_nexus`
+  (map)
+  Identifies the nexus repo that contains the JDBC connector (when it's not available as a package).
+  Has three keys that roughly correspond to those used by `archive::nexus`: `url`, `repo` and `gav`
+  (groupId:appId:version). For example:
+  ```
+          url    => 'https://repo1.maven.org/maven2/',
+          repo   => 'central',
+          gav    => 'com.microsoft.sqlserver:mssql-jdbc:7.0.0.jre8',
+  ```
+
 
 ##### `oauth_jdbc_jar_dir`
   (string)

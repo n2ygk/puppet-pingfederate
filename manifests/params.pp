@@ -113,6 +113,7 @@ class pingfederate::params {
   $oauth_jdbc_package_ensure           = 'installed'
   $oauth_jdbc_jar_dir                  = undef
   $oauth_jdbc_jar                      = undef
+  $oauth_jdbc_nexus                    = undef
   $oauth_jdbc_validate                 = undef
   $oauth_jdbc_create_cmd               = undef
   $oauth_jdbc_client_ddl_cmd           = undef

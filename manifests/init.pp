@@ -105,6 +105,7 @@ class pingfederate (
   $oauth_jdbc_package_ensure           = $::pingfederate::params::oauth_jdbc_package_ensure,
   $oauth_jdbc_jar_dir                  = $::pingfederate::params::oauth_jdbc_jar_dir,
   $oauth_jdbc_jar                      = $::pingfederate::params::oauth_jdbc_jar,
+  $oauth_jdbc_nexus                    = $::pingfederate::params::oauth_jdbc_nexus,
   $oauth_jdbc_driver                   = $::pingfederate::params::oauth_jdbc_driver,
   $oauth_jdbc_host                     = $::pingfederate::params::oauth_jdbc_host,
   $oauth_jdbc_port                     = $::pingfederate::params::oauth_jdbc_port,
@@ -184,6 +185,7 @@ class pingfederate (
         $def_pkgs     = ['mysql','mysql-connector-java']
         $def_jar_dir  = '/usr/share/java'
         $def_jar      = 'mysql-connector-java.jar'
+        $def_nexus    = undef # JAR is contained in an RPM package
         $def_validate = 'SELECT 1 from dual'
         $def_driver   = 'com.mysql.jdbc.Driver'
         $portstr      = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
@@ -228,8 +230,42 @@ class pingfederate (
                          | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'  " # allow 1050 (table already exists) or no output
       }
       'sqlserver': {
-        # TBD
-        fail("Config code for database type ${::pingfederate::oauth_jdbc_type} incomplete.")
+        $def_jar_dir  = '/usr/share/java'
+        $def_jar      = 'mssql-jdbc-7.0.0.jre8.jar'
+        $def_pkgs     = undef # no RPM pkg for the JAR, need to use nexus repo:
+        $def_nexus    = {
+          url    => 'https://repo1.maven.org/maven2/',
+          repo   => 'central',
+          gav    => 'com.microsoft.sqlserver:mssql-jdbc:7.0.0.jre8',
+        }
+        $def_driver   = 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
+        $def_validate = 'SELECT 1'
+        $portstr      = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
+        # TODO: fix url
+        $def_url      = "jdbc:mysql://${oauth_jdbc_host}${portstr}/${oauth_jdbc_db}"
+        $oauth_client_script = 'oauth-client-management-sqlserver.sql'
+        $oauth_access_script1 = 'access-grant-sqlserver.sql'
+        $oauth_access_script2 = 'access-grant-attribute-sqlserver.sql'
+        $acct_linking_script = 'account-linking-sqlserver.sql'
+        # TODO: replace mysql w/sqlcmd commands
+        # TODO make sure /opt/mssql-tools/bin/sqlcmd is installed
+        $sqlcmd_nodb =   "/opt/mssql-tools/bin/sqlcmd -l 30 \
+                         -S ${::pingfederate::oauth_jdbc_host},${::pingfederate::oauth_jdbc_port} \
+                         -U ${::pingfederate::oauth_jdbc_user}     \
+                         -P \"${::pingfederate::oauth_jdbc_pass}\""
+        $sqlcmd = "${sqlcmd_nodb} -d ${::pingfederate::oauth_jdbc_db}"
+
+        $def_create   = "${sqlcmd_nodb} \
+                         -Q \"create database ${::pingfederate::oauth_jdbc_db} \"  \
+                         | /bin/awk '/Msg 1801/{exit 0}/./{exit 1}' " # allow database exists error or no output
+        $def_oauth_client_cmd = "${sqlcmd} -i ${oauth_client_script_dir}/${oauth_client_script} \
+                         | /bin/awk '/Msg 2714/{exit 0}/./{exit 1}'  " # allow 2714 (table already exists) or no output
+        $def_oauth_access_cmd = "${sqlcmd} -i ${oauth_access_script_dir}/${oauth_access_script1} \
+                                 && ${sqlcmd} -i ${oauth_access_script_dir}/${oauth_access_script2} \
+                         | /bin/awk '/Msg 2714/{exit 0}/./{exit 1}'  "
+        $def_acct_linking_cmd  = "${sqlcmd} -i ${acct_linking_script_dir}/${acct_linking_script} \
+                         | /bin/awk '/Msg 2714/{exit 0}/./{exit 1}'  "
+
       }
       'oracle': {
         # TBD
@@ -239,6 +275,7 @@ class pingfederate (
         $def_pkgs     = undef
         $def_jar_dir  = undef
         $def_jar      = undef
+        $def_nexus    = undef
         $def_validate = undef
         $def_driver   = undef
         $def_url      = undef
@@ -254,6 +291,7 @@ class pingfederate (
     $o_pkgs     = if $::pingfederate::oauth_jdbc_package_list { $::pingfederate::oauth_jdbc_package_list } else { $def_pkgs }
     $o_jar_dir  = if $::pingfederate::oauth_jdbc_jar_dir { $::pingfederate::oauth_jdbc_jar_dir } else { $def_jar_dir }
     $o_jar      = if $::pingfederate::oauth_jdbc_jar { $::pingfederate::oauth_jdbc_jar } else { $def_jar }
+    $o_nexus    = if $::pingfederate::oauth_jdbc_nexus { $::pingfederate::oauth_jdbc_nexus } else { $def_nexus }
     $o_validate = if $::pingfederate::oauth_jdbc_validate { $::pingfederate::oauth_jdbc_validate } else { $def_validate }
     $o_driver   = if $::pingfederate::oauth_jdbc_driver { $::pingfederate::oauth_jdbc_driver } else { $def_driver }
     $o_url      = if $::pingfederate::oauth_jdbc_url { $::pingfederate::oauth_jdbc_url } else { $def_url }
