@@ -189,7 +189,7 @@ class pingfederate (
         $def_validate = 'SELECT 1 from dual'
         $def_driver   = 'com.mysql.jdbc.Driver'
         $portstr      = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
-        $def_url      = "jdbc:mysql://${oauth_jdbc_host}${portstr}/${oauth_jdbc_db}"
+        $def_url      = "jdbc:mysql://${oauth_jdbc_host}${portstr}/${oauth_jdbc_db}?autoReconnect=true"
         $oauth_client_script = 'oauth-client-management-mysql.sql'
         $oauth_access_script1 = 'access-grant-mysql.sql'
         $oauth_access_script2 = 'access-grant-attribute-mysql.sql'
@@ -234,15 +234,16 @@ class pingfederate (
         $def_jar      = 'mssql-jdbc-7.0.0.jre8.jar'
         $def_pkgs     = undef # no RPM pkg for the JAR, need to use nexus repo:
         $def_nexus    = {
-          url    => 'https://repo1.maven.org/maven2/',
+          use_v3 => true,
+          url    => 'http://oss.sonatype.org/',
           repo   => 'central',
           gav    => 'com.microsoft.sqlserver:mssql-jdbc:7.0.0.jre8',
         }
         $def_driver   = 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
-        $def_validate = 'SELECT 1'
+        $def_validate = 'SELECT getdate()'
         $portstr      = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
         # TODO: fix url
-        $def_url      = "jdbc:mysql://${oauth_jdbc_host}${portstr}/${oauth_jdbc_db}"
+        $def_url      = "jdbc:sqlserver://${oauth_jdbc_host}${portstr};databaseName=${oauth_jdbc_db}"
         $oauth_client_script = 'oauth-client-management-sqlserver.sql'
         $oauth_access_script1 = 'access-grant-sqlserver.sql'
         $oauth_access_script2 = 'access-grant-attribute-sqlserver.sql'
