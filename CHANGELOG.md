@@ -1,7 +1,8 @@
 # CHANGELOG
-## 0.5.1 [September 24, 2018]
+## 0.5.2 [September 26, 2018]
 - Added defaults for MS sqlserver `oauth_jdbc_type`.
 - Added `oauth_jdbc_nexus` which allows installing the jdbc JAR file via `archive::nexus`
+  and `oauth_jdbc_maven` which installs from a maven repository URL via `archive`.
 
 ## 0.4.1 [August 2, 2018]
 - Added `oauth_oidc_policy_scope_attr_map` which allows customizing which claims are returned by given scopes

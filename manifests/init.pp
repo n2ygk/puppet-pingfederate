@@ -105,6 +105,7 @@ class pingfederate (
   $oauth_jdbc_package_ensure           = $::pingfederate::params::oauth_jdbc_package_ensure,
   $oauth_jdbc_jar_dir                  = $::pingfederate::params::oauth_jdbc_jar_dir,
   $oauth_jdbc_jar                      = $::pingfederate::params::oauth_jdbc_jar,
+  $oauth_jdbc_maven                    = $::pingfederate::params::oauth_jdbc_maven,
   $oauth_jdbc_nexus                    = $::pingfederate::params::oauth_jdbc_nexus,
   $oauth_jdbc_driver                   = $::pingfederate::params::oauth_jdbc_driver,
   $oauth_jdbc_host                     = $::pingfederate::params::oauth_jdbc_host,
@@ -186,6 +187,7 @@ class pingfederate (
         $def_jar_dir  = '/usr/share/java'
         $def_jar      = 'mysql-connector-java.jar'
         $def_nexus    = undef # JAR is contained in an RPM package
+        $def_maven    = 'http://central.maven.org/maven2/mysql/mysql-connector-java/8.0.12/mysql-connector-java-8.0.12.jar'
         $def_validate = 'SELECT 1 from dual'
         $def_driver   = 'com.mysql.jdbc.Driver'
         $portstr      = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
@@ -231,14 +233,11 @@ class pingfederate (
       }
       'sqlserver': {
         $def_jar_dir  = '/usr/share/java'
-        $def_jar      = 'mssql-jdbc-7.0.0.jre8.jar'
+        $v = '7.0.0.jre8'
+        $def_jar      = "mssql-jdbc-${v}.jar"
         $def_pkgs     = undef # no RPM pkg for the JAR, need to use nexus repo:
-        $def_nexus    = {
-          use_v3 => true,
-          url    => 'http://oss.sonatype.org/',
-          repo   => 'central',
-          gav    => 'com.microsoft.sqlserver:mssql-jdbc:7.0.0.jre8',
-        }
+        $def_nexus    = undef
+        $def_maven    = "http://central.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/${v}/${def_jar}"
         $def_driver   = 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
         $def_validate = 'SELECT getdate()'
         $portstr      = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
@@ -277,6 +276,7 @@ class pingfederate (
         $def_jar_dir  = undef
         $def_jar      = undef
         $def_nexus    = undef
+        $def_maven    = undef
         $def_validate = undef
         $def_driver   = undef
         $def_url      = undef
@@ -293,6 +293,7 @@ class pingfederate (
     $o_jar_dir  = if $::pingfederate::oauth_jdbc_jar_dir { $::pingfederate::oauth_jdbc_jar_dir } else { $def_jar_dir }
     $o_jar      = if $::pingfederate::oauth_jdbc_jar { $::pingfederate::oauth_jdbc_jar } else { $def_jar }
     $o_nexus    = if $::pingfederate::oauth_jdbc_nexus { $::pingfederate::oauth_jdbc_nexus } else { $def_nexus }
+    $o_maven    = if $::pingfederate::oauth_jdbc_maven { $::pingfederate::oauth_jdbc_maven } else { $def_maven }
     $o_validate = if $::pingfederate::oauth_jdbc_validate { $::pingfederate::oauth_jdbc_validate } else { $def_validate }
     $o_driver   = if $::pingfederate::oauth_jdbc_driver { $::pingfederate::oauth_jdbc_driver } else { $def_driver }
     $o_url      = if $::pingfederate::oauth_jdbc_url { $::pingfederate::oauth_jdbc_url } else { $def_url }

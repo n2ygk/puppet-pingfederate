@@ -119,6 +119,7 @@
       - [`oauth_jdbc_package_list`](#oauth_jdbc_package_list)
       - [`oauth_jdbc_package_ensure`](#oauth_jdbc_package_ensure)
       - [`oauth_jdbc_nexus`](#oauth_jdbc_nexus)
+      - [`oauth_jdbc_maven`](#oauth_jdbc_maven)
       - [`oauth_jdbc_jar_dir`](#oauth_jdbc_jar_dir)
       - [`oauth_jdbc_jar`](#oauth_jdbc_jar)
       - [`oauth_jdbc_url`](#oauth_jdbc_url)
@@ -689,7 +690,7 @@ If it is `undef` then the default internal XML-based datastore will be used.
   [OAuth Client Datastore](https://documentation.pingidentity.com/pingfederate/pf83/index.shtml#concept_definingOauthClientDataStore.html)
   connector. One of `undef`, `mysql`,`sqlserver`,`oracle`,`other`. Default: `undef`. If `other`, you'll need to fill in the following as well.
   Otherwise they default to expected values for the given *oauth_jdbc_type* but can still be used to override the defaults. 
-  N.B. currently only fully implemented for `mysql`.
+  N.B. currently only fully implemented for `mysql` and `sqlserver`.
 
 ##### `oauth_jdbc_db`
   (string)
@@ -719,12 +720,17 @@ If it is `undef` then the default internal XML-based datastore will be used.
 ##### `oauth_jdbc_driver`
   (string)
   Name of the JDBC driver class.
-  Default: `com.mysql.jdbc.Driver`
+  Default: Set based on the *oauth_jdbc_type*
+  - mysql: `com.mysql.jdbc.Driver`
+  - sqlserver: `com.microsoft.sqlserver.jdbc.SQLServerDriver`
 
 ##### `oauth_jdbc_package_list`
   (string)
-  JDBC connector and command-line interface (CLI) pacakge(s).
-  Default: `['mysql','mysql-connector-java']`
+  JDBC connector and command-line interface (CLI) pacakge(s). See also [`oauth_jdbc_maven`](#oauth_jdbc_maven)
+  and [`oauth_jdbc_nexus`](#oauth_jdbc_nexus) for alternative ways to find the JDBC connector JAR.
+  Default: Set based on the *oauth_jdbc_type*
+  - mysql: `['mysql','mysql-connector-java']`
+  - sqlserver: none
 
 ##### `oauth_jdbc_package_ensure`
   (string)
@@ -735,34 +741,52 @@ If it is `undef` then the default internal XML-based datastore will be used.
   (map)
   Identifies the nexus repo that contains the JDBC connector (when it's not available as a package).
   Has three keys that roughly correspond to those used by `archive::nexus`: `url`, `repo` and `gav`
-  (groupId:appId:version). For example:
+  (groupId:appId:version). Default: none.
+
+  Example:
   ```
-          url    => 'https://repo1.maven.org/maven2/',
+          use_v3 => true,
+          url    => 'https://user:pass@nexus.example.com/
           repo   => 'central',
           gav    => 'com.microsoft.sqlserver:mssql-jdbc:7.0.0.jre8',
   ```
 
+##### `oauth_jdbc_maven`
+  (string)
+  Identifies the maven URL for the JDBC connector (when it's not available as a package or in nexus).
+
+  Default: Set based on the *oauth_jdbc_type*
+  - mysql: `http://central.maven.org/maven2/mysql/mysql-connector-java/8.0.12/mysql-connector-java-8.0.12.jar`
+  - sqlserver: `http://central.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/7.0.0.jre8/mssql-jdbc-7.0.0.jre8.jar`
 
 ##### `oauth_jdbc_jar_dir`
   (string)
-  Directory where the JDBC jar file can be found.
+  Directory where the JDBC jar file can be found after being installed from a package or JAR repo.
   Default: `/usr/share/java`
 
 ##### `oauth_jdbc_jar`
   (string)
   Name of the jar file.
-  Default: `mysql-connector-java.jar`
+  Default: Set based on the *oauth_jdbc_type*
+  - mysql: `mysql-connector-java.jar`
+  - sqlserver: `mssql-jdbc-7.0.0.jre8.jar`
 
 ##### `oauth_jdbc_url`
   (string)
   JDBC URL.
-  Default: `jdbc:mysql://<host>:<port>/<database>`
+
+  Default: 
+  - mysql: `jdbc:mysql://<host>:<port>/<database>?autoReconnect=true`
+  - sqlserver: `jdbc:sqlserver://<host>:<port>;databaseName=<database>`
 
 ##### `oauth_jdbc_validate`
   (string)
-  JDBC validation test.
-  Default: `SELECT 1 from dual`
+  JDBC validation test. Set based on the *oauth_jdbc_type*.
 
+  Default: 
+  - mysql: `SELECT 1 from dual`
+  - sqlserver: `SELECT getdate()`
+  
 ##### `oauth_jdbc_create_cmd`
   (string)
   Command to execute to create the database schema.

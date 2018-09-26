@@ -109,6 +109,12 @@ class pingfederate::install inherits ::pingfederate {
         extract    => false,
         before     => File["${::pingfederate::install_dir}/server/default/lib/${::pingfederate::o_jar}"],
       }
+    } elsif $::pingfederate::o_maven { # or default to a maven URL
+      archive { "${::pingfederate::o_jar_dir}/${::pingfederate::o_jar}":
+        source  => $::pingfederate::o_maven,
+        extract => false,
+        before     => File["${::pingfederate::install_dir}/server/default/lib/${::pingfederate::o_jar}"],
+      }
     }
     file { "${::pingfederate::install_dir}/server/default/lib/${::pingfederate::o_jar}":
       ensure => 'present',
