@@ -257,7 +257,7 @@ class pingfederate (
 
         $def_create   = "${sqlcmd_nodb} \
                          -Q \"create database ${::pingfederate::oauth_jdbc_db} \"  \
-                         | /bin/awk '/Msg 1801/{exit 0}/./{exit 1}' " # allow database exists error or no output
+                         | /bin/awk '/Msg 1801,/{exit 0}/Msg 262,/{exit 0}/./{exit 1}' " # allow database exists error or no output
         $def_oauth_client_cmd = "${sqlcmd} -i ${oauth_client_script_dir}/${oauth_client_script} \
                          | /bin/awk '/Msg 2714/{exit 0}/./{exit 1}'  " # allow 2714 (table already exists) or no output
         $def_oauth_access_cmd = "${sqlcmd} -i ${oauth_access_script_dir}/${oauth_access_script1} \
