@@ -1,4 +1,4 @@
-# puppet-pingfederate
+# pingfederate
 ## Description
 
 This module installs and configures the
@@ -45,6 +45,7 @@ This module has been tested with PingFederate 8.x - 9.1 and related social adapt
   * [Operating System Support](#operating-system-support)
   * [Known Issues](#known-issues)
 - [Development](#development)
+  * [git clone to make puppet-lint happy](#git-clone-to-make-puppet-lint-happy)
   * [Using Augeas to edit XML configuration files](#using-augeas-to-edit-xml-configuration-files)
   * [Invoking the administrative REST API (pf-admin-api)](#invoking-the-administrative-rest-api-pf-admin-api)
     + [oauth_jdbc_augeas script](#oauth_jdbc_augeas-script)
@@ -329,19 +330,19 @@ CORS needs to be enabled as otherwise Javascript OAuth clients will throw an XHR
 when attempting [XMLHttpRequest (XHR)](https://en.wikipedia.org/wiki/XMLHttpRequest).
 Most of these settings should be left with default values.
 
-##### `cors_allowedOrigins`
+##### `cors_allowedorigins`
   (string)
   Comma-separated list of allowed origins for CORS. Default `*`
 
   You might want to constrain the allowed origins (if you can figure out what the right list should be).
 
-##### `cors_allowedMethods`
+##### `cors_allowedmethods`
   (string)
   Allowed HTTP methods for CORS. Default `GET,OPTIONS,POST`
 
   Deprecation: No longer applicable for PingFederate version >= 9.0
   
-##### `cors_allowedHeaders`
+##### `cors_allowedheaders`
   (string)
   Allowed HTTP headers for CORS. Default `X-Requested-With,Content-Type,Accept,Origin,Authorization`
 
@@ -372,11 +373,11 @@ Most of these settings should be left with default values.
   currently know how to generate this, so make sure to copy it when you change
   the password*)
 
-##### `adm_api_baseURL`
+##### `adm_api_baseurl`
   (string) Base URL of the pf-admin-api.
   Default: `"https://${facts['fqdn']}:${admin_https_port}/pf-admin-api/v1"`
 
-##### `service_api_baseURL`
+##### `service_api_baseurl`
   (string) Base URL for the various services. Set this to your load-balancer's URL.
 
   Default: `"https://${facts['fqdn']}:${https_port}"`
@@ -385,12 +386,12 @@ Most of these settings should be left with default values.
 These are the native SAML2 IdP settings used for native *console_authentication* and
 *admin_api_authentication*. The *adm_user* and *adm_pass* are used for HTTP Basic Auth.
 
-##### `saml2_local_entityID`
+##### `saml2_local_entityid`
   (string)
   SAML 2 EntityID for the native local IdP (that provides the *adm_user* authentication).
   Default: `"${facts['hostname']}-ping:urn:saml2"`
 
-##### `saml1_local_issuerID`
+##### `saml1_local_issuerid`
   (string)
   SAML 1 issuerID for the native local IdP.
   Default: `${facts['hostname']}-ping:urn:saml1`
@@ -448,7 +449,7 @@ These are the native SAML2 IdP settings used for native *console_authentication*
 
 ##### `virtual`
   (Array[string])
-  Lost of virtual server entityIDs for the PingFederate SP. Used to override `saml2_local_entityID`.
+  Lost of virtual server entityIDs for the PingFederate SP. Used to override `saml2_local_entityid`.
   For example: `columbia-ping-mfa:urn:saml2`. The first entityID in the list becomes the
   defaultVirtualEntityID. Default: `[]`
 
@@ -1002,7 +1003,7 @@ $ sudo puppet agent -t ...
 ```
 
 Known issues include:
-- Changing `pingfederate::service_api_baseURL` does not properly remove references to the old URL.
+- Changing `pingfederate::service_api_baseurl` does not properly remove references to the old URL.
 - Setting a social media adapter like `pingfederate::facebook_adapter: true` and then setting it
 `false` fails to properly remove the adapter references.
 - A failed JDBC connection at initial configuration (e.g. database not running or no permission)
@@ -1018,6 +1019,18 @@ authorization code flow. PingFederate has many other features which are not yet 
 
 Please fork and submit PRs on [github](https://github.com/n2ygk/puppet-pingfederate) as you add
 fixes and features.
+
+### git clone to make puppet-lint happy
+
+`puppet-lint`
+[changed](https://ask.puppet.com/question/35269/is-puppet-lint-busted-with-respect-to-autoload-module-layout/)
+to *require* the containing directory name to be `pingfederate` even though that's not the name of the repo.
+Make sure to clone like this or puppet-lint will complain:
+
+```
+git clone git@github.com:n2ygk/puppet-pingfederate.git pingfederate
+cd pingfederate
+```
 
 ### Using Augeas to edit XML configuration files
 

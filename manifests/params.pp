@@ -52,10 +52,10 @@ class pingfederate::params {
   $adm_user                            = 'Administrator'
   $adm_pass                            = 'p@Ssw0rd'
   $adm_hash                            = 'k1H1o2jc66sgkDjJKq85Sr22QNk143S20oR2Yyt2kqo.5Cu-mnqB.2'
-  $adm_api_baseURL                     = "https://${facts['fqdn']}:${admin_https_port}/pf-admin-api/v1"
-  $service_api_baseURL                 = "https://${facts['fqdn']}:${https_port}"
-  $saml2_local_entityID                = "${facts['hostname']}-ping:urn:saml2"
-  $saml1_local_issuerID                = "${facts['hostname']}-ping:urn:saml1"
+  $adm_api_baseurl                     = "https://${facts['fqdn']}:${admin_https_port}/pf-admin-api/v1"
+  $service_api_baseurl                 = "https://${facts['fqdn']}:${https_port}"
+  $saml2_local_entityid                = "${facts['hostname']}-ping:urn:saml2"
+  $saml1_local_issuerid                = "${facts['hostname']}-ping:urn:saml1"
   $wsfed_local_realm                   = "${facts['hostname']}-ping:urn:wsfed"
   $http_forwarded_for_header           = undef
   $http_forwarded_host_header          = undef
@@ -96,9 +96,9 @@ class pingfederate::params {
     'oauth_token_map' => [],
     'oauth_idp_map' => []
   }
-  $cors_allowedOrigins                 = '*'
-  $cors_allowedMethods                 = 'GET,OPTIONS,POST'
-  $cors_allowedHeaders                 = 'X-Requested-With,Content-Type,Accept,Origin,Authorization'
+  $cors_allowedorigins                 = '*'
+  $cors_allowedmethods                 = 'GET,OPTIONS,POST'
+  $cors_allowedheaders                 = 'X-Requested-With,Content-Type,Accept,Origin,Authorization'
   $cors_filter_mapping                 = '/*'
   $ognl_expressions_enable             = true
   $oauth_jdbc_type                     = undef

@@ -1,4 +1,4 @@
-# Class pingfederate::oauth_jdbc_datastore
+# Class: pingfederate::oauth_jdbc_datastore
 #
 # Configure the oauth JDBC datastore only if oauth_jdbc_type is set.
 # The JDBC JAR files and database DDL initialization were done in install.pp
@@ -20,19 +20,19 @@ class pingfederate::oauth_jdbc_datastore inherits ::pingfederate {
     $ds = "${::pingfederate::install_dir}/local/etc/dataStores"
     $pfapi = "${::pingfederate::install_dir}/local/bin/pf-admin-api"
     file { "${ds}.json":
-      ensure   => 'present',
-      mode     => 'u=r,go=',
-      owner    => $::pingfederate::owner,
-      group    => $::pingfederate::group,
-      content  => template('pingfederate/dataStores.json.erb'),
-    } ~>
-    exec {'pf-admin-api POST dataStores':
+      ensure  => 'present',
+      mode    => 'u=r,go=',
+      owner   => $::pingfederate::owner,
+      group   => $::pingfederate::group,
+      content => template('pingfederate/dataStores.json.erb'),
+    }
+    ~> exec {'pf-admin-api POST dataStores':
       command     => "${pfapi} -m POST -j ${ds}.json -r ${ds}.out -i ${ds}.id dataStores", # || rm -f ${ds}
       refreshonly => true,
       user        => $::pingfederate::owner,
       logoutput   => true,
-    } ~>
-    exec {'oauth_jdbc_augeas':
+    }
+    ~> exec {'oauth_jdbc_augeas':
       subscribe   => File["${::pingfederate::install_dir}/local/bin/oauth_jdbc_augeas"],
       command     => "${::pingfederate::install_dir}/local/bin/oauth_jdbc_augeas",
       refreshonly => true,
@@ -44,10 +44,10 @@ class pingfederate::oauth_jdbc_datastore inherits ::pingfederate {
   else { # make sure datastore configs get reverted if the oauth_jdbc_type is (becomes) undef.
     # TODO: refactor as direct augeas edit here since there's nothing variable
     exec {'oauth_jdbc_revert_augeas': # this executes every puppet run. Need to add a notifier.
-      command     => "${::pingfederate::install_dir}/local/bin/oauth_jdbc_revert_augeas",
+      command   => "${::pingfederate::install_dir}/local/bin/oauth_jdbc_revert_augeas",
       #refreshonly => true,
-      user        => $::pingfederate::owner,
-      logoutput   => true,
+      user      => $::pingfederate::owner,
+      logoutput => true,
     }
   }
 }

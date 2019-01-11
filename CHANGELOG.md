@@ -1,4 +1,8 @@
 # CHANGELOG
+## 0.7.0 [January xx, 2019]
+- initial 'pdk convert' https://puppet.com/docs/pdk/
+- breaking changes to pass puppet-lint, including making all variable names *lowercase*.
+
 ## 0.6.0 [January 11, 2019]
 - Added OAuth2 Client Auth support for no secret (NONE) and Private Key JWT.
 - pf-admin-api renames the input `file.json` to `file.json.fail` on error.

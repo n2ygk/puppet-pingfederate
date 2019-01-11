@@ -7,7 +7,7 @@
     "enableAutoMetadataUpdate": true, 
     "metadataUrlRef": {
       "id": "@@metaId@@", 
-      "location": "<%= @adm_api_baseURL -%>/metadataUrls/@@metaId@@"
+      "location": "<%= @adm_api_baseurl -%>/metadataUrls/@@metaId@@"
     }
   }, 
 <% end -%>
@@ -69,7 +69,7 @@
       {
         "authenticationPolicyContractRef": {
           "id": "@@id@@",
-          "location": "<%= @adm_api_baseURL -%>/authenticationPolicyContracts/@@id@@"
+          "location": "<%= @adm_api_baseurl -%>/authenticationPolicyContracts/@@id@@"
         }, 
         "attributeContractFulfillment": {<%# mapping of attribute names to their fulfillment values %>
 <% @b['attr_map'].each_with_index do |val, i| -%>

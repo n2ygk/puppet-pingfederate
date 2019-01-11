@@ -4,12 +4,12 @@
     "type": "IDP_ADAPTER", 
     "contextRef": {
       "id": "@@aid@@", 
-      "location": "<%= @adm_api_baseURL -%>/idp/adapters/@@aid@@"
+      "location": "<%= @adm_api_baseurl -%>/idp/adapters/@@aid@@"
     }
   }, 
   "accessTokenManagerRef": {
     "id": "<%= @oauth_svc_acc_tok_mgr_id -%>", 
-    "location": "<%= @adm_api_baseURL -%>/oauth/accessTokenManagers/<%= @oauth_svc_acc_tok_mgr_id -%>"
+    "location": "<%= @adm_api_baseurl -%>/oauth/accessTokenManagers/<%= @oauth_svc_acc_tok_mgr_id -%>"
   }, 
   "attributeContractFulfillment": {
 <% @b['oauth_token_map'].each_with_index do |val, i| -%>

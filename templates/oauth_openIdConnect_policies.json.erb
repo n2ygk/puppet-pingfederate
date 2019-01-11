@@ -4,7 +4,7 @@
   "name": "<%= @oauth_oidc_policy_id -%>",<%# just use ID as the name -%>
   "accessTokenManagerRef": {
     "id": "<%= @oauth_svc_acc_tok_mgr_id -%>", 
-    "location": "<%= @adm_api_baseURL -%>/oauth/accessTokenManagers/<%= @oauth_svc_acc_tok_mgr_id -%>"
+    "location": "<%= @adm_api_baseurl -%>/oauth/accessTokenManagers/<%= @oauth_svc_acc_tok_mgr_id -%>"
   }, 
 <% if scope.function_versioncmp([@pf_ver, '9.0']) >= 0 -%>
   "scopeAttributeMappings": {

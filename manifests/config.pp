@@ -50,10 +50,10 @@ class pingfederate::config inherits ::pingfederate {
   }
   create_ini_settings($settings, $defaults)
 
-  mkdir::p {"${::pingfederate::log_dir}":
-    owner   => $::pingfederate::owner,
-    group   => $::pingfederate::group,
-    mode    => "0750",
+  mkdir::p {$::pingfederate::log_dir:
+    owner => $::pingfederate::owner,
+    group => $::pingfederate::group,
+    mode  => '0750',
   }
 
   # install license acceptance file
@@ -71,7 +71,6 @@ class pingfederate::config inherits ::pingfederate {
     content => $license_accept,
     owner   => $::pingfederate::owner,
     group   => $::pingfederate::group,
-    
   }
   # install license file
   $lic_file = "${::pingfederate::install_dir}/server/default/conf/pingfederate.lic"
@@ -90,7 +89,7 @@ class pingfederate::config inherits ::pingfederate {
       group   => $::pingfederate::group,
     }
   }
-  $adm_file = "$::pingfederate::install_dir/server/default/data/pingfederate-admin-user.xml"
+  $adm_file = "${::pingfederate::install_dir}/server/default/data/pingfederate-admin-user.xml"
   augeas{$adm_file:
     lens    => 'Xml.lns',
     incl    => $adm_file,
@@ -121,25 +120,27 @@ class pingfederate::config inherits ::pingfederate {
   # N.B. This stuff gets changed when pf-admin-api calls are used to configured SPs and IdPs which can lead to
   # thrashing each time puppet runs if the exact same values are not synchronized.
   # XXX Don't configure this if CLUSTERED_ENGINE since this gets pushed from the CLUSTERED_CONSOLE???
-  $saml_file = "$::pingfederate::install_dir/server/default/data/sourceid-saml2-local-metadata.xml"
+  $saml_file = "${::pingfederate::install_dir}/server/default/data/sourceid-saml2-local-metadata.xml"
   augeas{$saml_file:
     lens    => 'Xml.lns',
     incl    => $saml_file,
     context => "/files/${saml_file}",
     changes =>
     [
-     "set EntityDescriptor/#attribute/entityID \"${::pingfederate::saml2_local_entityID}\"",
-     'set EntityDescriptor/#attribute/cacheDuration "PT1440M"',
-     "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/BaseURL \"${::pingfederate::service_api_baseURL}\"",
-     "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/DynaFedID \"${::pingfederate::service_api_baseURL}\"",
-     "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/Saml1xId \"${::pingfederate::saml1_local_issuerID}\"",
-     "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/WsFedID \"${::pingfederate::wsfed_local_realm}\"",
-     "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/CustomGlobalHttpHeaderName \"${::pingfederate::http_forwarded_for_header}\"",
-     "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ForwardedHostHeaderName \"${::pingfederate::http_forwarded_host_header}\""]
+      "set EntityDescriptor/#attribute/entityID \"${::pingfederate::saml2_local_entityid}\"",
+      'set EntityDescriptor/#attribute/cacheDuration "PT1440M"',
+      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/BaseURL \"${::pingfederate::service_api_baseurl}\"",
+      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/DynaFedID \"${::pingfederate::service_api_baseurl}\"",
+      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/Saml1xId \"${::pingfederate::saml1_local_issuerid}\"",
+      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/WsFedID \"${::pingfederate::wsfed_local_realm}\"",
+      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/CustomGlobalHttpHeaderName\
+        \"${::pingfederate::http_forwarded_for_header}\"",
+      "set EntityDescriptor/Extensions/sid:SourceIDExtension/#attribute/ForwardedHostHeaderName\
+        \"${::pingfederate::http_forwarded_host_header}\""]
   }
 
   # enable OGNL expressions
-  $ognl_file = "$::pingfederate::install_dir/server/default/data/config-store/org.sourceid.common.ExpressionManager.xml"
+  $ognl_file = "${::pingfederate::install_dir}/server/default/data/config-store/org.sourceid.common.ExpressionManager.xml"
   augeas{$ognl_file:
     lens    => 'Xml.lns',
     incl    => $ognl_file,
@@ -152,35 +153,49 @@ class pingfederate::config inherits ::pingfederate {
   # This adds a new CrossOriginFilter and enables the OPTIONS method in the security-constraint
   # Adding OPTIONS involves appending a new entry to web-resource-collection for url-pattern="/*"
   # and changing the documentation of that node to indicate OPTIONS is now permitted.
-  if $::pingfederate::cors_allowedOrigins and $::pingfederate::package_ensure < '9' {
-      $cors_file = "$::pingfederate::install_dir/etc/webdefault.xml"
+  if $::pingfederate::cors_allowedorigins and $::pingfederate::package_ensure < '9' {
+      $cors_file = "$::{pingfederate::install_dir}/etc/webdefault.xml"
       augeas{$cors_file:
         lens    => 'Xml.lns',
         incl    => $cors_file,
         context => "/files/${cors_file}",
-        changes => ['set web-app/filter/filter-name/#text "cross-origin"',
+        changes => [
+                    'set web-app/filter/filter-name/#text "cross-origin"',
                     'set web-app/filter/filter-class/#text "org.eclipse.jetty.servlets.CrossOriginFilter"',
                     'set web-app/filter/init-param[1]/param-name/#text "allowedOrigins"',
-                    "set web-app/filter/init-param[1]/param-value/#text \"${::pingfederate::cors_allowedOrigins}\"",
+                    "set web-app/filter/init-param[1]/param-value/#text \"${::pingfederate::cors_allowedorigins}\"",
                     'set web-app/filter/init-param[2]/param-name/#text "allowedMethods"',
-                    "set web-app/filter/init-param[2]/param-value/#text \"${::pingfederate::cors_allowedMethods}\"",
+                    "set web-app/filter/init-param[2]/param-value/#text \"${::pingfederate::cors_allowedmethods}\"",
                     'set web-app/filter/init-param[3]/param-name/#text "allowedHeaders"',
-                    "set web-app/filter/init-param[3]/param-value/#text \"${::pingfederate::cors_allowedHeaders}\"",
+                    "set web-app/filter/init-param[3]/param-value/#text \"${::pingfederate::cors_allowedheaders}\"",
                     'set web-app/filter-mapping/filter-name/#text "cross-origin"',
                     "set web-app/filter-mapping/url-pattern/#text \"${::pingfederate::cors_filter_mapping}\"",
-                    'set web-app/security-constraint/web-resource-collection/url-pattern[./#text="/*"]/../http-method[#text="OPTIONS" and (last()+1)]/#text "OPTIONS"',
-                    'set web-app/security-constraint/web-resource-collection/url-pattern[./#text="/*"]/../web-resource-name/#text "Enable all methods except for TRACE (OPTIONS was added for OAuth 2.0 XHR)"']
+                    @(END/L),
+                    set web-app/security-constraint/web-resource-collection
+                    /url-pattern[./#text="/*"]/../http-method[#text="OPTIONS" and (last()+1)]/#text "OPTIONS"
+                    |-END
+                    @(END/L),
+                    set web-app/security-constraint/web-resource-collection
+                    /url-pattern[./#text="/*"]/../web-resource-name/#text
+                      "Enable all methods except for TRACE (OPTIONS was added for OAuth 2.0 XHR)"
+                    |-END
+                    ]
       }
   }
 
   # configure JDBC implementation
-  $hive_file = "$::pingfederate::install_dir/server/default/conf/META-INF/hivemodule.xml"
+  $hive_file = "${::pingfederate::install_dir}/server/default/conf/META-INF/hivemodule.xml"
   if $::pingfederate::oauth_jdbc_type {
     augeas{$hive_file:
       lens    => 'Xml.lns',
       incl    => $hive_file,
       context => "/files/${hive_file}",
-      changes => ['set module/service-point[#attribute/id="ClientManager"][#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]/invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerJdbcImpl']
+      changes => [
+        @(END/L)
+        set module/service-point[#attribute/id="ClientManager"][#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]
+        /invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerJdbcImpl
+        |-END
+      ],
     }
   }
   else {                        # (revert JDBC back to) XML file implementation
@@ -188,7 +203,13 @@ class pingfederate::config inherits ::pingfederate {
       lens    => 'Xml.lns',
       incl    => $hive_file,
       context => "/files/${hive_file}",
-      changes => ['set module/service-point[#attribute/id="ClientManager"][#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]/invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerXmlFileImpl"']
+      changes => [
+                  @(END/L)
+                  set module/service-point[#attribute/id="ClientManager"]
+                  [#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]
+                  /invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerXmlFileImpl"
+                  @-END
+                  ]
     }
   }
 
@@ -234,15 +255,28 @@ class pingfederate::config inherits ::pingfederate {
   # Sets the fileName, filePattern, removes any extant Policies, adds daily CronTriggeringPolicy and max retension days.
   $log4_rollers = $::pingfederate::log_files.map |$i| {
     [
-     "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/#attribute/fileName \${sys:pf.log.dir}/${i['fileName']}",
-     "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/#attribute/filePattern \${sys:pf.log.dir}/${i['filePattern']}",
-     "rm Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/Policies",
-     "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/CronTriggeringPolicy/#attribute/schedule \"0 0 0 * * ?\"",
-     "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/DefaultRolloverStrategy/#attribute/max ${::pingfederate::log_retain_days}"]
+      @("END"/L),
+      set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]
+      /#attribute/fileName \${sys:pf.log.dir}/${i['fileName']}
+      |-END
+      @("END"/L),
+      set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]
+      /#attribute/filePattern \${sys:pf.log.dir}/${i['filePattern']}",
+      |-END
+      "rm Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/Policies",
+      @("END"/L),
+      set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]
+      /CronTriggeringPolicy/#attribute/schedule \"0 0 0 * * ?\"
+      |-END
+      @("END"/L),
+      set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]
+      /DefaultRolloverStrategy/#attribute/max ${::pingfederate::log_retain_days}
+      @-END
+    ]
   }
 
   $log4_do = flatten($log4_loggers) + flatten($log4_rollers)
-  $log4_file = "$::pingfederate::install_dir/server/default/conf/log4j2.xml"
+  $log4_file = "${::pingfederate::install_dir}/server/default/conf/log4j2.xml"
   augeas{$log4_file:
     lens    => 'Xml.lns',
     incl    => $log4_file,
@@ -253,32 +287,32 @@ class pingfederate::config inherits ::pingfederate {
   # Jetty files
   # here's a really ugly nested XML doc!
   # <Configure id="AdminServer" class="org.eclipse.jetty.server.Server">
-  #     <Set name="handler">
-  #         <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
-  #             <Set name="handlers">
-  #                 <Array type="org.eclipse.jetty.server.Handler">
-  #                     <Item>
-  #                         <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
-  #                     </Item>
-  #                     <Item>
-  #                         <New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler">
-  #                               <Set name="requestLog">
-  #                                 <New id="RequestLogImpl" class="org.eclipse.jetty.server.NCSARequestLog">
-  #                                        <Set name="filename"><SystemProperty name="pf.log.dir" default="."/>/yyyy_mm_dd.request2.log</Set>
-  #                                        <Set name="filenameDateFormat">yyyy_MM_dd</Set>
-  #                                        <Set name="retainDays">90</Set>
-  #                                        <Set name="append">true</Set>
-  #                                        <Set name="extended">true</Set>
-  #                                        <Set name="logCookies">false</Set>
-  #                                        <Set name="LogTimeZone">GMT</Set>
-  #                                 </New>
-  #                               </Set>
-  #                         </New>
-  #                     </Item>
-  #                 </Array>
-  #             </Set>
-  #         </New>
-  #     </Set>
+  #   <Set name="handler">
+  #     <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+  #       <Set name="handlers">
+  #         <Array type="org.eclipse.jetty.server.Handler">
+  #           <Item>
+  #             <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
+  #           </Item>
+  #           <Item>
+  #             <New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler">
+  #                 <Set name="requestLog">
+  #                 <New id="RequestLogImpl" class="org.eclipse.jetty.server.NCSARequestLog">
+  #                    <Set name="filename"><SystemProperty name="pf.log.dir" default="."/>/yyyy_mm_dd.request2.log</Set>
+  #                    <Set name="filenameDateFormat">yyyy_MM_dd</Set>
+  #                    <Set name="retainDays">90</Set>
+  #                    <Set name="append">true</Set>
+  #                    <Set name="extended">true</Set>
+  #                    <Set name="logCookies">false</Set>
+  #                    <Set name="LogTimeZone">GMT</Set>
+  #                 </New>
+  #                 </Set>
+  #             </New>
+  #           </Item>
+  #         </Array>
+  #       </Set>
+  #     </New>
+  #   </Set>
   # </Configure>
 
   # And an ulgy here document so the string can be split up into somewhat readable text:
@@ -294,7 +328,7 @@ class pingfederate::config inherits ::pingfederate {
   /New[#attribute/id="RequestLogImpl"]\
   /Set[#attribute/name="retainDays"]/#text
   |-EoF
-  $jetty_adm_file = "$::pingfederate::install_dir/etc/jetty-admin.xml"
+  $jetty_adm_file = "${::pingfederate::install_dir}/etc/jetty-admin.xml"
   augeas{$jetty_adm_file:
     lens    => 'Xml.lns',
     incl    => $jetty_adm_file,
@@ -314,7 +348,7 @@ class pingfederate::config inherits ::pingfederate {
   /New[#attribute/id="RequestLogImpl"]\
   /Set[#attribute/name="retainDays"]/#text
   |-EoF
-  $jetty_run_file = "$::pingfederate::install_dir/etc/jetty-runtime.xml"
+  $jetty_run_file = "${::pingfederate::install_dir}/etc/jetty-runtime.xml"
   augeas{$jetty_run_file:
     lens    => 'Xml.lns',
     incl    => $jetty_run_file,

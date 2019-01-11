@@ -74,11 +74,11 @@ class pingfederate (
   $adm_user                            = $::pingfederate::params::adm_user,
   $adm_pass                            = $::pingfederate::params::adm_pass,
   $adm_hash                            = $::pingfederate::params::adm_hash,
-  $adm_api_baseURL                     = $::pingfederate::params::adm_api_baseURL,
+  $adm_api_baseurl                     = $::pingfederate::params::adm_api_baseurl,
   # API: serverSettings & XML: sourceid-saml2-local-metadata.xml (local SAML IdP configuration)
-  $service_api_baseURL                 = $::pingfederate::params::service_api_baseURL,
-  $saml2_local_entityID                = $::pingfederate::params::saml2_local_entityID,
-  $saml1_local_issuerID                = $::pingfederate::params::saml1_local_issuerID,
+  $service_api_baseurl                 = $::pingfederate::params::service_api_baseurl,
+  $saml2_local_entityid                = $::pingfederate::params::saml2_local_entityid,
+  $saml1_local_issuerid                = $::pingfederate::params::saml1_local_issuerid,
   $wsfed_local_realm                   = $::pingfederate::params::wsfed_local_realm,
   $http_forwarded_for_header           = $::pingfederate::params::http_forwarded_for_header,
   $http_forwarded_host_header          = $::pingfederate::params::http_forwarded_host_header,
@@ -93,9 +93,9 @@ class pingfederate (
   $social_adapter                      = $::pingfederate::params::social_adapter,
   $social_adapter_default              = $::pingfederate::params::social_adapter_default,
   # XML: etc/webdefault.xml (Enable Cross-Origin Resource Sharing -- CORS)
-  $cors_allowedOrigins                 = $::pingfederate::params::cors_allowedOrigins,
-  $cors_allowedMethods                 = $::pingfederate::params::cors_allowedMethods,
-  $cors_allowedHeaders                 = $::pingfederate::params::cors_allowedHeaders,
+  $cors_allowedorigins                 = $::pingfederate::params::cors_allowedorigins,
+  $cors_allowedmethods                 = $::pingfederate::params::cors_allowedmethods,
+  $cors_allowedheaders                 = $::pingfederate::params::cors_allowedheaders,
   $cors_filter_mapping                 = $::pingfederate::params::cors_filter_mapping,
   # XML: server/default/data/config-store/org.sourceid.common.ExpressionManager.xml (OGNL expressions)
   $ognl_expressions_enable             = $::pingfederate::params::ognl_expressions_enable,
@@ -183,107 +183,129 @@ class pingfederate (
     $acct_linking_script_dir = "${::pingfederate::install_dir}/server/default/conf/account-linking/sql-scripts/"
     case $::pingfederate::oauth_jdbc_type {
       'mysql': {
-        $def_pkgs     = ['mysql','mysql-connector-java']
-        $def_jar_dir  = '/usr/share/java'
-        $def_jar      = 'mysql-connector-java.jar'
-        $def_nexus    = undef # JAR is contained in an RPM package
-        $def_maven    = 'http://central.maven.org/maven2/mysql/mysql-connector-java/8.0.12/mysql-connector-java-8.0.12.jar'
-        $def_validate = 'SELECT 1 from dual'
-        $def_driver   = 'com.mysql.jdbc.Driver'
-        $portstr      = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
-        $def_url      = "jdbc:mysql://${oauth_jdbc_host}${portstr}/${oauth_jdbc_db}?autoReconnect=true"
-        $oauth_client_script = 'oauth-client-management-mysql.sql'
-        $oauth_access_script1 = 'access-grant-mysql.sql'
-        $oauth_access_script2 = 'access-grant-attribute-mysql.sql'
-        $acct_linking_script = 'account-linking-mysql.sql'
-        $def_create   = "/usr/bin/mysqladmin --wait                    \
-                         --connect_timeout=30                          \
-                         --host=${::pingfederate::oauth_jdbc_host}     \
-                         --port=${::pingfederate::oauth_jdbc_port}     \
-                         --user=${::pingfederate::oauth_jdbc_user}     \
-                         --password=\"${::pingfederate::oauth_jdbc_pass}\" \
-                         create ${::pingfederate::oauth_jdbc_db}       \
-                         | /bin/awk '/database exists/{exit 0}/./{exit 1}' " # allow database exists error or no output
-        $def_oauth_client_cmd      = "/usr/bin/mysql --wait --connect_timeout=30    \
-                         --host=${::pingfederate::oauth_jdbc_host}     \
-                         --port=${::pingfederate::oauth_jdbc_port}     \
-                         --user=${::pingfederate::oauth_jdbc_user}     \
-                         --password=\"${::pingfederate::oauth_jdbc_pass}\" \
-                         --database=${::pingfederate::oauth_jdbc_db}   \
-                         < ${oauth_client_script_dir}/${oauth_client_script} \
-                         | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'  " # allow 1050 (table already exists) or no output
+        $def_pkgs              = ['mysql','mysql-connector-java']
+        $def_jar_dir           = '/usr/share/java'
+        $def_jar               = 'mysql-connector-java.jar'
+        $def_nexus             = undef # JAR is contained in an RPM package
+        $def_maven             = 'http://central.maven.org/maven2/mysql/mysql-connector-java/8.0.12/mysql-connector-java-8.0.12.jar'
+        $def_validate          = 'SELECT 1 from dual'
+        $def_driver            = 'com.mysql.jdbc.Driver'
+        $portstr               = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
+        $def_url               = "jdbc:mysql://${oauth_jdbc_host}${portstr}/${oauth_jdbc_db}?autoReconnect=true"
+        $oauth_client_script   = 'oauth-client-management-mysql.sql'
+        $oauth_access_script1  = 'access-grant-mysql.sql'
+        $oauth_access_script2  = 'access-grant-attribute-mysql.sql'
+        $acct_linking_script   = 'account-linking-mysql.sql'
+        # allow database exists error or no output
+        $def_create            = @("END"/L)
+          /usr/bin/mysqladmin
+            --wait
+            --connect_timeout=30
+            --host=${::pingfederate::oauth_jdbc_host}
+            --port=${::pingfederate::oauth_jdbc_port}
+            --user=${::pingfederate::oauth_jdbc_user}
+            --password=\"${::pingfederate::oauth_jdbc_pass}\"
+            create ${::pingfederate::oauth_jdbc_db}
+          | /bin/awk '/database exists/{exit 0}/./{exit 1}'
+          |-END
+        # allow 1050 (table already exists) or no output
+        $def_oauth_client_cmd  = @("END"/L)
+          /usr/bin/mysql
+            --wait --connect_timeout=30
+            --host=${::pingfederate::oauth_jdbc_host}
+            --port=${::pingfederate::oauth_jdbc_port}
+            --user=${::pingfederate::oauth_jdbc_user}
+            --password=\"${::pingfederate::oauth_jdbc_pass}\"
+            --database=${::pingfederate::oauth_jdbc_db}
+            < ${oauth_client_script_dir}/${oauth_client_script}
+          | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'
+          |-END
         # kludge to deal with a back-level mysql < 5.6
-        $def_oauth_access_cmd      = "/bin/cat ${oauth_access_script_dir}/${oauth_access_script1} ${oauth_access_script_dir}/${oauth_access_script2} \
-                         | /bin/sed -e 's/default CURRENT_TIMESTAMP//' \
-                         | /usr/bin/mysql --wait --connect_timeout=30  \
-                         --host=${::pingfederate::oauth_jdbc_host}     \
-                         --port=${::pingfederate::oauth_jdbc_port}     \
-                         --user=${::pingfederate::oauth_jdbc_user}     \
-                         --password=\"${::pingfederate::oauth_jdbc_pass}\" \
-                         --database=${::pingfederate::oauth_jdbc_db}   \
-                         | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'  " # allow 1050 (table already exists) or no output
-        $def_acct_linking_cmd      = "/usr/bin/mysql --wait --connect_timeout=30    \
-                         --host=${::pingfederate::oauth_jdbc_host}     \
-                         --port=${::pingfederate::oauth_jdbc_port}     \
-                         --user=${::pingfederate::oauth_jdbc_user}     \
-                         --password=\"${::pingfederate::oauth_jdbc_pass}\" \
-                         --database=${::pingfederate::oauth_jdbc_db}   \
-                         < ${acct_linking_script_dir}/${acct_linking_script} \
-                         | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'  " # allow 1050 (table already exists) or no output
+        $def_oauth_access_cmd  = @("END"/L)
+          /bin/cat ${oauth_access_script_dir}/${oauth_access_script1} ${oauth_access_script_dir}/${oauth_access_script2}
+          | /bin/sed -e 's/default CURRENT_TIMESTAMP//'
+          | /usr/bin/mysql
+            --wait --connect_timeout=30
+            --host=${::pingfederate::oauth_jdbc_host}
+            --port=${::pingfederate::oauth_jdbc_port}
+            --user=${::pingfederate::oauth_jdbc_user}
+            --password=\"${::pingfederate::oauth_jdbc_pass}\"
+            --database=${::pingfederate::oauth_jdbc_db}
+          | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'
+          |-END
+        $def_acct_linking_cmd  = @("END")/L)
+          /usr/bin/mysql
+            --wait --connect_timeout=30
+            --host=${::pingfederate::oauth_jdbc_host}
+            --port=${::pingfederate::oauth_jdbc_port}
+            --user=${::pingfederate::oauth_jdbc_user}
+            --password=\"${::pingfederate::oauth_jdbc_pass}\"
+            --database=${::pingfederate::oauth_jdbc_db}
+            < ${acct_linking_script_dir}/${acct_linking_script}
+          | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'
+          |-END
       }
       'sqlserver': {
-        $def_jar_dir  = '/usr/share/java'
-        $v = '7.0.0.jre8'
-        $def_jar      = "mssql-jdbc-${v}.jar"
-        $def_pkgs     = undef # no RPM pkg for the JAR, need to use nexus repo:
-        $def_nexus    = undef
-        $def_maven    = "http://central.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/${v}/${def_jar}"
-        $def_driver   = 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
-        $def_validate = 'SELECT getdate()'
-        $portstr      = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
-        # TODO: fix url
-        $def_url      = "jdbc:sqlserver://${oauth_jdbc_host}${portstr};databaseName=${oauth_jdbc_db}"
-        $oauth_client_script = 'oauth-client-management-sqlserver.sql'
-        $oauth_access_script1 = 'access-grant-sqlserver.sql'
-        $oauth_access_script2 = 'access-grant-attribute-sqlserver.sql'
-        $acct_linking_script = 'account-linking-sqlserver.sql'
-        # TODO: replace mysql w/sqlcmd commands
-        # TODO make sure /opt/mssql-tools/bin/sqlcmd is installed
-        $sqlcmd_nodb =   "/opt/mssql-tools/bin/sqlcmd -l 30 \
-                         -S ${::pingfederate::oauth_jdbc_host},${::pingfederate::oauth_jdbc_port} \
-                         -U ${::pingfederate::oauth_jdbc_user}     \
-                         -P \"${::pingfederate::oauth_jdbc_pass}\""
-        $sqlcmd = "${sqlcmd_nodb} -d ${::pingfederate::oauth_jdbc_db}"
-
-        $def_create   = "${sqlcmd_nodb} \
-                         -Q \"create database ${::pingfederate::oauth_jdbc_db} \"  \
-                         | /bin/awk '/Msg 1801,/{exit 0}/Msg 262,/{exit 0}/./{exit 1}' " # allow database exists error or no output
-        $def_oauth_client_cmd = "${sqlcmd} -i ${oauth_client_script_dir}/${oauth_client_script} \
-                         | /bin/awk '/Msg 2714/{exit 0}/./{exit 1}'  " # allow 2714 (table already exists) or no output
-        $def_oauth_access_cmd = "${sqlcmd} -i ${oauth_access_script_dir}/${oauth_access_script1} \
-                                 && ${sqlcmd} -i ${oauth_access_script_dir}/${oauth_access_script2} \
-                         | /bin/awk '/Msg 2714/{exit 0}/./{exit 1}'  "
-        $def_acct_linking_cmd  = "${sqlcmd} -i ${acct_linking_script_dir}/${acct_linking_script} \
-                         | /bin/awk '/Msg 2714/{exit 0}/./{exit 1}'  "
-
+        $def_jar_dir           = '/usr/share/java'
+        $v                     = '7.0.0.jre8'
+        $def_jar               = "mssql-jdbc-${v}.jar"
+        $def_pkgs              = undef # no RPM pkg for the JAR, need to use nexus repo
+        $def_nexus             = undef
+        $def_maven             = "http://central.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/${v}/${def_jar}"
+        $def_driver            = 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
+        $def_validate          = 'SELECT getdate()'
+        $portstr               = if $::pingfederate::oauth_jdbc_port { ":${::pingfederate::oauth_jdbc_port}" } else { '' }
+        $def_url               = "jdbc:sqlserver://${oauth_jdbc_host}${portstr};databaseName=${oauth_jdbc_db}"
+        $oauth_client_script   = 'oauth-client-management-sqlserver.sql'
+        $oauth_access_script1  = 'access-grant-sqlserver.sql'
+        $oauth_access_script2  = 'access-grant-attribute-sqlserver.sql'
+        $acct_linking_script   = 'account-linking-sqlserver.sql'
+        $sqlcmd_nodb           =  @("END")/L)
+          /opt/mssql-tools/bin/sqlcmd
+            -l 30
+            -S ${::pingfederate::oauth_jdbc_host},${::pingfederate::oauth_jdbc_port}
+            -U ${::pingfederate::oauth_jdbc_user}
+            -P \"${::pingfederate::oauth_jdbc_pass}\"
+          |-END
+        $sqlcmd                = "${sqlcmd_nodb} -d ${::pingfederate::oauth_jdbc_db}"
+        # allow database exists error or no output
+        $def_create            = @("END"/L)
+          ${sqlcmd_nodb}
+            -Q \"create database ${::pingfederate::oauth_jdbc_db}\"
+          | /bin/awk '/Msg 1801,/{exit 0}/Msg 262,/{exit 0}/./{exit 1}'
+          |-END
+        # allow 2714 (table already exists) or no output
+        $def_oauth_client_cmd  = @("END"/L)
+          ${sqlcmd} -i ${oauth_client_script_dir}/${oauth_client_script}
+          | /bin/awk '/Msg 2714/{exit 0}/./{exit 1}'
+          |-END
+        $def_oauth_access_cmd  = @("END"/L)
+          ${sqlcmd} -i ${oauth_access_script_dir}/${oauth_access_script1}
+          && ${sqlcmd} -i ${oauth_access_script_dir}/${oauth_access_script2}
+          | /bin/awk '/Msg 2714/{exit 0}/./{exit 1}'
+          |-END
+        $def_acct_linking_cmd  = @("END"/L)
+          ${sqlcmd} -i ${acct_linking_script_dir}/${acct_linking_script}
+          | /bin/awk '/Msg 2714/{exit 0}/./{exit 1}'
+          |-END
       }
       'oracle': {
         # TBD
         fail("Config code for database type ${::pingfederate::oauth_jdbc_type} incomplete.")
       }
-      'other': {                # everything must be set in $::pingfederate::oauth_jdbc_*
-        $def_pkgs     = undef
-        $def_jar_dir  = undef
-        $def_jar      = undef
-        $def_nexus    = undef
-        $def_maven    = undef
-        $def_validate = undef
-        $def_driver   = undef
-        $def_url      = undef
-        $def_create   = undef
-        $def_oauth_client_cmd      = undef
-        $def_oauth_access_cmd      = undef
-        $def_acct_linking_cmd      = undef
+      'other': {               # everything must be set in $::pingfederate::oauth_jdbc_*
+        $def_pkgs              = undef
+        $def_jar_dir           = undef
+        $def_jar               = undef
+        $def_nexus             = undef
+        $def_maven             = undef
+        $def_validate          = undef
+        $def_driver            = undef
+        $def_url               = undef
+        $def_create            = undef
+        $def_oauth_client_cmd  = undef
+        $def_oauth_access_cmd  = undef
+        $def_acct_linking_cmd  = undef
       }
       default: { fail("Don't know to configure for database type ${::pingfederate::oauth_jdbc_type}.") }
     }
@@ -298,19 +320,22 @@ class pingfederate (
     $o_driver   = if $::pingfederate::oauth_jdbc_driver { $::pingfederate::oauth_jdbc_driver } else { $def_driver }
     $o_url      = if $::pingfederate::oauth_jdbc_url { $::pingfederate::oauth_jdbc_url } else { $def_url }
     $o_create   = if $::pingfederate::oauth_jdbc_create_cmd { $::pingfederate::oauth_jdbc_create_cmd } else { $def_create }
-    $o_c_cmd    = if $::pingfederate::oauth_jdbc_client_ddl_cmd { $::pingfederate::oauth_jdbc_client_ddl_cmd } else { $def_oauth_client_cmd }
-    $o_a_cmd    = if $::pingfederate::oauth_jdbc_access_ddl_cmd { $::pingfederate::oauth_jdbc_ddl_access_cmd } else { $def_oauth_access_cmd }
-    $a_l_cmd    = if $::pingfederate::acct_jdbc_linking_ddl_cmd { $::pingfederate::acct_jdbc_ddl_linking_cmd } else { $def_acct_linking_cmd }
+    $o_c_cmd    = if $::pingfederate::oauth_jdbc_client_ddl_cmd { $::pingfederate::oauth_jdbc_client_ddl_cmd }
+                  else { $def_oauth_client_cmd }
+    $o_a_cmd    = if $::pingfederate::oauth_jdbc_access_ddl_cmd { $::pingfederate::oauth_jdbc_ddl_access_cmd }
+                  else { $def_oauth_access_cmd }
+    $a_l_cmd    = if $::pingfederate::acct_jdbc_linking_ddl_cmd { $::pingfederate::acct_jdbc_ddl_linking_cmd }
+                  else { $def_acct_linking_cmd }
   }
 
   # need to do more validation...
 
   # Install the package(s), configure the pre-runtime settings, start the service, and administer the post-startup settings.
-  anchor { 'pingfederate::begin': } ->
-  class { '::pingfederate::install': } ->
-  class { '::pingfederate::config': } ~>
-  class { '::pingfederate::service': } ->
-  class { '::pingfederate::admin': } ->
-  anchor { 'pingfederate::end': }
+  anchor { 'pingfederate::begin': }
+  -> class { '::pingfederate::install': }
+  -> class { '::pingfederate::config': }
+  ~> class { '::pingfederate::service': }
+  -> class { '::pingfederate::admin': }
+  -> anchor { 'pingfederate::end': }
 
 }

@@ -12,7 +12,7 @@
           "type": "AUTHN_SELECTOR",
           "authenticationSelectorRef": {
             "id": "<%= selID -%>",<%# name the selector the same as the adapter %>
-            "location": "<%= @adm_api_baseURL -%>/authenticationSelectors/<%= selID -%>"
+            "location": "<%= @adm_api_baseurl -%>/authenticationSelectors/<%= selID -%>"
           }
         },
         "children": [
@@ -31,9 +31,9 @@
                 "sourceRef": {
                   "id": "@@<%= id -%>@@",
 <%              if val['type'] == 'IDP_CONNECTION' -%>
-                  "location": "<%= @adm_api_baseURL -%>/sp/idpConnections/@@<%= id -%>@@"
+                  "location": "<%= @adm_api_baseurl -%>/sp/idpConnections/@@<%= id -%>@@"
 <%              elsif val['type'] == 'IDP_ADAPTER' -%>
-                  "location": "<%= @adm_api_baseURL -%>/idp/adapters/@@<%= id -%>@@"
+                  "location": "<%= @adm_api_baseurl -%>/idp/adapters/@@<%= id -%>@@"
 <%              end -%>
                 }
               }
