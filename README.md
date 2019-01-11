@@ -1,178 +1,4 @@
-# pingfederate
-
-#### Table of Contents
-
-<!-- TOC generated with: `markdown-toc -i README.md` -->
-
-<!-- toc -->
-
-- [Description](#description)
-- [Compatibility](#compatibility)
-- [Setup](#setup)
-  * [Beginning with pingfederate](#beginning-with-pingfederate)
-- [Usage](#usage)
-  * [Basic Usage](#basic-usage)
-    + [with RPMS available](#with-rpms-available)
-    + [without RPMS](#without-rpms)
-  * [Parameters](#parameters)
-    + [Packaging](#packaging)
-      - [`install_dir`](#install_dir)
-      - [`owner`](#owner)
-      - [`group`](#group)
-      - [`package_list`](#package_list)
-      - [`package_ensure`](#package_ensure)
-      - [`package_java_ensure`](#package_java_ensure)
-      - [`package_java_redhat`](#package_java_redhat)
-      - [`package_java_centos`](#package_java_centos)
-    + [Service](#service)
-      - [`service_name`](#service_name)
-      - [`service_ensure`](#service_ensure)
-    + [Logging](#logging)
-      - [`log_dir`](#log_dir)
-      - [`log_retain_days`](#log_retain_days)
-      - [`log_files`](#log_files)
-      - [`log_levels`](#log_levels)
-    + [Providing the License Key](#providing-the-license-key)
-      - [`license_content`](#license_content)
-      - [`license_file`](#license_file)
-    + [Run.properties](#runproperties)
-      - [`admin_https_port`](#admin_https_port)
-      - [`admin_hostname`](#admin_hostname)
-      - [`console_bind_address`](#console_bind_address)
-      - [`console_title`](#console_title)
-      - [`console_session_timeout`](#console_session_timeout)
-      - [`console_login_mode`](#console_login_mode)
-      - [`console_authentication`](#console_authentication)
-      - [`admin_api_authentication`](#admin_api_authentication)
-      - [`http_port`](#http_port)
-      - [`https_port`](#https_port)
-      - [`secondary_https_port`](#secondary_https_port)
-      - [`engine_bind_address`](#engine_bind_address)
-      - [`monitor_bind_address`](#monitor_bind_address)
-      - [`log_event_detail`](#log_event_detail)
-      - [`heartbeat_system_monitoring`](#heartbeat_system_monitoring)
-      - [`operational_mode`](#operational_mode)
-      - [`cluster_node_index`](#cluster_node_index)
-      - [`cluster_auth_pwd`](#cluster_auth_pwd)
-      - [`cluster_encrypt`](#cluster_encrypt)
-      - [`cluster_bind_address`](#cluster_bind_address)
-      - [`cluster_bind_port`](#cluster_bind_port)
-      - [`cluster_failure_detection_bind_port`](#cluster_failure_detection_bind_port)
-      - [`cluster_transport_protocol`](#cluster_transport_protocol)
-      - [`cluster_mcast_group_address`](#cluster_mcast_group_address)
-      - [`cluster_mcast_group_port`](#cluster_mcast_group_port)
-      - [`cluster_tcp_discovery_initial_hosts`](#cluster_tcp_discovery_initial_hosts)
-      - [`cluster_diagnostics_enabled`](#cluster_diagnostics_enabled)
-      - [`cluster_diagnostics_addr`](#cluster_diagnostics_addr)
-      - [`cluster_diagnostics_port`](#cluster_diagnostics_port)
-    + [Cross-Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors)
-      - [`cors_allowedOrigins`](#cors_allowedorigins)
-      - [`cors_allowedMethods`](#cors_allowedmethods)
-      - [`cors_allowedHeaders`](#cors_allowedheaders)
-      - [`cors_filter_mapping`](#cors_filter_mapping)
-    + [OGNL expressions](#ognl-expressions)
-      - [`ognl_expressions_enable`](#ognl_expressions_enable)
-    + [Administration](#administration)
-      - [`adm_user`](#adm_user)
-      - [`adm_pass`](#adm_pass)
-      - [`adm_hash`](#adm_hash)
-      - [`adm_api_baseURL`](#adm_api_baseurl)
-      - [`service_api_baseURL`](#service_api_baseurl)
-    + [Native SAML2 IdP](#native-saml2-idp)
-      - [`saml2_local_entityID`](#saml2_local_entityid)
-      - [`saml1_local_issuerID`](#saml1_local_issuerid)
-      - [`wsfed_local_realm`](#wsfed_local_realm)
-      - [`http_forwarded_for_header`](#http_forwarded_for_header)
-      - [`http_forwarded_host_header`](#http_forwarded_host_header)
-    + [SAML 2.0 SP Configuration](#saml-20-sp-configuration)
-      - [Authentication Policy Contracts](#authentication-policy-contracts)
-        * [`name` (string)](#name-string)
-        * [`core_attrs` (Array[string])](#core_attrs-arraystring)
-        * [`extd_attrs` (Array[string])](#extd_attrs-arraystring)
-    + [SAML 2.0 Partner IdP Configuration](#saml-20-partner-idp-configuration)
-      - [`url`](#url)
-      - [`post`](#post)
-      - [`redirect`](#redirect)
-      - [`entityID`](#entityid)
-      - [`name`](#name)
-      - [`metadata`](#metadata)
-      - [`virtual`](#virtual)
-      - [`contact`](#contact)
-      - [`profiles`](#profiles)
-      - [`auth_policy_contract`](#auth_policy_contract)
-      - [`id_mapping`](#id_mapping)
-      - [`core_attrs`](#core_attrs)
-      - [`extd_attrs`](#extd_attrs)
-      - [`attr_map`](#attr_map)
-      - [`oauth_map`](#oauth_map)
-      - [`cert_file`](#cert_file)
-      - [`cert_content`](#cert_content)
-      - [`saml2_oauth_token_map`](#saml2_oauth_token_map)
-    + [OAuth JDBC configuration](#oauth-jdbc-configuration)
-      - [`oauth_jdbc_type`](#oauth_jdbc_type)
-      - [`oauth_jdbc_db`](#oauth_jdbc_db)
-      - [`oauth_jdbc_user`](#oauth_jdbc_user)
-      - [`oauth_jdbc_pass`](#oauth_jdbc_pass)
-      - [`oauth_jdbc_host`](#oauth_jdbc_host)
-      - [`oauth_jdbc_port`](#oauth_jdbc_port)
-      - [`oauth_jdbc_driver`](#oauth_jdbc_driver)
-      - [`oauth_jdbc_package_list`](#oauth_jdbc_package_list)
-      - [`oauth_jdbc_package_ensure`](#oauth_jdbc_package_ensure)
-      - [`oauth_jdbc_nexus`](#oauth_jdbc_nexus)
-      - [`oauth_jdbc_maven`](#oauth_jdbc_maven)
-      - [`oauth_jdbc_jar_dir`](#oauth_jdbc_jar_dir)
-      - [`oauth_jdbc_jar`](#oauth_jdbc_jar)
-      - [`oauth_jdbc_url`](#oauth_jdbc_url)
-      - [`oauth_jdbc_validate`](#oauth_jdbc_validate)
-      - [`oauth_jdbc_create_cmd`](#oauth_jdbc_create_cmd)
-      - [`oauth_jdbc_client_ddl_cmd`](#oauth_jdbc_client_ddl_cmd)
-      - [`oauth_jdbc_access_ddl_cmd`](#oauth_jdbc_access_ddl_cmd)
-      - [`acct_jdbc_linking_ddl_cmd`](#acct_jdbc_linking_ddl_cmd)
-    + [OAuth client manager](#oauth-client-manager)
-      - [`oauth_client_mgr_user`](#oauth_client_mgr_user)
-      - [`oauth_client_mgr_pass`](#oauth_client_mgr_pass)
-    + [OAuth server settings](#oauth-server-settings)
-      - [`oauth_svc_scopes`](#oauth_svc_scopes)
-      - [`oauth_svc_scope_groups`](#oauth_svc_scope_groups)
-      - [`oauth_svc_grant_core_attrs`](#oauth_svc_grant_core_attrs)
-      - [`oauth_svc_grant_extd_attrs`](#oauth_svc_grant_extd_attrs)
-    + [OAuth scope selectors](#oauth-scope-selectors)
-      - [`oauth_scope_selectors`](#oauth_scope_selectors)
-      - [`oauth_scope_fail_no_selection`](#oauth_scope_fail_no_selection)
-    + [OAuth Access Token Managers](#oauth-access-token-managers)
-      - [`oauth_svc_acc_tok_mgr_id`](#oauth_svc_acc_tok_mgr_id)
-      - [`oauth_svc_acc_tok_mgr_core_attrs`](#oauth_svc_acc_tok_mgr_core_attrs)
-      - [`oauth_svc_acc_tok_mgr_extd_attrs`](#oauth_svc_acc_tok_mgr_extd_attrs)
-    + [OAuth OpenID Connect Policy Contracts](#oauth-openid-connect-policy-contracts)
-      - [`oauth_oidc_policy_id`](#oauth_oidc_policy_id)
-      - [`oauth_oidc_id_userinfo`](#oauth_oidc_id_userinfo)
-      - [`oauth_oidc_policy_core_map`](#oauth_oidc_policy_core_map)
-      - [`oauth_oidc_policy_extd_map`](#oauth_oidc_policy_extd_map)
-      - [`oauth_oidc_policy_scope_attr_map`](#oauth_oidc_policy_scope_attr_map)
-      - [`oauth_authn_policy_map`](#oauth_authn_policy_map)
-    + [`social_adapter`](#social_adapter)
-        * [key](#key)
-        * [`enable`](#enable)
-        * [`package_list`](#package_list-1)
-        * [`package_ensure`](#package_ensure-1)
-        * [`app_id`](#app_id)
-        * [`app_secret`](#app_secret)
-        * [`oauth_token_map`](#oauth_token_map)
-        * [`oauth_idp_map`](#oauth_idp_map)
-    + [OAuth Clients](#oauth-clients)
-      - [`oauth_client_default`](#oauth_client_default)
-      - [`oauth_client`](#oauth_client)
-- [Limitations](#limitations)
-  * [Operating System Support](#operating-system-support)
-  * [Known Issues](#known-issues)
-- [Development](#development)
-  * [Using Augeas to edit XML configuration files](#using-augeas-to-edit-xml-configuration-files)
-  * [Invoking the administrative REST API (pf-admin-api)](#invoking-the-administrative-rest-api-pf-admin-api)
-    + [pf-admin-api idempotent REST API client](#pf-admin-api-idempotent-rest-api-client)
-    + [oauth_jdbc_augeas script](#oauth_jdbc_augeas-script)
-
-<!-- tocstop -->
-
+# puppet-pingfederate
 ## Description
 
 This module installs and configures the
@@ -181,7 +7,50 @@ Puppet instead of the more typical interactive shell-script approach.
 
 ## Compatibility
 
-This module has been tested with PingFederate 8.x - 9.x and related social adapters (in progress).
+This module has been tested with PingFederate 8.x - 9.1 and related social adapters (in progress).
+
+## Table of Contents
+
+<!-- TOC generated with: `markdown-toc --maxdepth 4 -i README.md` -->
+
+<!-- toc -->
+
+- [Setup](#setup)
+  * [Beginning with pingfederate](#beginning-with-pingfederate)
+- [Usage](#usage)
+  * [Basic Usage](#basic-usage)
+    + [with RPMS available](#with-rpms-available)
+    + [without RPMS](#without-rpms)
+  * [Puppet Module Configuration](#puppet-module-configuration)
+    + [Packages](#packages)
+    + [Service](#service)
+    + [Logging](#logging)
+    + [Providing the License Key](#providing-the-license-key)
+    + [Run.properties](#runproperties)
+    + [Cross-Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors)
+    + [OGNL expressions](#ognl-expressions)
+    + [Administration](#administration)
+    + [Native SAML2 IdP](#native-saml2-idp)
+    + [SAML 2.0 SP Configuration](#saml-20-sp-configuration)
+    + [SAML 2.0 Partner IdP Configuration](#saml-20-partner-idp-configuration)
+    + [OAuth JDBC configuration](#oauth-jdbc-configuration)
+    + [OAuth client manager](#oauth-client-manager)
+    + [OAuth server settings](#oauth-server-settings)
+    + [OAuth scope selectors](#oauth-scope-selectors)
+    + [OAuth Access Token Manager](#oauth-access-token-manager)
+    + [OAuth OpenID Connect Policy Contract](#oauth-openid-connect-policy-contract)
+    + [Social Identity Adapters](#social-identity-adapters)
+    + [OAuth Clients](#oauth-clients)
+- [Limitations](#limitations)
+  * [Operating System Support](#operating-system-support)
+  * [Known Issues](#known-issues)
+- [Development](#development)
+  * [Using Augeas to edit XML configuration files](#using-augeas-to-edit-xml-configuration-files)
+  * [Invoking the administrative REST API (pf-admin-api)](#invoking-the-administrative-rest-api-pf-admin-api)
+    + [oauth_jdbc_augeas script](#oauth_jdbc_augeas-script)
+  * [TODO List](#todo-list)
+
+<!-- tocstop -->
 
 ## Setup
 
@@ -195,7 +64,7 @@ manual steps.
 
 The module installs PingFederate, performs basic static configuration of the
 server, that is, things that are changed prior to starting it up, and post-startup administration.
-The static configuration includes the run.properties` and various configuration XML files, 
+The static configuration includes the `run.properties` and various configuration XML files, 
 and installation of the license key.
 
 The administrative configuraton is done to the point of being able to
@@ -222,11 +91,11 @@ Install PingFederate per the [installation manual](https://documentation.pingide
   }
 ```
 
-### Parameters
-Using most of the defaults will just work to get the basic server installed and running. However, it will not do a heck of a lot. You'll need
-to set a number of the following parameters.
+### Puppet Module Configuration
+Using most of the defaults will just work to get the basic server installed and running.
+However, it will not do a heck of a lot. You'll need to set a number of the following parameters.
 
-#### Packaging
+#### Packages
 ##### `install_dir`
   (string)
   Path to installation directory of PingFederate server.
@@ -365,7 +234,7 @@ Provide either a license file or the content as a multiline string.
 #### Run.properties
 
 The following are used to configure `run.properties`. See the
-[PingFederate documentation](https://documentation.pingidentity.com/pingfederate/pf83/index.shtml#adminGuide/concept/changingConfigurationParameters.html)
+[PingFederate documentation](https://documentation.pingidentity.com/pingfederate/pf/index.shtml#adminGuide/concept/changingConfigurationParameters.html)
 for an explanation. The defaults are as distributed by PingIdentity.
 
 ##### `admin_https_port`
@@ -687,7 +556,7 @@ If it is `undef` then the default internal XML-based datastore will be used.
 
 ##### `oauth_jdbc_type`
   (string) Type of JDBC
-  [OAuth Client Datastore](https://documentation.pingidentity.com/pingfederate/pf83/index.shtml#concept_definingOauthClientDataStore.html)
+  [OAuth Client Datastore](https://documentation.pingidentity.com/pingfederate/pf/index.shtml#concept_definingOauthClientDataStore.html)
   connector. One of `undef`, `mysql`,`sqlserver`,`oracle`,`other`. Default: `undef`. If `other`, you'll need to fill in the following as well.
   Otherwise they default to expected values for the given *oauth_jdbc_type* but can still be used to override the defaults. 
   N.B. currently only fully implemented for `mysql` and `sqlserver`.
@@ -908,7 +777,9 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   Fail to login if no `oauth_scope_selector` was selected. If `false` an menu of available authentication
   options is presented to the user. If `false` no menu is presented. Default: `false`
 
-#### OAuth Access Token Managers
+#### OAuth Access Token Manager
+Currently only a single Access Token Manager may be configured. If you need more, please [submit a PR](#development)!
+
 ##### `oauth_svc_acc_tok_mgr_id`
   (string)
   ID of the access token manager. No default.
@@ -923,7 +794,9 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   List of extended attributes.
   No default.
 
-#### OAuth OpenID Connect Policy Contracts
+#### OAuth OpenID Connect Policy Contract
+Currently only a single OIDC Policy Contract may be configured. If you need more, please please [submit a PR](#development)!
+
 ##### `oauth_oidc_policy_id`
   (string)
   The ID of the policy. No default.
@@ -974,7 +847,7 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   ...
   ```
 
-#### `social_adapter`
+#### Social Identity Adapters
   (Map of maps) Social identity adapters have the following map keys.
   Example:
   ```
@@ -1062,11 +935,15 @@ pingfederate::oauth_client_default:
     grantAccessSessionRevocationApi: false
     pingAccessLogoutCapable: false
     logoutUris: []
+  jwksSettings:
+    jwks: ''
+    jwksUrl: ''
   clientAuth:
     type: SECRET
     secret: ''
     clientCertIssuerDn: ''
     clientCertSubjectDn: ''
+    enforceReplayPrevention: false
   ```
 
 ##### `oauth_client`
@@ -1102,6 +979,9 @@ pingfederate::oauth_client_default:
       type: SECRET
       secret: 73a7176Ab322549FCBEF46554d3381d5
   ```
+
+###### `clientAuth` types
+`clientAuth` type can be one of 'NONE', 'SECRET', 'CERTIFICATE', or 'PRIVATE_KEY_JWT'.
 
 ## Limitations
 
@@ -1218,7 +1098,7 @@ develop configuration puppet modules based on diffs of XML config files.
 
 ### Invoking the administrative REST API (pf-admin-api)
 Most configuration is done via the
-[PingFederate Administrative API](https://documentation.pingidentity.com/pingfederate/pf83/index.shtml#adminGuide/concept/pingFederateAdministrativeApi.html).
+[PingFederate Administrative API](https://documentation.pingidentity.com/pingfederate/pf/index.shtml#adminGuide/pingFederateAdministrativeApi.html).
 
 Unfortunately, one key configuration is done by editing XML files, using data returned from the API call. For example,
 the process for adding a mysql data store for oauth client management consists of:
@@ -1232,7 +1112,6 @@ the process for adding a mysql data store for oauth client management consists o
 1. Edit `<pf-install>server/default/data/config-store/org.sourceid.oauth20.domain.ClientManagerJdbcImpl.xml` to include the JNDI-name that was
 returned by the POST.
 
-#### pf-admin-api idempotent REST API client
 [pf-admin-api.erb](templates/pf-admin-api.erb) is a templated Python script which invokes the REST API.
 The script is templated to embed the default name of "this" server's configuration file as a default value.
 
@@ -1266,6 +1145,11 @@ Options:
   --retries=RETRIES     Number of retries [default: 5]
   --verify              verify SSL/TLS server certificate [default: False]
 ```
+
+If an API call returns an error (response status >= 400) then the input json file
+(e.g. `oauth_clients_demo_client.json`) will be renamed with a `.fail` extension
+(e.g. `oauth_clients_demo_client.json.fail`). This will help trigger a subsequent
+Puppet run (after what cause the error has been resolved).
 
 Here's an example of GET of the server version:
 
@@ -1356,3 +1240,10 @@ fault of the app for not having a clean set of APIs that do everything.) It's ki
 2. Edits several files in `<pf_install_dir>server/default/data/config-store`.
 
 There's also an `oauth_jdbc_revert_augeas` script that reverts back to the built-in non-JDBC datastore.
+
+### TODO List
+
+- Allow for multiple Access Token Managers
+  - Configure for different token lifetimes.
+  - Generally fix all instances of singleton configurations to allow for multiples.
+

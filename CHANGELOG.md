@@ -1,4 +1,8 @@
 # CHANGELOG
+## 0.6.0 [January 11, 2019]
+- Added OAuth2 Client Auth support for no secret (NONE) and Private Key JWT.
+- pf-admin-api renames the input `file.json` to `file.json.fail` on error.
+
 ## 0.5.2 [September 26, 2018]
 - Added defaults for MS sqlserver `oauth_jdbc_type`.
 - Added `oauth_jdbc_nexus` which allows installing the jdbc JAR file via `archive::nexus`

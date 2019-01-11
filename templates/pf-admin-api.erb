@@ -14,7 +14,7 @@ from optparse import OptionParser
 import time
 import sys
 import io
-
+import os
 
 def do_req(retries,method,url,**kwargs):
   """
@@ -176,5 +176,6 @@ if response.status_code < 400:
   exit(0)
 else:
   print(resp,file=sys.stderr)
+  if opt.json:
+    os.rename(opt.json, opt.json+".fail")
   exit(1)
-

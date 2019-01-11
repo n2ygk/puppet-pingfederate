@@ -157,11 +157,16 @@ class pingfederate::params {
       'pingAccessLogoutCapable' => false,
       'logoutUris'  => [],
     },
+    'jwksSettings' => {
+      'jwks' => '',
+      'jwksUrl' => '',
+    },
     'clientAuth' => {
       'type' => 'SECRET',
       'secret' => '',
       'clientCertIssuerDn'  => '',
       'clientCertSubjectDn'  => '',
-    }
+      'enforceReplayPrevention' => false,
+    },
   }
 }

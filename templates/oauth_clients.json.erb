@@ -34,11 +34,20 @@
 <% end -%>
     ]
   },
+<% if @b['clientAuth']['type'] == 'NONE' -%>
+  "clientAuth": null
+<% else -%>
   "clientAuth": {
     "type": "<%= @b['clientAuth']['type'] -%>",
     "secret": "<%= @b['clientAuth']['secret'] -%>",
     "encryptedSecret": "<%= @b['clientAuth']['encryptedSecret'] -%>",
     "clientCertIssuerDn": "<%= @b['clientAuth']['clientCertIssuerDn'] -%>",
-    "clientCertSubjectDn": "<%= @b['clientAuth']['clientCertSubjectDn'] -%>"
-  }
+    "clientCertSubjectDn": "<%= @b['clientAuth']['clientCertSubjectDn'] -%>",
+    "enforceReplayPrevention": <%= @b['clientAuth']['enforceReplayPrevention'] %>
+  }<% if @b['clientAuth']['type'] == 'PRIVATE_KEY_JWT' -%>,
+  "jwksSettings": {
+    "jwks": "<%= @b['jwksSettings']['jwks'] -%>",
+    "jwksUrl": "<%= @b['jwksSettings']['jwksUrl'] -%>"
+  }<% end -%>
+<% end %>
 }
