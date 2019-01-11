@@ -19,10 +19,10 @@ class pingfederate::install inherits ::pingfederate {
   }
   if $pingfederate::package_ensure {
     ensure_packages($pingfederate::package_list,{'ensure' => $pingfederate::package_ensure})
-    $pf_pkgs = Package[$::pingfederate::package_list] # dependency used below
+    $ensure_pf_pkgs = Package[$::pingfederate::package_list] # dependency used below
   }
   else {
-    $pf_pkgs = undef
+    $ensure_pf_pkgs = undef
   }
 
   # TBD: Refactor to a list of adapters to add? Or to download from PingIdentity.com?
@@ -40,7 +40,7 @@ class pingfederate::install inherits ::pingfederate {
   # Also install some local configuration tools
   file { "${::pingfederate::install_dir}/local":
     ensure  => 'directory',
-    require => $pf_pkgs, # require the package to create the install_dir
+    require => $ensure_pf_pkgs, # require the package to create the install_dir
     owner   => $::pingfederate::owner,
     group   => $::pingfederate::group,
   }
@@ -97,8 +97,12 @@ class pingfederate::install inherits ::pingfederate {
   }
   # If using an external JDBC database, install the JAR on the classpath and initialize the database.
   if $::pingfederate::oauth_jdbc_type {
-    if $::pingfederate::oauth_jdbc_package_ensure { # sometimes the jar is in an RPM
+    if $::pingfederate::oauth_jdbc_package_ensure { # sometimes the jar is in an RPM and/or CLI tools are
       ensure_packages($::pingfederate::o_pkgs,{'ensure' => $::pingfederate::oauth_jdbc_package_ensure})
+      $ensure_o_pkgs = Package[$::pingfederate::o_pkgs] # dependency used below
+    }
+    else {
+      $ensure_o_pkgs = undef
     }
     if $::pingfederate::o_nexus { # other times the jar is in a nexus repo
       archive::nexus { "${::pingfederate::o_jar_dir}/${::pingfederate::o_jar}":
@@ -125,6 +129,7 @@ class pingfederate::install inherits ::pingfederate {
       group  => $::pingfederate::group,
     }
     ~> exec {"oauth_jdbc CREATE ${::pingfederate::o_url}":
+      require     => $ensure_o_pkgs,
       command     => $::pingfederate::o_create,
       refreshonly => true,
       user        => $::pingfederate::owner,

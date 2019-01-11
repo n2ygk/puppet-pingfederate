@@ -198,50 +198,50 @@ class pingfederate (
         $acct_linking_script   = 'account-linking-mysql.sql'
         # allow database exists error or no output
         $def_create            = @("END"/L)
-          /usr/bin/mysqladmin
-            --wait
-            --connect_timeout=30
-            --host=${::pingfederate::oauth_jdbc_host}
-            --port=${::pingfederate::oauth_jdbc_port}
-            --user=${::pingfederate::oauth_jdbc_user}
-            --password=\"${::pingfederate::oauth_jdbc_pass}\"
-            create ${::pingfederate::oauth_jdbc_db}
+          /usr/bin/mysqladmin \
+            --wait \
+            --connect_timeout=30 \
+            --host=${::pingfederate::oauth_jdbc_host} \
+            --port=${::pingfederate::oauth_jdbc_port} \
+            --user=${::pingfederate::oauth_jdbc_user} \
+            --password=\"${::pingfederate::oauth_jdbc_pass}\" \
+            create ${::pingfederate::oauth_jdbc_db} \
           | /bin/awk '/database exists/{exit 0}/./{exit 1}'
           |-END
         # allow 1050 (table already exists) or no output
         $def_oauth_client_cmd  = @("END"/L)
-          /usr/bin/mysql
-            --wait --connect_timeout=30
-            --host=${::pingfederate::oauth_jdbc_host}
-            --port=${::pingfederate::oauth_jdbc_port}
-            --user=${::pingfederate::oauth_jdbc_user}
-            --password=\"${::pingfederate::oauth_jdbc_pass}\"
-            --database=${::pingfederate::oauth_jdbc_db}
-            < ${oauth_client_script_dir}/${oauth_client_script}
+          /usr/bin/mysql \
+            --wait --connect_timeout=30 \
+            --host=${::pingfederate::oauth_jdbc_host} \
+            --port=${::pingfederate::oauth_jdbc_port} \
+            --user=${::pingfederate::oauth_jdbc_user} \
+            --password=\"${::pingfederate::oauth_jdbc_pass}\" \
+            --database=${::pingfederate::oauth_jdbc_db} \
+            < ${oauth_client_script_dir}/${oauth_client_script} \
           | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'
           |-END
         # kludge to deal with a back-level mysql < 5.6
         $def_oauth_access_cmd  = @("END"/L)
-          /bin/cat ${oauth_access_script_dir}/${oauth_access_script1} ${oauth_access_script_dir}/${oauth_access_script2}
-          | /bin/sed -e 's/default CURRENT_TIMESTAMP//'
-          | /usr/bin/mysql
-            --wait --connect_timeout=30
-            --host=${::pingfederate::oauth_jdbc_host}
-            --port=${::pingfederate::oauth_jdbc_port}
-            --user=${::pingfederate::oauth_jdbc_user}
-            --password=\"${::pingfederate::oauth_jdbc_pass}\"
-            --database=${::pingfederate::oauth_jdbc_db}
+          /bin/cat ${oauth_access_script_dir}/${oauth_access_script1} ${oauth_access_script_dir}/${oauth_access_script2} \
+          | /bin/sed -e 's/default CURRENT_TIMESTAMP//' \
+          | /usr/bin/mysql \
+            --wait --connect_timeout=30 \
+            --host=${::pingfederate::oauth_jdbc_host} \
+            --port=${::pingfederate::oauth_jdbc_port} \
+            --user=${::pingfederate::oauth_jdbc_user} \
+            --password=\"${::pingfederate::oauth_jdbc_pass}\" \
+            --database=${::pingfederate::oauth_jdbc_db} \
           | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'
           |-END
-        $def_acct_linking_cmd  = @("END")/L)
-          /usr/bin/mysql
-            --wait --connect_timeout=30
-            --host=${::pingfederate::oauth_jdbc_host}
-            --port=${::pingfederate::oauth_jdbc_port}
-            --user=${::pingfederate::oauth_jdbc_user}
-            --password=\"${::pingfederate::oauth_jdbc_pass}\"
-            --database=${::pingfederate::oauth_jdbc_db}
-            < ${acct_linking_script_dir}/${acct_linking_script}
+        $def_acct_linking_cmd  = @("END"/L)
+          /usr/bin/mysql \
+            --wait --connect_timeout=30 \
+            --host=${::pingfederate::oauth_jdbc_host} \
+            --port=${::pingfederate::oauth_jdbc_port} \
+            --user=${::pingfederate::oauth_jdbc_user} \
+            --password=\"${::pingfederate::oauth_jdbc_pass}\" \
+            --database=${::pingfederate::oauth_jdbc_db} \
+            < ${acct_linking_script_dir}/${acct_linking_script} \
           | /bin/awk '/ERROR 1050/{exit 0}/./{exit 1}'
           |-END
       }
@@ -260,32 +260,31 @@ class pingfederate (
         $oauth_access_script1  = 'access-grant-sqlserver.sql'
         $oauth_access_script2  = 'access-grant-attribute-sqlserver.sql'
         $acct_linking_script   = 'account-linking-sqlserver.sql'
-        $sqlcmd_nodb           =  @("END")/L)
-          /opt/mssql-tools/bin/sqlcmd
-            -l 30
-            -S ${::pingfederate::oauth_jdbc_host},${::pingfederate::oauth_jdbc_port}
-            -U ${::pingfederate::oauth_jdbc_user}
+        $sqlcmd_nodb           =  @("END"/L)
+          /opt/mssql-tools/bin/sqlcmd \
+            -l 30 \
+            -S ${::pingfederate::oauth_jdbc_host},${::pingfederate::oauth_jdbc_port} \
+            -U ${::pingfederate::oauth_jdbc_user} \
             -P \"${::pingfederate::oauth_jdbc_pass}\"
           |-END
         $sqlcmd                = "${sqlcmd_nodb} -d ${::pingfederate::oauth_jdbc_db}"
         # allow database exists error or no output
         $def_create            = @("END"/L)
-          ${sqlcmd_nodb}
-            -Q \"create database ${::pingfederate::oauth_jdbc_db}\"
+          ${sqlcmd_nodb} -Q \"create database ${::pingfederate::oauth_jdbc_db}\" \
           | /bin/awk '/Msg 1801,/{exit 0}/Msg 262,/{exit 0}/./{exit 1}'
           |-END
         # allow 2714 (table already exists) or no output
         $def_oauth_client_cmd  = @("END"/L)
-          ${sqlcmd} -i ${oauth_client_script_dir}/${oauth_client_script}
+          ${sqlcmd} -i ${oauth_client_script_dir}/${oauth_client_script} \
           | /bin/awk '/Msg 2714/{exit 0}/./{exit 1}'
           |-END
         $def_oauth_access_cmd  = @("END"/L)
-          ${sqlcmd} -i ${oauth_access_script_dir}/${oauth_access_script1}
-          && ${sqlcmd} -i ${oauth_access_script_dir}/${oauth_access_script2}
+          ${sqlcmd} -i ${oauth_access_script_dir}/${oauth_access_script1} \
+          && ${sqlcmd} -i ${oauth_access_script_dir}/${oauth_access_script2} \
           | /bin/awk '/Msg 2714/{exit 0}/./{exit 1}'
           |-END
         $def_acct_linking_cmd  = @("END"/L)
-          ${sqlcmd} -i ${acct_linking_script_dir}/${acct_linking_script}
+          ${sqlcmd} -i ${acct_linking_script_dir}/${acct_linking_script} \
           | /bin/awk '/Msg 2714/{exit 0}/./{exit 1}'
           |-END
       }

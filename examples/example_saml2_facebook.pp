@@ -15,11 +15,18 @@ $lic = @(LICENSE)
        Signature=302C02141B7xxxx55996EB354FAEDC5211E14E3BC2B4964602144EEBD282F20EF2B77AA8A87DCB17BE533A537720
        | LICENSE
 # ugh it is impossible to get this damn quoting right. It gets double-interpolated. Once by puppet and again by JSON parser.
-$map_group = join(['#result=#this.get(\'urn:oid:1.3.6.1.4.1.5923.1.1.1.1.9\').toString()', # get the PingAffiliation extended attribute value
-                   '#result=#result.replace(\"[\", \'[\\\\\"\')',                            # replace [ with [\"
-                   '#result=#result.replace(\"]\", \'\\\\\"]\')',                            # replace ] with "]
-                   '#result=#result.replace(\",\", \'\\\\\",\\\\\"\')',                        # replace , with ","
-                   '#result=#result.replace(\" \", \"\")'],',  ')                          # compress out whitespace, join stmts with ',  '
+# Steps below:
+#  get the PingAffiliation extended attribute value
+#  replace [ with [\"
+#  replace ] with "]
+#  replace , with ","
+#  compress out whitespace, join stmts with ',  '
+$map_group = join([
+                    '#result=#this.get(\'urn:oid:1.3.6.1.4.1.5923.1.1.1.1.9\').toString()',
+                    '#result=#result.replace(\"[\", \'[\\\\\"\')',
+                    '#result=#result.replace(\"]\", \'\\\\\"]\')',
+                    '#result=#result.replace(\",\", \'\\\\\",\\\\\"\')',
+                    '#result=#result.replace(\" \", \"\")'],',  ')
 $cert_str =  @(x509File)
              -----BEGIN CERTIFICATE-----
              MIIDZjCCAk6gAwIBAgIVAJfrwoV8xxxxXzQxy/P+tTmLVdd2MA0GCSqGSIb3DQEB
@@ -59,35 +66,41 @@ class { '::pingfederate':
   oauth_oidc_policy_id             => 'CUoidcApis',
   oauth_oidc_policy_core_map       => [{'name' =>'sub', 'type' => 'TOKEN', 'value' => 'username'}],
   oauth_oidc_policy_extd_map       => [{'name' => 'group', 'type' => 'TOKEN', 'value' => 'group'}],
-  oauth_authn_policy_map           => [{'name' => 'USER_KEY', 'type' => 'AUTHENTICATION_POLICY_CONTRACT', 'value' => 'subject'},
-                                       {'name' => 'USER_NAME', 'type' => 'AUTHENTICATION_POLICY_CONTRACT', 'value' => 'subject'},
-                                       {'name' => 'group', 'type' => 'AUTHENTICATION_POLICY_CONTRACT', 'value' => 'pingAffiliation'},
-                                       ],
+  oauth_authn_policy_map           => [
+                                        {'name' => 'USER_KEY', 'type' => 'AUTHENTICATION_POLICY_CONTRACT', 'value' => 'subject'},
+                                        {'name' => 'USER_NAME', 'type' => 'AUTHENTICATION_POLICY_CONTRACT', 'value' => 'subject'},
+                                        {'name' => 'group', 'type' => 'AUTHENTICATION_POLICY_CONTRACT', 'value' => 'pingAffiliation'},
+                                      ],
   facebook_adapter                 => true,
   facebook_app_id                  => '1141518492609366',
   facebook_app_secret              => '99bd671e89381082a3f2f2743cad4635',
-  facebook_oauth_token_map         => [{'name' => 'username', 'type' => 'ADAPTER', 'value' => 'name'},
-                                       {'name' => 'group', 'type' => 'TEXT', 'value' => 'facebook'},
-                                       {'name' => 'uid', 'type' => 'ADAPTER', 'value' => 'id'}
-                                       ],
-  facebook_oauth_idp_map           => [{'name' => 'USER_KEY', 'type' => 'ADAPTER', 'value' => 'id'},
-                                       {'name' => 'USER_NAME', 'type' => 'ADAPTER', 'value' => 'name'},
-                                       {'name' => 'group', 'type' => 'TEXT', 'value' => 'group'},
-                                       ],
+  facebook_oauth_token_map         => [
+                                        {'name' => 'username', 'type' => 'ADAPTER', 'value' => 'name'},
+                                        {'name' => 'group', 'type' => 'TEXT', 'value' => 'facebook'},
+                                        {'name' => 'uid', 'type' => 'ADAPTER', 'value' => 'id'}
+                                      ],
+  facebook_oauth_idp_map           => [
+                                        {'name' => 'USER_KEY', 'type' => 'ADAPTER', 'value' => 'id'},
+                                        {'name' => 'USER_NAME', 'type' => 'ADAPTER', 'value' => 'name'},
+                                        {'name' => 'group', 'type' => 'TEXT', 'value' => 'group'},
+                                      ],
   saml2_idp_url                    => 'https://shibboleth-dev.cc.columbia.edu',
   saml2_idp_contact                => {'firstName' => 'CUIT', 'lastName' => 'IDM', 'email' => 'cuit-idm-tech@columbia.edu'},
   saml2_idp_extd_attrs             => ['urn:oid:1.3.6.1.4.1.5923.1.1.1.1.9'],
-  saml2_idp_attr_map               => [{'name' => 'pingAffiliation', 'type' => 'EXPRESSION', 'value' => $map_group},
-                                       {'name' => 'subject', 'type' => 'ASSERTION', 'value' => 'SAML_SUBJECT'}
-                                       ],
-  saml2_idp_oauth_map              => [{'name' => 'USER_KEY', 'type' => 'ASSERTION', 'value' => 'SAML_SUBJECT'},
-                                       {'name' => 'USER_NAME', 'type' => 'ASSERTION', 'value' => 'SAML_SUBJECT'},
-                                       {'name' => 'group', 'type' => 'EXPRESSION', 'value' => $map_group}
-                                       ],
-  saml2_oauth_token_map            => [{'name' => 'username', 'type' => 'OAUTH_PERSISTENT_GRANT', 'value' => 'USER_KEY'},
-                                       {'name' => 'group', 'type' => 'OAUTH_PERSISTENT_GRANT', 'value' => 'group'},
-                                       {'name' => 'uid', 'type' => 'OAUTH_PERSISTENT_GRANT', 'value' => 'USER_KEY'}
-                                       ],
+  saml2_idp_attr_map               => [
+                                        {'name' => 'pingAffiliation', 'type' => 'EXPRESSION', 'value' => $map_group},
+                                        {'name' => 'subject', 'type' => 'ASSERTION', 'value' => 'SAML_SUBJECT'}
+                                      ],
+  saml2_idp_oauth_map              => [
+                                        {'name' => 'USER_KEY', 'type' => 'ASSERTION', 'value' => 'SAML_SUBJECT'},
+                                        {'name' => 'USER_NAME', 'type' => 'ASSERTION', 'value' => 'SAML_SUBJECT'},
+                                        {'name' => 'group', 'type' => 'EXPRESSION', 'value' => $map_group}
+                                      ],
+  saml2_oauth_token_map            => [
+                                        {'name' => 'username', 'type' => 'OAUTH_PERSISTENT_GRANT', 'value' => 'USER_KEY'},
+                                        {'name' => 'group', 'type' => 'OAUTH_PERSISTENT_GRANT', 'value' => 'group'},
+                                        {'name' => 'uid', 'type' => 'OAUTH_PERSISTENT_GRANT', 'value' => 'USER_KEY'}
+                                      ],
   saml2_idp_cert_str               => $cert_str,
 }
 

@@ -173,9 +173,17 @@ if response.status_code < 400:
     id_out = open(opt.id,'wb')
     if opt.idkey in rjson:
       print(rjson[opt.idkey],file=id_out,end='')
+  # remove any prior .fail
+  if opt.json:
+    try:
+      os.remove(opt.json+".fail")
+    except OSError as e:
+      if e.errno != 2:
+        print(e)
   exit(0)
 else:
   print(resp,file=sys.stderr)
+  # on failure rename input +.fail
   if opt.json:
     os.rename(opt.json, opt.json+".fail")
   exit(1)

@@ -104,7 +104,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     }
     ~> exec { "pf-admin-api POST ${apcm}_${un}":
       command     => @("END"/L),
-        ${pfapi} -m POST -j ${etc}/${apcmf}_${un}.json -s id=${etc}/${apc}_${un}.id
+        ${pfapi} -m POST -j ${etc}/${apcmf}_${un}.json -s id=${etc}/${apc}_${un}.id \
          -r ${etc}/${apcmf}_${un}.json.out -i ${etc}/${apcmf}_${un}.id ${apcm}
         |-END
       refreshonly => true,
@@ -213,7 +213,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     }
     ~> exec {"pf-admin-api POST ${spidp}_${un}":
       command     => @("END"/L),
-        ${pfapi} -m POST -j ${etc}/${spidpf}_${un}.json -s id=${etc}/${apc}_${uan}.id ${mdsubst}
+        ${pfapi} -m POST -j ${etc}/${spidpf}_${un}.json -s id=${etc}/${apc}_${uan}.id ${mdsubst} \
          -r ${etc}/${spidpf}_${un}.json.out -i ${etc}/${spidpf}_${un}.id ${spidp}
         |-END
       refreshonly => true,
@@ -233,7 +233,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     }
     ~> exec {"pf-admin-api POST ${oatsp}/saml2_${un}":
       command     => @("END"/L),
-        ${pfapi} -m POST -j ${etc}/${oatspf}_${un}.json -s id=${etc}/${spidpf}_${un}.id 
+        ${pfapi} -m POST -j ${etc}/${oatspf}_${un}.json -s id=${etc}/${spidpf}_${un}.id \
           -r ${etc}/${oatspf}_${un}.json.out -i ${etc}/${oatspf}_${un}.id ${oatsp}
         |-END
       refreshonly => true,

@@ -44,10 +44,7 @@ class pingfederate::admin inherits ::pingfederate {
         require => Class['::pingfederate::oauth_jdbc_datastore'],
       }
       ~> exec {"pf-admin-api POST ${oacf}":
-        command     => @("END"/L),
-          ${pfapi} -m POST -j ${etc}/${oacf}.json -r ${etc}/${oacf}.json.out
-           -k clientId -i ${etc}/${oacf}.id ${oac}
-          |-END
+        command     => "${pfapi} -m POST -j ${etc}/${oacf}.json -r ${etc}/${oacf}.json.out -k clientId -i ${etc}/${oacf}.id ${oac}",
         refreshonly => true,
         user        => $::pingfederate::owner,
         logoutput   => true,
@@ -57,8 +54,8 @@ class pingfederate::admin inherits ::pingfederate {
       exec {'pf-admin-api cluster replicate':
         subscribe   => [Exec[$restart],Class['::pingfederate::server_settings']],
         command     => @("END"/L),
-          ${::pingfederate::install_dir}/local/bin/pf-admin-api cluster/status
-           | grep -q '\"replicationRequired\": false'
+          ${::pingfederate::install_dir}/local/bin/pf-admin-api cluster/status \
+           | grep -q '\"replicationRequired\": false' \
            || ${::pingfederate::install_dir}/local/bin/pf-admin-api -m POST --timeout=60 cluster/replicate
           |-END
         user        =>  $::pingfederate::owner,

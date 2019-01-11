@@ -7,6 +7,8 @@ Puppet instead of the more typical interactive shell-script approach.
 
 ## Compatibility
 
+This module has only been tested with Puppet 4.
+
 This module has been tested with PingFederate 8.x - 9.1 and related social adapters (in progress).
 
 ## Table of Contents
@@ -1259,4 +1261,4 @@ There's also an `oauth_jdbc_revert_augeas` script that reverts back to the built
 - Allow for multiple Access Token Managers
   - Configure for different token lifetimes.
   - Generally fix all instances of singleton configurations to allow for multiples.
-
+- Support Puppet 5+

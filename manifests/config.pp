@@ -171,12 +171,12 @@ class pingfederate::config inherits ::pingfederate {
                     'set web-app/filter-mapping/filter-name/#text "cross-origin"',
                     "set web-app/filter-mapping/url-pattern/#text \"${::pingfederate::cors_filter_mapping}\"",
                     @(END/L),
-                    set web-app/security-constraint/web-resource-collection
+                    set web-app/security-constraint/web-resource-collection\
                     /url-pattern[./#text="/*"]/../http-method[#text="OPTIONS" and (last()+1)]/#text "OPTIONS"
                     |-END
                     @(END/L),
-                    set web-app/security-constraint/web-resource-collection
-                    /url-pattern[./#text="/*"]/../web-resource-name/#text
+                    set web-app/security-constraint/web-resource-collection\
+                    /url-pattern[./#text="/*"]/../web-resource-name/#text\
                       "Enable all methods except for TRACE (OPTIONS was added for OAuth 2.0 XHR)"
                     |-END
                     ]
@@ -192,8 +192,8 @@ class pingfederate::config inherits ::pingfederate {
       context => "/files/${hive_file}",
       changes => [
         @(END/L)
-        set module/service-point[#attribute/id="ClientManager"][#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]
-        /invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerJdbcImpl
+        set module/service-point[#attribute/id="ClientManager"][#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]\
+        /invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerJdbcImpl"
         |-END
       ],
     }
@@ -205,10 +205,10 @@ class pingfederate::config inherits ::pingfederate {
       context => "/files/${hive_file}",
       changes => [
                   @(END/L)
-                  set module/service-point[#attribute/id="ClientManager"]
-                  [#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]
+                  set module/service-point[#attribute/id="ClientManager"]\
+                  [#attribute/interface="org.sourceid.oauth20.domain.ClientManager"]\
                   /invoke-factory/construct/#attribute/class "org.sourceid.oauth20.domain.ClientManagerXmlFileImpl"
-                  @-END
+                  |-END
                   ]
     }
   }
@@ -255,23 +255,11 @@ class pingfederate::config inherits ::pingfederate {
   # Sets the fileName, filePattern, removes any extant Policies, adds daily CronTriggeringPolicy and max retension days.
   $log4_rollers = $::pingfederate::log_files.map |$i| {
     [
-      @("END"/L),
-      set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]
-      /#attribute/fileName \${sys:pf.log.dir}/${i['fileName']}
-      |-END
-      @("END"/L),
-      set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]
-      /#attribute/filePattern \${sys:pf.log.dir}/${i['filePattern']}",
-      |-END
+      "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/#attribute/fileName \${sys:pf.log.dir}/${i['fileName']}", # lint:ignore:140chars
+      "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/#attribute/filePattern \${sys:pf.log.dir}/${i['filePattern']}", # lint:ignore:140chars
       "rm Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/Policies",
-      @("END"/L),
-      set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]
-      /CronTriggeringPolicy/#attribute/schedule \"0 0 0 * * ?\"
-      |-END
-      @("END"/L),
-      set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]
-      /DefaultRolloverStrategy/#attribute/max ${::pingfederate::log_retain_days}
-      @-END
+      "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/CronTriggeringPolicy/#attribute/schedule \"0 0 0 * * ?\"", # lint:ignore:140chars
+      "set Configuration/Appenders/RollingFile[#attribute/name=\"${i['name']}\"]/DefaultRolloverStrategy/#attribute/max ${::pingfederate::log_retain_days}", # lint:ignore:140chars
     ]
   }
 
