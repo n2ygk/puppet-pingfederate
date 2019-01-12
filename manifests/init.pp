@@ -265,7 +265,7 @@ class pingfederate (
             -l 30 \
             -S ${::pingfederate::oauth_jdbc_host},${::pingfederate::oauth_jdbc_port} \
             -U ${::pingfederate::oauth_jdbc_user} \
-            -P \"${::pingfederate::oauth_jdbc_pass}\"
+            -P ${::pingfederate::oauth_jdbc_pass}
           |-END
         $sqlcmd                = "${sqlcmd_nodb} -d ${::pingfederate::oauth_jdbc_db}"
         # allow database exists error or no output
