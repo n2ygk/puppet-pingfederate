@@ -321,7 +321,7 @@ class pingfederate (
     $o_create   = if $::pingfederate::oauth_jdbc_create_cmd { $::pingfederate::oauth_jdbc_create_cmd } else { $def_create }
     $o_c_cmd    = if $::pingfederate::oauth_jdbc_client_ddl_cmd { $::pingfederate::oauth_jdbc_client_ddl_cmd }
                   else { $def_oauth_client_cmd }
-    $o_a_cmd    = if $::pingfederate::oauth_jdbc_access_ddl_cmd { $::pingfederate::oauth_jdbc_ddl_access_cmd }
+    $o_a_cmd    = if $::pingfederate::oauth_jdbc_access_ddl_cmd { $::pingfederate::oauth_jdbc_access_ddl_cmd }
                   else { $def_oauth_access_cmd }
     $a_l_cmd    = if $::pingfederate::acct_jdbc_linking_ddl_cmd { $::pingfederate::acct_jdbc_ddl_linking_cmd }
                   else { $def_acct_linking_cmd }

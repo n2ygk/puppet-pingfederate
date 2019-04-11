@@ -1,8 +1,14 @@
 # CHANGELOG
+## 0.7.3 (April 11, 2019)
+- 0.6.1 Bugfix: Attempting to set `pingfederate::oauth_jdbc_access_ddl_cmd` did not work.
+
 ## 0.7.2 [January 12, 2019]
 - pdk convert and validate https://puppet.com/docs/pdk/
 - **BREAKING CHANGES** to pass puppet-lint, including making all variable names *lowercase*.
   This requires matching changes to hieradata keys for any users of this module.
+
+## 0.6.1 [April 11, 2019]
+- Bugfix: Attempting to set `pingfederate::oauth_jdbc_access_ddl_cmd` did not work.
 
 ## 0.6.0 [January 11, 2019]
 - Added OAuth2 Client Auth support for no secret (NONE) and Private Key JWT.
