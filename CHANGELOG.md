@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.6.1 [April 11, 2019]
+- Bugfix: Attempting to set `pingfederate::oauth_jdbc_access_ddl_cmd` did not work.
+
 ## 0.6.0 [January 11, 2019]
 - Added OAuth2 Client Auth support for no secret (NONE) and Private Key JWT.
 - pf-admin-api renames the input `file.json` to `file.json.fail` on error.
