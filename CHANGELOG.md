@@ -1,4 +1,8 @@
 # CHANGELOG
+
+## 0.7.4 (March 15, 2019)
+- 0.6.2: Support to install (optionally CA-signed) TLS server cert.
+
 ## 0.7.3 (April 11, 2019)
 - 0.6.1 Bugfix: Attempting to set `pingfederate::oauth_jdbc_access_ddl_cmd` did not work.
 
@@ -6,6 +10,10 @@
 - pdk convert and validate https://puppet.com/docs/pdk/
 - **BREAKING CHANGES** to pass puppet-lint, including making all variable names *lowercase*.
   This requires matching changes to hieradata keys for any users of this module.
+
+## 0.6.2 [March 15, 2020]
+- Support to install (optionally CA-signed) TLS server cert.
+
 
 ## 0.6.1 [April 11, 2019]
 - Bugfix: Attempting to set `pingfederate::oauth_jdbc_access_ddl_cmd` did not work.

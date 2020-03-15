@@ -32,6 +32,7 @@ This module has been tested with PingFederate 8.x - 9.1 and related social adapt
     + [Cross-Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors)
     + [OGNL expressions](#ognl-expressions)
     + [Administration](#administration)
+    + [Server SSL/TLS Certificate](#server-ssltls-certificate)
     + [Native SAML2 IdP](#native-saml2-idp)
     + [SAML 2.0 SP Configuration](#saml-20-sp-configuration)
     + [SAML 2.0 Partner IdP Configuration](#saml-20-partner-idp-configuration)
@@ -384,6 +385,55 @@ Most of these settings should be left with default values.
 
   Default: `"https://${facts['fqdn']}:${https_port}"`
   
+#### Server SSL/TLS Certificate
+Use these settings to import a server SSL certificate (optionally signed by a chain of CAs).
+You can use `openssl` to create these certs and CSRs but make sure to use the
+same `ssl_cert_passphrase`.
+
+TODO: document with full openssl examples.
+
+##### `ssl_cert_passphrase`
+  (string)
+  The passphrase used to protect the private key.
+  ```
+  pingfederate::ssl_cert_passphrase: ThePassword
+  ```
+
+##### `ssl_cert_content`
+  (string)
+  Base 64 encoded string containing PKCS12 TLS certificate. Example:
+  ```
+  pingfederate::ssl_cert_content: |
+    MIIKPwIBAzCCCfgGCSqGSIb3DQEHAaCCCekEggnlMIIJ4TCCBWUGCSqGSIb3DQEHAaCCBVYEggVS
+    MIIFTjCCBUoGCyqGSIb3DQEMCgECoIIE+zCCBPcwKQYKKoZIhvcNAQwBAzAbBBQWj4ebhqdFy6yp
+    ...
+    AgMBhqA=
+  ```
+
+  Produce this string like this and then insert it into your YAML.
+  ```
+  $ base64 -b 76 170D457373C.p12 | sed -e 's/^/  /'
+  ```
+
+##### `ssl_cert_csr_content`
+  (string)
+  PEM encoded string containing signed cert with CA chain.
+  ```
+  pingfederate::ssl_cert_csr_content: |
+    -----BEGIN CERTIFICATE-----
+    MIIENjCCAx6gAwIBAgIBATANBgkqhkiG9w0BAQUFADBvMQswCQYDVQQGEwJTRTEUMBIGA1UEChML
+    QWRkVHJ1c3QgQUIxJjAkBgNVBAsTHUFkZFRydXN0IEV4dGVybmFsIFRUUCBOZXR3b3JrMSIwIAYD
+    ...
+    -----END CERTIFICATE-----
+  ```
+
+  This file is provided by your CA as a Certificate (w/ chain), PEM encoded.
+
+  Produce this string like this and then insert it into your YAML:
+  ```
+  sed -e 's/^/  /' pem_encoded.cer
+  ```
+
 #### Native SAML2 IdP
 These are the native SAML2 IdP settings used for native *console_authentication* and
 *admin_api_authentication*. The *adm_user* and *adm_pass* are used for HTTP Basic Auth.

@@ -56,6 +56,9 @@ class pingfederate::params {
   $service_api_baseurl                 = "https://${facts['fqdn']}:${https_port}"
   $saml2_local_entityid                = "${facts['hostname']}-ping:urn:saml2"
   $saml1_local_issuerid                = "${facts['hostname']}-ping:urn:saml1"
+  $ssl_cert_passphrase                 = undef
+  $ssl_cert_content                    = undef
+  $ssl_cert_csr_content                = undef
   $wsfed_local_realm                   = "${facts['hostname']}-ping:urn:wsfed"
   $http_forwarded_for_header           = undef
   $http_forwarded_host_header          = undef

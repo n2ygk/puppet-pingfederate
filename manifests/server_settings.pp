@@ -13,32 +13,87 @@ class pingfederate::server_settings inherits ::pingfederate {
 
   $ss = 'serverSettings'
   file { "${etc}/${ss}.json":
-    ensure  => 'present',
-    mode    => 'a=r',
-    owner   => $::pingfederate::owner,
-    group   => $::pingfederate::group,
-    content => template("pingfederate/${ss}.json.erb"),
-  }
-  ~> exec {"pf-admin-api PUT ${ss}":
+    ensure   => 'present',
+    mode     => 'a=r',
+    owner    => $::pingfederate::owner,
+    group    => $::pingfederate::group,
+    content  => template("pingfederate/${ss}.json.erb"),
+  } ~>
+  exec {"pf-admin-api PUT ${ss}":
     command     => "${pfapi} -m PUT -j ${etc}/${ss}.json -r ${etc}/${ss}.json.out ${ss}",
     refreshonly => true,
     user        => $::pingfederate::owner,
     logoutput   => true,
   }
 
-  $pcv = 'passwordCredentialValidators'
+  $pcv = "passwordCredentialValidators"
   file {"${etc}/${pcv}.json":
-    ensure  => 'present',
-    mode    => 'a=r',
-    owner   => $::pingfederate::owner,
-    group   => $::pingfederate::group,
-    content => template("pingfederate/${pcv}.json.erb"),
-  }
-  ~> exec {"pf-admin-api POST ${pcv}":
+    ensure   => 'present',
+    mode     => 'a=r',
+    owner    => $::pingfederate::owner,
+    group    => $::pingfederate::group,
+    content  => template("pingfederate/${pcv}.json.erb"),
+  } ~>
+  exec {"pf-admin-api POST ${pcv}":
     command     => "${pfapi} -m POST -j ${etc}/${pcv}.json -r ${etc}/${pcv}.json.out ${pcv}",
     refreshonly => true,
     user        => $::pingfederate::owner,
     logoutput   => true,
+  }
+
+  # import a server SSL cert and select it
+  if $::pingfederate::ssl_cert_content {
+    $ssl = "keyPairs/sslServer"
+    $sslf = "keyPairs_sslServer"
+    # base64 string has no whitespace:
+    $ssl_pkcs12_string = regsubst($::pingfederate::ssl_cert_content,'\n','','G')
+    file { "${etc}/${sslf}_import.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${sslf}_import.json.erb"),
+    } ~>
+    file { "${etc}/${sslf}_settings.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${sslf}_settings.json.erb"),
+    } ~>
+    exec {"pf-admin-api POST ${ssl}_import":
+      command     => "${pfapi} -m POST -j ${etc}/${sslf}_import.json -r ${etc}/${sslf}_import.json.out ${ssl}/import",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    } ~>
+    exec {"pf-admin-api PUT ${ssl}_settings":
+      command     => "${pfapi} -m PUT -j ${etc}/${sslf}_settings.json -r ${etc}/${sslf}_settings.json.out ${ssl}/settings",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+  }
+
+  # optionally import the CSR response
+  if $::pingfederate::ssl_cert_csr_content {
+    $sslc = "keyPairs/sslServer/mykey/csr"
+    $sslcf = "keyPairs_sslServer_csr"
+    # replace newlines with quoted newlines
+    $csr_x509_string = regsubst($::pingfederate::ssl_cert_csr_content,'\n','\\n','G')
+    file { "${etc}/${sslcf}.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${sslcf}.json.erb"),
+    } ~>
+    exec {"pf-admin-api POST ${sslc}":
+      command     => "${pfapi} -m POST -j ${etc}/${sslcf}.json -r ${etc}/${sslcf}.json.out ${sslc}",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
   }
 
 
@@ -90,6 +145,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
+
 
     $apcm = 'oauth/authenticationPolicyContractMappings'
     $apcmf = 'oauth_authenticationPolicyContractMappings'
