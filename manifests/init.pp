@@ -75,6 +75,10 @@ class pingfederate (
   $adm_pass                            = $::pingfederate::params::adm_pass,
   $adm_hash                            = $::pingfederate::params::adm_hash,
   $adm_api_baseURL                     = $::pingfederate::params::adm_api_baseURL,
+  # Server SSL certs
+  $ssl_cert_passphrase                 = $::pingfederate::params::ssl_cert_passphrase,
+  $ssl_cert_content                    = $::pingfederate::params::ssl_cert_content,
+  $ssl_cert_csr_content                = $::pingfederate::params::ssl_cert_csr_content,
   # API: serverSettings & XML: sourceid-saml2-local-metadata.xml (local SAML IdP configuration)
   $service_api_baseURL                 = $::pingfederate::params::service_api_baseURL,
   $saml2_local_entityID                = $::pingfederate::params::saml2_local_entityID,

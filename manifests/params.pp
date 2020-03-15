@@ -54,6 +54,9 @@ class pingfederate::params {
   $adm_hash                            = 'k1H1o2jc66sgkDjJKq85Sr22QNk143S20oR2Yyt2kqo.5Cu-mnqB.2'
   $adm_api_baseURL                     = "https://${facts['fqdn']}:${admin_https_port}/pf-admin-api/v1"
   $service_api_baseURL                 = "https://${facts['fqdn']}:${https_port}"
+  $ssl_cert_passphrase                 = undef
+  $ssl_cert_content                    = undef
+  $ssl_cert_csr_content                = undef
   $saml2_local_entityID                = "${facts['hostname']}-ping:urn:saml2"
   $saml1_local_issuerID                = "${facts['hostname']}-ping:urn:saml1"
   $wsfed_local_realm                   = "${facts['hostname']}-ping:urn:wsfed"

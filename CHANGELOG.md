@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.6.2 [March 15, 2020]
+- Support to install (optionally CA-signed) TLS server cert.
+
 ## 0.6.1 [April 11, 2019]
 - Bugfix: Attempting to set `pingfederate::oauth_jdbc_access_ddl_cmd` did not work.
 

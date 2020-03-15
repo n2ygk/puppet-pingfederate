@@ -18,12 +18,67 @@ class pingfederate::server_settings inherits ::pingfederate {
     owner    => $::pingfederate::owner,
     group    => $::pingfederate::group,
     content  => template("pingfederate/${ss}.json.erb"),
-  } ~> 
+  } ~>
   exec {"pf-admin-api PUT ${ss}":
     command     => "${pfapi} -m PUT -j ${etc}/${ss}.json -r ${etc}/${ss}.json.out ${ss}", # || rm -f ${ss}.json",
     refreshonly => true,
     user        => $::pingfederate::owner,
     logoutput   => true,
+  }
+
+  # import a server SSL cert and select it
+  if $::pingfederate::ssl_cert_content {
+    $ssl = "keyPairs/sslServer"
+    $sslf = "keyPairs_sslServer"
+    # base64 string has no whitespace:
+    $ssl_pkcs12_string = regsubst($::pingfederate::ssl_cert_content,'\n','','G')
+    file { "${etc}/${sslf}_import.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${sslf}_import.json.erb"),
+    } ~>
+    file { "${etc}/${sslf}_settings.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${sslf}_settings.json.erb"),
+    } ~>
+    exec {"pf-admin-api POST ${ssl}_import":
+      command     => "${pfapi} -m POST -j ${etc}/${sslf}_import.json -r ${etc}/${sslf}_import.json.out ${ssl}/import",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    } ~>
+    exec {"pf-admin-api PUT ${ssl}_settings":
+      command     => "${pfapi} -m PUT -j ${etc}/${sslf}_settings.json -r ${etc}/${sslf}_settings.json.out ${ssl}/settings",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
+  }
+
+  # optionally import the CSR response
+  if $::pingfederate::ssl_cert_csr_content {
+    $sslc = "keyPairs/sslServer/mykey/csr"
+    $sslcf = "keyPairs_sslServer_csr"
+    # replace newlines with quoted newlines
+    $csr_x509_string = regsubst($::pingfederate::ssl_cert_csr_content,'\n','\\n','G')
+    file { "${etc}/${sslcf}.json":
+      ensure   => 'present',
+      mode     => 'a=r',
+      owner    => $::pingfederate::owner,
+      group    => $::pingfederate::group,
+      content  => template("pingfederate/${sslcf}.json.erb"),
+    } ~>
+    exec {"pf-admin-api POST ${sslc}":
+      command     => "${pfapi} -m POST -j ${etc}/${sslcf}.json -r ${etc}/${sslcf}.json.out ${sslc}",
+      refreshonly => true,
+      user        => $::pingfederate::owner,
+      logoutput   => true,
+    }
   }
 
   $pcv = "passwordCredentialValidators"
@@ -33,7 +88,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     owner    => $::pingfederate::owner,
     group    => $::pingfederate::group,
     content  => template("pingfederate/${pcv}.json.erb"),
-  } ~> 
+  } ~>
   exec {"pf-admin-api POST ${pcv}":
     command     => "${pfapi} -m POST -j ${etc}/${pcv}.json -r ${etc}/${pcv}.json.out ${pcv}", # || rm -f ${pcv}.json",
     refreshonly => true,
@@ -54,7 +109,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     owner    => $::pingfederate::owner,
     group    => $::pingfederate::group,
     content  => template("pingfederate/${oasf}.json.erb"),
-  } ~> 
+  } ~>
   exec {"pf-admin-api PUT ${oas}":
     command     => "${pfapi} -m PUT -j ${etc}/${oasf}.json -r ${etc}/${oasf}.json.out ${oas}", # || rm -f ${oasf}.json",
     refreshonly => true,
@@ -90,11 +145,11 @@ class pingfederate::server_settings inherits ::pingfederate {
       user        => $::pingfederate::owner,
       logoutput   => true,
     }
-  
+ 
     $apcm = 'oauth/authenticationPolicyContractMappings'
     $apcmf = "oauth_authenticationPolicyContractMappings"
 
-   
+  
     file {"${etc}/${apcmf}_${un}.json":
       subscribe => [Exec["pf-admin-api PUT ${oas}"],Exec["pf-admin-api POST ${apc}_${un}"]],
       ensure  => present,
@@ -121,7 +176,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       owner    => $::pingfederate::owner,
       group    => $::pingfederate::group,
       content  => template("pingfederate/${atmf}.json.erb"),
-    } ~> 
+    } ~>
     exec {"pf-admin-api POST ${atm}":
       command     => "${pfapi} -m POST -j ${etc}/${atmf}.json -r ${etc}/${atmf}.json.out ${atm}", # || rm -f ${atmf}.json",
       refreshonly => true,
@@ -142,7 +197,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       owner    => $::pingfederate::owner,
       group    => $::pingfederate::group,
       content  => template("pingfederate/${oipf}.json.erb"),
-    } ~> 
+    } ~>
     exec {"pf-admin-api POST ${oip}":
       command     => "${pfapi} -m POST -j ${etc}/${oipf}.json -r ${etc}/${oipf}.json.out ${oip}", # || rm -f ${oipf}.json",
       refreshonly => true,
@@ -155,7 +210,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       owner    => $::pingfederate::owner,
       group    => $::pingfederate::group,
       content  => template("pingfederate/${oisf}.json.erb"),
-    } ~> 
+    } ~>
     exec {"pf-admin-api PUT ${ois}":
       command     => "${pfapi} -m PUT -j ${etc}/${oisf}.json -r ${etc}/${oisf}.json.out ${ois}", # || rm -f ${oisf}.json",
       refreshonly => true,
@@ -181,7 +236,7 @@ class pingfederate::server_settings inherits ::pingfederate {
     $uan=uriescape($an)
     if $b['metadata'] != '' {
       $md = 'metadataUrls'
-      
+     
       Exec["pf-admin-api POST ${apc}_${uan}"] ~>
       file {"${etc}/${md}_${un}.json":
         ensure   => present,
@@ -330,7 +385,7 @@ class pingfederate::server_settings inherits ::pingfederate {
       owner    => $::pingfederate::owner,
       group    => $::pingfederate::group,
       content  => template("pingfederate/${asel}.json.erb"),
-    } ~> 
+    } ~>
     exec {"pf-admin-api POST ${asel}_${n}":
       command     => "${pfapi} -m POST -j ${etc}/${asel}_${n}.json -r ${etc}/${asel}_${n}.json.out ${asel}", # || rm -f ${asel}_${n}.json",
       refreshonly => true,
@@ -377,7 +432,7 @@ class pingfederate::server_settings inherits ::pingfederate {
         default         : { undef }
       }
       "${u}=${f}"
-    }.join(' -s ') 
+    }.join(' -s ')
 
     file {"${etc}/${apdf}.json":
       subscribe => Exec["pf-admin-api PUT ${apsf}"],
