@@ -1,4 +1,10 @@
 # CHANGELOG
+## 0.6.3 [March 20, 2020]
+- Adds a few more configuration knobs:
+  - `jetty_max_form_content_size`
+  - `jetty_max_form_keys`
+  - `oauth_return_scope_always`
+
 ## 0.6.2 [March 15, 2020]
 - Support to install (optionally CA-signed) TLS server cert.
 

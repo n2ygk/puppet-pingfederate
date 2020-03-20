@@ -35,6 +35,9 @@ class pingfederate (
   $log_retain_days                     = $::pingfederate::params::log_retain_days,
   $log_files                           = $::pingfederate::params::log_files,
   $log_levels                          = $::pingfederate::params::log_levels,
+  # some jetty settings:
+  $jetty_max_form_content_size         = $::pingfederate::params::jetty_max_form_content_size,
+  $jetty_max_form_keys                 = $::pingfederate::params::jetty_max_form_keys,
   # license key file: provide either the content or source file URL
   $license_content                     = $::pingfederate::params::license_content,
   $license_file                        = $::pingfederate::params::license_file,
@@ -127,6 +130,7 @@ class pingfederate (
   # API: passwordCredentialValidators (for OAuth client manager)
   $oauth_client_mgr_user               = $::pingfederate::params::oauth_client_mgr_user,
   $oauth_client_mgr_pass               = $::pingfederate::params::oauth_client_mgr_pass,
+  $oauth_return_scope_always           = $::pingfederate::params::oauth_return_scope_always,
   # API: oauth/authServerSettings
   $oauth_svc_scopes                    = $::pingfederate::params::oauth_svc_scopes,
   $oauth_svc_scope_groups              = $::pingfederate::params::oauth_svc_scope_groups,

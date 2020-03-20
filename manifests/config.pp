@@ -71,7 +71,6 @@ class pingfederate::config inherits ::pingfederate {
     content => $license_accept,
     owner   => $::pingfederate::owner,
     group   => $::pingfederate::group,
-    
   }
   # install license file
   $lic_file = "${::pingfederate::install_dir}/server/default/conf/pingfederate.lic"
@@ -250,8 +249,16 @@ class pingfederate::config inherits ::pingfederate {
     changes => $log4_do,
   }
 
-  # Jetty files
-  # here's a really ugly nested XML doc!
+  ###
+  # udpdates to configure these parts of jetty-admin.xml:
+  #  - RequestLog retainDays
+  #  - org.eclipse.jetty.server.Request.maxFormContentSize
+  #  - org.eclipse.jetty.server.Request.maxFormKeys
+  ###
+
+  $jetty_adm_file = "$::pingfederate::install_dir/etc/jetty-admin.xml"
+
+  # Here's a portion of the really ugly nested XML doc:
   # <Configure id="AdminServer" class="org.eclipse.jetty.server.Server">
   #     <Set name="handler">
   #         <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
@@ -279,46 +286,230 @@ class pingfederate::config inherits ::pingfederate {
   #             </Set>
   #         </New>
   #     </Set>
+  #     <!-- ... -->
+  #     <Call name="setAttribute">
+  #         <Arg>org.eclipse.jetty.server.Request.maxFormContentSize</Arg>
+  #         <Arg>1000000</Arg>
+  #     </Call>
+  #     <Call name="setAttribute">
+  #         <Arg>org.eclipse.jetty.server.Request.maxFormKeys</Arg>
+  #         <Arg>20000</Arg>
+  #     </Call>
   # </Configure>
-
-  # And an ulgy here document so the string can be split up into somewhat readable text:
-  $adm_cfg = @(EoF/L)
-  Configure[#attribute/id="AdminServer"]\
-  /Set[#attribute/name="handler"]\
-  /New[#attribute/id="Handlers"]\
-  /Set[#attribute/name="handlers"]\
-  /Array[#attribute/type="org.eclipse.jetty.server.Handler"]\
-  /Item\
-  /New[#attribute/id="RequestLog"]\
-  /Set[#attribute/name="requestLog"]\
-  /New[#attribute/id="RequestLogImpl"]\
-  /Set[#attribute/name="retainDays"]/#text
-  |-EoF
-  $jetty_adm_file = "$::pingfederate::install_dir/etc/jetty-admin.xml"
+  # All these entries already exist in the delivered file, so just need to edit the values.
+  # each of $adm_cfgN is a single-line set command.
+  $adm_cfg1 = @("EoF"/L)
+    set Configure[#attribute/id="AdminServer"]\
+    /Set[#attribute/name="handler"]\
+    /New[#attribute/id="Handlers"]\
+    /Set[#attribute/name="handlers"]\
+    /Array[#attribute/type="org.eclipse.jetty.server.Handler"]\
+    /Item\
+    /New[#attribute/id="RequestLog"]\
+    /Set[#attribute/name="requestLog"]\
+    /New[#attribute/id="RequestLogImpl"]\
+    /Set[#attribute/name="retainDays"]/#text ${::pingfederate::log_retain_days}
+    |-EoF
+  $adm_cfg2 = @("EoF"/L)
+    set Configure[#attribute/id="AdminServer"]\
+    /Call[#attribute/name="setAttribute"]\
+    /Arg[#text="org.eclipse.jetty.server.Request.maxFormContentSize"]\
+    /../Arg[2]/#text ${::pingfederate::jetty_max_form_content_size}
+    |-EoF
+  $adm_cfg3 = @("EoF"/L)
+    set Configure[#attribute/id="AdminServer"]\
+    /Call[#attribute/name="setAttribute"]\
+    /Arg[#text="org.eclipse.jetty.server.Request.maxFormKeys"]\
+    /../Arg[2]/#text ${::pingfederate::jetty_max_form_keys}
+    |-EoF
   augeas{$jetty_adm_file:
     lens    => 'Xml.lns',
     incl    => $jetty_adm_file,
     context => "/files/${jetty_adm_file}",
-    changes => [ "set ${adm_cfg} ${::pingfederate::log_retain_days}"]
+    changes => [ "${adm_cfg1}",
+                 "${adm_cfg2}",
+                 "${adm_cfg3}" ]
   }
-  # now do the same for the runtime file
-  $run_cfg = @(EoF/L)
-  Configure[#attribute/id="RuntimeServer"]\
-  /Set[#attribute/name="handler"]\
-  /New[#attribute/id="Handlers"]\
-  /Set[#attribute/name="handlers"]\
-  /Array[#attribute/type="org.eclipse.jetty.server.Handler"]\
-  /Item\
-  /New[#attribute/id="RequestLog"]\
-  /Set[#attribute/name="requestLog"]\
-  /New[#attribute/id="RequestLogImpl"]\
-  /Set[#attribute/name="retainDays"]/#text
-  |-EoF
+
+  ###
+  # udpdates to configure these parts of jetty-runtime.xml:
+  #  - RequestLog retainDays
+  #  - org.eclipse.jetty.server.Request.maxFormContentSize
+  #  - org.eclipse.jetty.server.Request.maxFormKeys
+  ###
+
   $jetty_run_file = "$::pingfederate::install_dir/etc/jetty-runtime.xml"
+  $run_cfg1 = @("EoF"/L)
+    set Configure[#attribute/id="RuntimeServer"]\
+    /Set[#attribute/name="handler"]\
+    /New[#attribute/id="Handlers"]\
+    /Set[#attribute/name="handlers"]\
+    /Array[#attribute/type="org.eclipse.jetty.server.Handler"]\
+    /Item\
+    /New[#attribute/id="RequestLog"]\
+    /Set[#attribute/name="requestLog"]\
+    /New[#attribute/id="RequestLogImpl"]\
+    /Set[#attribute/name="retainDays"]/#text ${::pingfederate::log_retain_days}
+    |-EoF
   augeas{$jetty_run_file:
     lens    => 'Xml.lns',
     incl    => $jetty_run_file,
     context => "/files/${jetty_run_file}",
-    changes => [ "set ${run_cfg} ${::pingfederate::log_retain_days}"]
+    changes => [ "${run_cfg1}" ]
   }
+
+  # Unlike above, org...maxFormContentSize & maxFormKeys are NOT present in the delivered
+  # file. So we need to use onlyif to add them if missing or edit them if present.
+
+  # if <Configure...><Call name="setAttribute">... is missing:
+  $run_set_attr_missing = @("EoF"/L)
+    match Configure[#attribute/id="RuntimeServer"]\
+    /Call[#attribute/name="setAttribute"] size == 0
+    |-EoF
+  $run_add_set_attr =  @("EoF"/L)
+    set Configure[#attribute/id="RuntimeServer"]/Call[last()+1]/#attribute/name "setAttribute"
+    |-EoF
+  augeas{"${jetty_run_file}_set_attr_missing":
+    lens    => 'Xml.lns',
+    incl    => $jetty_run_file,
+    context => "/files/${jetty_run_file}",
+    onlyif  => $run_set_attr_missing,
+    changes => [ "${run_add_set_attr}" ],
+    before => Augeas["${jetty_run_file}_max_form_size_missing"]
+  }
+
+  # if <Configure...><Call name="setAttribute"><Arg>org...maxFormContentSize</Arg> is missing:
+  $run_form_size_missing = @("EoF"/L)
+    match Configure[#attribute/id="RuntimeServer"]\
+    /Call[#attribute/name="setAttribute"]\
+    /Arg[#text="org.eclipse.jetty.server.Request.maxFormContentSize"] size == 0
+    |-EoF
+  $run_set_form_size1 = @("EoF"/L)
+    set Configure[#attribute/id="RuntimeServer"]\
+    /Call[#attribute/name="setAttribute"]\
+    /Arg/#text "org.eclipse.jetty.server.Request.maxFormContentSize"
+    |-EoF
+  # set the first arg (org....) only if it's missing
+  augeas{"${jetty_run_file}_max_form_size_missing":
+    lens    => 'Xml.lns',
+    incl    => $jetty_run_file,
+    context => "/files/${jetty_run_file}",
+    onlyif  => $run_form_size_missing,
+    changes => [ "${run_set_form_size1}" ],
+    before => Augeas["${jetty_run_file}_set_max_form_size"]
+  }
+  # set the second arg (${::ping...}) unconditionaly as now it's guaranteed to be present.
+  $run_set_form_size2 = @("EoF"/L)
+    set Configure[#attribute/id="RuntimeServer"]\
+    /Call[#attribute/name="setAttribute"]\
+    /Arg[#text="org.eclipse.jetty.server.Request.maxFormContentSize"]\
+    /../Arg[2]/#text ${::pingfederate::jetty_max_form_content_size}
+    |-EoF
+  augeas{"${jetty_run_file}_set_max_form_size":
+    lens    => 'Xml.lns',
+    incl    => $jetty_run_file,
+    context => "/files/${jetty_run_file}",
+    changes => [ "${run_set_form_size2}" ]
+  }
+
+  # repeat for org.eclipse.jetty.server.Request.maxFormKeys:
+  # we have one <Call id="setAttribute"> and want to add a second if it's not already there.
+  $run_set_form_keys_missing = @("EoF"/L)
+    match Configure[#attribute/id="RuntimeServer"]\
+    /Call[#attribute/name="setAttribute"]\
+    /Arg[#text="org.eclipse.jetty.server.Request.maxFormKeys"] size == 0
+    |-EoF
+  $run_add_set_attr2 = @("EoF"/L)
+    set Configure[#attribute/id="RuntimeServer"]\
+    /Call[#attribute/name="setAttribute"]/../Call[last()+1]/#attribute/name "setAttribute"
+    |-EoF
+  augeas{"${jetty_run_file}_run_add_set_attr2":
+    lens    => 'Xml.lns',
+    incl    => $jetty_run_file,
+    context => "/files/${jetty_run_file}",
+    onlyif  => $run_set_form_keys_missing,
+    changes => [ "${run_add_set_attr2}" ],
+    before  => Augeas["${jetty_run_file}_max_form_keys_missing"]
+  }
+  # if <Configure...><Call name="setAttribute"><Arg>org...maxFormKeys</Arg> is missing:
+  $run_form_keys_missing = @("EoF"/L)
+    match Configure[#attribute/id="RuntimeServer"]\
+    /Call[#attribute/name="setAttribute"]\
+    /Arg[#text="org.eclipse.jetty.server.Request.maxFormKeys"] size == 0
+    |-EoF
+  $run_set_form_keys1 = @("EoF"/L)
+    set Configure[#attribute/id="RuntimeServer"]\
+    /Call[#attribute/name="setAttribute"][last()]\
+    /Arg/#text "org.eclipse.jetty.server.Request.maxFormKeys"
+    |-EoF
+  # set the first arg (org....) only if it's missing
+  augeas{"${jetty_run_file}_max_form_keys_missing":
+    lens    => 'Xml.lns',
+    incl    => $jetty_run_file,
+    context => "/files/${jetty_run_file}",
+    onlyif  => $run_form_keys_missing,
+    changes => [ "${run_set_form_keys1}" ],
+    before => Augeas["${jetty_run_file}_set_max_form_keys"]
+  }
+  # set the second arg (${::ping...}) unconditionaly as now it's guaranteed to be present.
+  $run_set_form_keys2 = @("EoF"/L)
+    set Configure[#attribute/id="RuntimeServer"]\
+    /Call[#attribute/name="setAttribute"]\
+    /Arg[#text="org.eclipse.jetty.server.Request.maxFormKeys"]\
+    /../Arg[2]/#text ${::pingfederate::jetty_max_form_keys}
+    |-EoF
+  augeas{"${jetty_run_file}_set_max_form_keys":
+    lens    => 'Xml.lns',
+    incl    => $jetty_run_file,
+    context => "/files/${jetty_run_file}",
+    changes => [ "${run_set_form_keys2}" ]
+  }
+
+  ###
+  # Fix up oauth AS to optional return the scope if when the RFC says not to
+  ###
+  # <z:config xmlns:z="http://www.sourceid.org/2004/05/config">
+  #   <!-- <z:item name="always-return-scope-for-authz-code">false</z:item> -->
+  # </z:config>
+
+  # augeas appears to fail to work properly with an "empty" XML file so just use file:
+  $oauth_scope_settings_file = "$::pingfederate::install_dir/server/default/data/config-store/oauth-scope-settings.xml"
+  $oauth_scope_settings_content = @("EoF"/L)
+    <?xml version="1.0" encoding="UTF-8"?>
+    <z:config xmlns:z="http://www.sourceid.org/2004/05/config">
+      <z:item name="always-return-scope-for-authz-code">${::pingfederate::oauth_return_scope_always}</z:item>
+    </z:config>
+    |-EoF
+  file {$oauth_scope_settings_file:
+    ensure  => 'present',
+    content => $oauth_scope_settings_content,
+    owner   => $::pingfederate::owner,
+    group   => $::pingfederate::group,
+  }
+
+  # unable to get this to work even though testing in augtool is fine:
+  # $oauth_scope_settings_missing = @("EoF"/L)
+  #   match /z:config/z:item[name="always-return-scope-for-authz-code"] size == 0
+  #   |-EoF
+  # $oauth_scope_settings_attr = @("EoF"/L)
+  #   set /z:config[1]/z:item[1]/#attribute/name "always-return-scope-for-authz-code"
+  #   |-EoF
+  # augeas{$oauth_scope_settings_file:
+  #   lens    => 'Xml.lns',
+  #   incl    => $oauth_scope_settings_file,
+  #   context => "/files/${oauth_scope_settings_file}",
+  #   onlyif  => $oauth_scope_settings_missing,
+  #   changes => [ "$oauth_scope_settings_attr" ],
+  #   before  => Augeas["${oauth_scope_settings_file}_set"]
+  # }
+  # $oauth_scope_settings_val = @("EoF"/L)
+  #   set /z:config/z:item[name="always-return-scope-for-authz-code"]/#text \
+  #   ${::pingfederate::oauth_return_scope_always}
+  #   |-EoF
+  # augeas{"${oauth_scope_settings_file}_set":
+  #   lens    => 'Xml.lns',
+  #   incl    => $oauth_scope_settings_file,
+  #   context => "/files/${oauth_scope_settings_file}",
+  #   changes => [ "$oauth_scope_settings_val" ],
+  # }
 }
