@@ -1,4 +1,9 @@
 # CHANGELOG
+## 0.7.5 [March 20, 2020]
+- 0.6.3: Adds a few more configuration knobs:
+  - `jetty_max_form_content_size`
+  - `jetty_max_form_keys`
+  - `oauth_return_scope_always`
 
 ## 0.7.4 (March 15, 2019)
 - 0.6.2: Support to install (optionally CA-signed) TLS server cert.
@@ -10,6 +15,12 @@
 - pdk convert and validate https://puppet.com/docs/pdk/
 - **BREAKING CHANGES** to pass puppet-lint, including making all variable names *lowercase*.
   This requires matching changes to hieradata keys for any users of this module.
+
+## 0.6.3 [March 20, 2020]
+- Adds a few more configuration knobs:
+  - `jetty_max_form_content_size`
+  - `jetty_max_form_keys`
+  - `oauth_return_scope_always`
 
 ## 0.6.2 [March 15, 2020]
 - Support to install (optionally CA-signed) TLS server cert.

@@ -12,6 +12,8 @@ class pingfederate::params {
   $log_retain_days                     = 30
   $log_levels                          = []
   $log_files                           = []
+  $jetty_max_form_content_size         = 1000000
+  $jetty_max_form_keys                 = 20000
   $license_content                     = undef
   $license_file                        = undef
   $owner                               = 'pingfederate'
@@ -125,6 +127,7 @@ class pingfederate::params {
   $acct_jdbc_linking_ddl_cmd           = undef
   $oauth_client_mgr_user               = 'clientmgr'
   $oauth_client_mgr_pass               = 'ProviderP@55'
+  $oauth_return_scope_always           = false
   $oauth_svc_scopes                    = []
   $oauth_svc_scope_groups              = []
   $oauth_svc_grant_core_attrs          = ['USER_KEY','USER_NAME']

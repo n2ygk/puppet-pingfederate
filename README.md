@@ -27,6 +27,7 @@ This module has been tested with PingFederate 8.x - 9.1 and related social adapt
     + [Packages](#packages)
     + [Service](#service)
     + [Logging](#logging)
+    + [Jetty web server settings](#jetty-web-server-settings)
     + [Providing the License Key](#providing-the-license-key)
     + [Run.properties](#runproperties)
     + [Cross-Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors)
@@ -39,6 +40,7 @@ This module has been tested with PingFederate 8.x - 9.1 and related social adapt
     + [OAuth JDBC configuration](#oauth-jdbc-configuration)
     + [OAuth client manager](#oauth-client-manager)
     + [OAuth server settings](#oauth-server-settings)
+    + [OAuth returned scope](#oauth-returned-scope)
     + [OAuth scope selectors](#oauth-scope-selectors)
     + [OAuth Access Token Manager](#oauth-access-token-manager)
     + [OAuth OpenID Connect Policy Contract](#oauth-openid-connect-policy-contract)
@@ -198,6 +200,37 @@ However, it will not do a heck of a lot. You'll need to set a number of the foll
       level: DEBUG
     - name: com.pingidentity.appserver.jetty
       level: DEBUG
+  ```
+
+#### Jetty web server settings
+
+There are a small number of web server settings that may need to be changed from the defaults.
+Currently there are only these two which are used to
+[configure form content limits](https://www.eclipse.org/jetty/documentation/current/configuring-form-size.html):
+
+##### `jetty_max_form_content_size`
+  (Integer)
+
+  Sets the max form size. This is used to resolve the [form too large error](https://support.pingidentity.com/s/article/Form-too-large-error-in-server-log).
+
+  Default: 1000000
+
+  Example:
+  ```
+  pingfederate::jetty_max_form_content_size: 5000000
+  ```
+
+##### `jetty_max_form_keys`
+  (Integer)
+
+  Sets the [max form keys]. This is used to resolve the
+  [maxFormKeys limit exceeded error](https://support.pingidentity.com/s/article/Admin-UI-with-many-elements-can-yield-maxFormKeys-limit-exceeded-keys-1000).
+
+  Default: 20000
+
+  Example:
+  ```
+  pingfederate::jetty_max_form_keys: 50000
   ```
 
 #### Providing the License Key
@@ -797,6 +830,18 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
   (array[string])
   Oauth server persistent grant contract extended attributes.
 
+#### OAuth returned scope
+The response `scope` for an Access Token request per
+[RFC 6749 section 4.1](https://tools.ietf.org/html/rfc6749#section-5.1)
+is "OPTIONAL, if identical to the scope requested by the client; otherwise, REQUIRED."
+
+##### `oauth_return_scope_always`
+  (boolean)
+  Set to `true` to always return the granted scopes in the response, even if identical.
+  Default: `false` Example:
+  ```
+  pingfederate::oauth_return_scope_always: true
+  ```
 #### OAuth scope selectors
   Authentication scope selectors are used to match requested oauth scopes to select
   an authentication provider (e.g. which [social identity adapter](#social-identity-adapters)
