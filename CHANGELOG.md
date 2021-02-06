@@ -1,4 +1,10 @@
 # CHANGELOG
+
+**NOTE: I've never actually switched to the 0.7.x version branch so it's completely untested in real use**
+
+## 0.7.6 [February 6, 2021]
+- 0.6.4: Added OAuth2 Dynamic Client Registration configuration
+
 ## 0.7.5 [March 20, 2020]
 - 0.6.3: Adds a few more configuration knobs:
   - `jetty_max_form_content_size`
@@ -15,6 +21,9 @@
 - pdk convert and validate https://puppet.com/docs/pdk/
 - **BREAKING CHANGES** to pass puppet-lint, including making all variable names *lowercase*.
   This requires matching changes to hieradata keys for any users of this module.
+
+## 0.6.4 [February 6, 2021]
+- Added OAuth2 Dynamic Client Registration configuration
 
 ## 0.6.3 [March 20, 2020]
 - Adds a few more configuration knobs:
