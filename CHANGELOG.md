@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.6.4 [February 6, 2021]
+- Added OAuth2 Dynamic Client Registration configuration
+
 ## 0.6.3 [March 20, 2020]
 - Adds a few more configuration knobs:
   - `jetty_max_form_content_size`

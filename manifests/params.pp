@@ -175,4 +175,6 @@ class pingfederate::params {
       'enforceReplayPrevention' => false,
     },
   }
+  $oauth_client_metadata               = []
+  $oauth_dynamic_client_registration   = {}
 }
