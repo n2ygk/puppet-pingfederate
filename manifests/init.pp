@@ -154,6 +154,9 @@ class pingfederate (
   # API: oauth/clients
   $oauth_client                        = $::pingfederate::params::oauth_client,
   $oauth_client_default                = $::pingfederate::params::oauth_client_default,
+  # API: oauth/clientSettings
+  $oauth_client_metadata               = $::pingfederate::params::oauth_client_metadata,
+  $oauth_dynamic_client_registration   = $::pingfederate::params::oauth_dynamic_client_registration,
   ) inherits ::pingfederate::params {
 
   validate_re($operational_mode,['^STANDALONE$','^CLUSTERED_CONSOLE$','^CLUSTERED_ENGINE$'])

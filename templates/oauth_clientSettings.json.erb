@@ -1,0 +1,118 @@
+{
+  "clientMetadata": [
+<% @oauth_client_metadata.each_with_index do |val, i| -%>
+      {
+        "parameter": "<%= val['parameter'] -%>",
+        "description": "<%= val['description'] -%>"
+        "multiValued": <%= val['multiValued'] -%>
+      }<%= ',' if i < (@oauth_client_metadata.size - 1) %>
+<% end -%>
+  ], 
+  "dynamicClientRegistration": {
+<% if @oauth_dynamic_client_registrations['initialAccessTokenScope'] -%>
+    "initialAccessTokenScope": "<%= @oauth_dynamic_client_registration['initialAccessTokenScope'] -%>",
+<% end -%>
+<% if @oauth_dynamic_client_registrations['restrictCommonScopes'] -%>
+    "restrictCommonScopes": <%= @oauth_dynamic_client_registration['restrictCommonScopes'] -%>,
+<% end -%>
+    "restrictedCommonScopes": [
+<% @oauth_dynamic_client_registrations['restrictedCommonScopes'].each_with_index do |val, i| -%>
+      "<%= val -%>"<%= ',' if i < @oauth_dynamic_client_registration['restrictedCommonScopes'].size - 1) %>
+<% end -%>
+    ],
+    "allowedExclusiveScopes": [
+<% @oauth_dynamic_client_registrations['allowedExclusiveScopes'].each_with_index do |val, i| -%>
+      "<%= val -%>"<%= ',' if i < @oauth_dynamic_client_registration['allowedExclusiveScopes'].size - 1) %>
+<% end -%>
+    ],
+<% if @oauth_dynamic_client_registrations['requestPolicyRef'] -%>
+    "requestPolicyRef": {
+      "id": "<%= @oauth_dynamic_client_registrations['requestPolicyRef']['id'] -%>",
+      "location": "<%= @oauth_dynamic_client_registrations['requestPolicyRef']['location'] -%>"
+    },
+<% end -%>
+    "enforceReplayPrevention": <%= @oauth_dynamic_client_registration['enforceReplayPrevention']? || false -%>,
+    "requireSignedRequests": <%= @oauth_dynamic_client_registration['requireSignedRequests']? || false -%>,
+<% if @oauth_dynamic_client_registrations['defaultAccessTokenManagerRef'] -%>
+    "defaultAccessTokenManagerRef": {
+      "id": "<%= @oauth_dynamic_client_registrations['defaultAccessTokenManagerRef']['id'] -%>",
+      "location": "<%= @oauth_dynamic_client_registrations['defaultAccessTokenManagerRef']['location'] -%>"
+    },
+<% end -%>
+<% if @oauth_dynamic_client_registrations['persistentGrantExpirationType'] -%>
+    "persistentGrantExpirationType": "<%= @oauth_dynamic_client_registration['persistentGrantExpirationType'] -%>",
+<% end -%>
+<% if @oauth_dynamic_client_registrations['persistentGrantExpirationTime'] -%>
+    "persistentGrantExpirationTime": <%= @oauth_dynamic_client_registration['persistentGrantExpirationTime'] -%>,
+<% end -%>
+<% if @oauth_dynamic_client_registrations['persistentGrantExpirationTimeUnit'] -%>
+    "persistentGrantExpirationTimeUnit": "<%= @oauth_dynamic_client_registration['persistentGrantExpirationTimeUnit'] -%>",
+<% end -%>
+<% if @oauth_dynamic_client_registrations['persistentGrantIdleTimeoutType'] -%>
+    "persistentGrantIdleTimeoutType": "<%= @oauth_dynamic_client_registration['persistentGrantIdleTimeoutType'] -%>",
+<% end -%>
+<% if @oauth_dynamic_client_registrations['persistentGrantIdleTimeout'] -%>
+    "persistentGrantIdleTimeout": <%= @oauth_dynamic_client_registration['persistentGrantIdleTimeout'] -%>,
+<% end -%>
+<% if @oauth_dynamic_client_registrations['persistentGrantIdleTimeoutTimeUnit'] -%>
+    "persistentGrantIdleTimeoutTimeUnit": "<%= @oauth_dynamic_client_registration['persistentGrantIdleTimeoutTimeUnit'] -%>",
+<% end -%>
+<% if @oauth_dynamic_client_registrations['clientCertIssuerType'] -%>
+    "clientCertIssuerType": "<%= @oauth_dynamic_client_registration['clientCertIssuerType'] -%>",
+<% end -%>
+<% if @oauth_dynamic_client_registrations['clientCertIssuerRef'] -%>
+    "clientCertIssuerRef": {
+      "id": "<%= @oauth_dynamic_client_registrations['clientCertIssuerRef']['id'] -%>",
+      "location": "<%= @oauth_dynamic_client_registrations['clientCertIssuerRef']['location'] -%>"
+    },
+<% end -%>
+<% if @oauth_dynamic_client_registrations['refreshRolling'] -%>
+    "refreshRolling": "<%= @oauth_dynamic_client_registration['refreshRolling'] -%>",
+<% end -%>
+<% if @oauth_dynamic_client_registrations['oidcPolicy'] -%>
+    "oidcPolicy": {
+      "idTokenSigningAlgorithm": "<%= @oauth_dynamic_client_registrations['oidcPolicy']['idTokenSigningAlgorithm'] -%>",
+      "idTokenEncryptionAlgorithm": "<%= @oauth_dynamic_client_registrations['oidcPolicy']['idTokenEncryptionAlgorithm'] -%>",
+      "idTokenContentEncryptionAlgorithm": "<%= @oauth_dynamic_client_registrations['oidcPolicy']['idTokenContentEncryptionAlgorithm'] -%>",
+<%    if @oauth_dynamic_client_registrations['oidcPolicy']['policyGroup'] -%>
+      "policyGroup": {
+        "id": "<%= @oauth_dynamic_client_registrations['oidcPolicy']['policyGroup']['id'] -%>",
+        "location": "<%= @oauth_dynamic_client_registrations['oidcPolicy']['policyGroup']['location'] -%>"
+      }
+<%    end -%>
+    },
+<% end -%>
+    "policyRefs": [
+<% @oauth_dynamic_clint_registrations['policyRefs'].each_with_index do |val, i| -%>
+      {
+        "id": "<%= val['id'] -%>",
+        "location": "<%= val['location'] -%>"
+      }<%= ',' if i < (@oauth_dynamic_clint_registrations['policyRefs'].size - 1) %>
+<% end -%>
+    ],
+<% if @oauth_dynamic_client_registrations['deviceFlowSettingType'] -%>
+    "deviceFlowSettingType": "<%= @oauth_dynamic_client_registration['deviceFlowSettingType'] -%>",
+<% end -%>
+<% if @oauth_dynamic_client_registrations['userAuthorizationUrlOverride'] -%>
+    "userAuthorizationUrlOverride": "<%= @oauth_dynamic_client_registration['userAuthorizationUrlOverride'] -%>",
+<% end -%>
+<% if @oauth_dynamic_client_registrations['pendingAuthorizationTimeoutOverride'] -%>
+    "pendingAuthorizationTimeoutOverride": <%= @oauth_dynamic_client_registration['pendingAuthorizationTimeoutOverride'] -%>,
+<% end -%>
+<% if @oauth_dynamic_client_registrations['devicePollingIntervalOverride'] -%>
+    "devicePollingIntervalOverride": <%= @oauth_dynamic_client_registration['devicePollingIntervalOverride'] -%>,
+<% end -%>
+<% if @oauth_dynamic_client_registrations['bypassActivationCodeConfirmationOverride'] -%>
+    "bypassActivationCodeConfirmationOverride": <%= @oauth_dynamic_client_registration['bypassActivationCodeConfirmationOverride'] -%>,
+<% end -%>
+<% if @oauth_dynamic_client_registrations['requireProofKeyForCodeExchange'] -%>
+    "requireProofKeyForCodeExchange": <%= @oauth_dynamic_client_registration['requireProofKeyForCodeExchange'] -%>,
+<% end -%>
+<% if @oauth_dynamic_client_registrations['cibaPollingInterval'] -%>
+    "cibaPollingInterval": <%= @oauth_dynamic_client_registration['cibaPollingInterval'] -%>,
+<% end -%>
+<% if @oauth_dynamic_client_registrations['cibaRequireSignedRequests'] -%>
+    "cibaRequireSignedRequests": <%= @oauth_dynamic_client_registration['cibaRequireSignedRequests'] -%>
+<% end -%>
+  }
+}

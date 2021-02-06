@@ -791,6 +791,72 @@ Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}
 Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns:   "resultId": "validation_error"
 Notice: /Stage[main]/Pingfederate::Server_settings/Exec[pf-admin-api POST ${pcv}]/returns: }
   ```
+#### OAuth client settings
+##### `oauth_client_metadata`
+  (array of hashes) OAuth Client Metadata. Each hash has the following keys:
+  - parameter: (string) The metadata name.
+  - description: (string) The metadata description.
+  - multiValued: (boolean) If the field should allow multiple values.
+
+##### `oauth_dynamic_cient_registration`
+  (map) OAuth Dynamic Client Registration (RFC 7691) settings. (These are directly mapped to the API parameters).
+  - initialAccessTokenScope: (string): Access Token scope required to allow dynamic client registration.
+  - restrictCommonScopes: (boolean) Restrict common scopes.
+  - restrictedCommonScopes: (array[string]): The common scopes to restrict.
+  - allowedExclusiveScopes (array[string]): The exclusive scopes to allow.
+  - requestPolicyRef: (link) The CIBA request policy.
+  - enforceReplayPrevention: (boolean) Enforce replay prevention.
+  - requireSignedRequests: (boolean) Require signed requests.
+  - defaultAccessTokenManagerRef: (link) The default access token manager for this client.
+  - persistentGrantExpirationType: (string) `INDEFINITE_EXPIRY` or `SERVER_DEFAULT` or `OVERRIDE_SERVER_DEFAULT`. Defaults to `SERVER_DEFAULT`.
+  - persistentGrantExpirationTime: (integer) The persistent grant expiration time.
+  - persistentGrantExpirationTimeUnit: (strng) = `MINUTES` or `DAYS` or `HOURS`. The persistent grant expiration time unit.
+  - persistentGrantIdleTimeoutType: (string) `INDEFINITE_EXPIRY` or `SERVER_DEFAULT` or `OVERRIDE_SERVER_DEFAULT`. Defaults to `SERVER_DEFAULT`.
+  - persistentGrantIdleTimeout: (integer) The persistent grant idle timeout.
+  - persistentGrantIdleTimeoutTimeUnit:(string) `MINUTES` or `DAYS` or `HOURS`
+  - clientCertIssuerType: (string) = `NONE` or `TRUST_ANY` or `CERTIFICATE`
+  - clientCertIssuerRef: (link): Client TLS Certificate Issuer DN.
+  - refreshRolling: (string) = `SERVER_DEFAULT` or `DONT_ROLL` or `ROLL`. Defaults to `SERVER_DEFAULT`.
+  - oidcPolicy: (string): Open ID Connect Policy settings.
+  - policyRefs: (array[link]) The client registration policies.
+  - deviceFlowSettingType: (string) `SERVER_DEFAULT` or `OVERRIDE_SERVER_DEFAULT`
+  - userAuthorizationUrlOverride: (string): The URL is used as `verification_url` and `verification_url_complete` values in a device flow authorization request.
+  - pendingAuthorizationTimeoutOverride: (integer) The `device_code` and `user_code` timeout, in seconds.
+  - devicePollingIntervalOverride: (integer) The amount of time client should wait between polling requests, in seconds.
+  - bypassActivationCodeConfirmationOverride: (boolean) Indicates if the Activation Code Confirmation page should be bypassed if `verification_url_complete` is used by the end user to authorize a device.
+  - requireProofKeyForCodeExchange: (boolean) Determines whether Proof Key for Code Exchange (PKCE) is required for the dynamically created client.
+  - cibaPollingInterval: (integer) The minimum amount of time in seconds that the Client must wait between polling requests to the token endpoint. The default is 3 seconds.
+  - cibaRequireSignedRequests: (boolean) Determines whether CIBA signed requests are required for this client.
+
+  Here's an example in a Hiera YAML file:
+
+  ```yaml
+  pingfederate::oauth_dynamic_client_registration:
+	allowedExclusiveScopes: []
+	cibaPollingInterval: 3
+	cibaRequireSignedRequests: false
+	clientCertIssuerType: NONE
+	deviceFlowSettingType: SERVER_DEFAULT
+	enforceReplayPrevention: false
+	initialAccessTokenScope: dyn-client
+	persistentGrantExpirationType: SERVER_DEFAULT
+	persistentGrantIdleTimeoutType: SERVER_DEFAULT
+	policyRefs: []
+	refreshRolling: SERVER_DEFAULT
+	requireProofKeyForCodeExchange: false
+	requireSignedRequests: false
+	restrictCommonScopes: true
+	restrictedCommonScopes:
+	- address
+	- create
+	- delete
+	- email
+	- openid
+	- profile
+	- read
+	- update
+  ```
+
 #### OAuth server settings
 ##### `oauth_svc_scopes`
   (array of hashes) Allowable OAuth scopes. Each hash has the following keys:

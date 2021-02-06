@@ -117,6 +117,23 @@ class pingfederate::server_settings inherits ::pingfederate {
     logoutput   => true,
   }
 
+  # Dynamic Client Registration settings
+  $oac = 'oauth/clientSettings'
+  $oacf = 'oauth_clientSettings'
+  file {"${etc}/${oacf}.json":
+    ensure  => 'present',
+    mode    => 'a=r',
+    owner   => $::pingfederate::owner,
+    group   => $::pingfederate::group,
+    content => template("pingfederate/${oacf}.json.erb"),
+  }
+  ~> exec {"pf-admin-api PUT ${oac}":
+    command     => "${pfapi} -m PUT -j ${etc}/${oacf}.json -r ${etc}/${oacf}.json.out ${oac}",
+    refreshonly => true,
+    user        => $::pingfederate::owner,
+    logoutput   => true,
+  }
+  
   # authenticationPolicyContracts link sp/idpConnections and oauth/authenticationPolicyContractMappings
   # by the 'id' that is the result of a POST. We identify our contacts by the 'name' which is used in
   # the JSON filename in order to find the 'id' to link by. oauth/authServerSettings comes first because
