@@ -358,6 +358,9 @@ for an explanation. The defaults are as distributed by PingIdentity.
 ##### `cluster_diagnostics_port`
   (integer) Default `7500`
 
+##### `max_request_bodysize`
+  (integer) Default `200000`
+
 #### Cross-Origin Resource Sharing (CORS)
 CORS needs to be enabled as otherwise Javascript OAuth clients will throw an XHR error
 when attempting [XMLHttpRequest (XHR)](https://en.wikipedia.org/wiki/XMLHttpRequest).
