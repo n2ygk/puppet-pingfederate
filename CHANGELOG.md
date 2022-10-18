@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.6.5 [October 18, 2022]
+- Update some configuration parameter names for Pingfederate 11.
+
 ## 0.6.4 [February 6, 2021]
 - Added OAuth2 Dynamic Client Registration configuration
 
