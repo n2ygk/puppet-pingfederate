@@ -46,6 +46,7 @@ class pingfederate::config inherits ::pingfederate {
       'pf.cluster.diagnostics.enabled'         => $::pingfederate::cluster_diagnostics_enabled,
       'pf.cluster.diagnostics.addr'            => $::pingfederate::cluster_diagnostics_addr,
       'pf.cluster.diagnostics.port'            => $::pingfederate::cluster_diagnostics_port,
+      'pf.runtime.http.max.request.bodysize'   => $::pingfederate::max_request_bodysize,
     }
   }
   create_ini_settings($settings, $defaults)
@@ -252,8 +253,8 @@ class pingfederate::config inherits ::pingfederate {
   ###
   # udpdates to configure these parts of jetty-admin.xml:
   #  - RequestLog retainDays
-  #  - org.eclipse.jetty.server.Request.maxFormContentSize
-  #  - org.eclipse.jetty.server.Request.maxFormKeys
+  #  - pf.admin.http.maxFormContentSize
+  #  - pf.admin.http.maxFormKeys
   ###
 
   $jetty_adm_file = "$::pingfederate::install_dir/etc/jetty-admin.xml"
@@ -288,11 +289,11 @@ class pingfederate::config inherits ::pingfederate {
   #     </Set>
   #     <!-- ... -->
   #     <Call name="setAttribute">
-  #         <Arg>org.eclipse.jetty.server.Request.maxFormContentSize</Arg>
+  #         <Arg>pf.admin.http.maxFormContentSize</Arg>
   #         <Arg>1000000</Arg>
   #     </Call>
   #     <Call name="setAttribute">
-  #         <Arg>org.eclipse.jetty.server.Request.maxFormKeys</Arg>
+  #         <Arg>pf.admin.http.maxFormKeys</Arg>
   #         <Arg>20000</Arg>
   #     </Call>
   # </Configure>
@@ -313,13 +314,13 @@ class pingfederate::config inherits ::pingfederate {
   $adm_cfg2 = @("EoF"/L)
     set Configure[#attribute/id="AdminServer"]\
     /Call[#attribute/name="setAttribute"]\
-    /Arg[#text="org.eclipse.jetty.server.Request.maxFormContentSize"]\
+    /Arg[#text="pf.admin.http.maxFormContentSize"]\
     /../Arg[2]/#text ${::pingfederate::jetty_max_form_content_size}
     |-EoF
   $adm_cfg3 = @("EoF"/L)
     set Configure[#attribute/id="AdminServer"]\
     /Call[#attribute/name="setAttribute"]\
-    /Arg[#text="org.eclipse.jetty.server.Request.maxFormKeys"]\
+    /Arg[#text="pf.admin.http.maxFormKeys"]\
     /../Arg[2]/#text ${::pingfederate::jetty_max_form_keys}
     |-EoF
   augeas{$jetty_adm_file:
@@ -334,8 +335,8 @@ class pingfederate::config inherits ::pingfederate {
   ###
   # udpdates to configure these parts of jetty-runtime.xml:
   #  - RequestLog retainDays
-  #  - org.eclipse.jetty.server.Request.maxFormContentSize
-  #  - org.eclipse.jetty.server.Request.maxFormKeys
+  #  - pf.admin.http.maxFormContentSize
+  #  - pf.admin.http.maxFormKeys
   ###
 
   $jetty_run_file = "$::pingfederate::install_dir/etc/jetty-runtime.xml"
@@ -382,12 +383,12 @@ class pingfederate::config inherits ::pingfederate {
   $run_form_size_missing = @("EoF"/L)
     match Configure[#attribute/id="RuntimeServer"]\
     /Call[#attribute/name="setAttribute"]\
-    /Arg[#text="org.eclipse.jetty.server.Request.maxFormContentSize"] size == 0
+    /Arg[#text="pf.admin.http.maxFormContentSize"] size == 0
     |-EoF
   $run_set_form_size1 = @("EoF"/L)
     set Configure[#attribute/id="RuntimeServer"]\
     /Call[#attribute/name="setAttribute"]\
-    /Arg/#text "org.eclipse.jetty.server.Request.maxFormContentSize"
+    /Arg/#text "pf.admin.http.maxFormContentSize"
     |-EoF
   # set the first arg (org....) only if it's missing
   augeas{"${jetty_run_file}_max_form_size_missing":
@@ -402,7 +403,7 @@ class pingfederate::config inherits ::pingfederate {
   $run_set_form_size2 = @("EoF"/L)
     set Configure[#attribute/id="RuntimeServer"]\
     /Call[#attribute/name="setAttribute"]\
-    /Arg[#text="org.eclipse.jetty.server.Request.maxFormContentSize"]\
+    /Arg[#text="pf.admin.http.maxFormContentSize"]\
     /../Arg[2]/#text ${::pingfederate::jetty_max_form_content_size}
     |-EoF
   augeas{"${jetty_run_file}_set_max_form_size":
@@ -412,12 +413,12 @@ class pingfederate::config inherits ::pingfederate {
     changes => [ "${run_set_form_size2}" ]
   }
 
-  # repeat for org.eclipse.jetty.server.Request.maxFormKeys:
+  # repeat for pf.admin.http.maxFormKeys:
   # we have one <Call id="setAttribute"> and want to add a second if it's not already there.
   $run_set_form_keys_missing = @("EoF"/L)
     match Configure[#attribute/id="RuntimeServer"]\
     /Call[#attribute/name="setAttribute"]\
-    /Arg[#text="org.eclipse.jetty.server.Request.maxFormKeys"] size == 0
+    /Arg[#text="pf.admin.http.maxFormKeys"] size == 0
     |-EoF
   $run_add_set_attr2 = @("EoF"/L)
     set Configure[#attribute/id="RuntimeServer"]\
@@ -435,12 +436,12 @@ class pingfederate::config inherits ::pingfederate {
   $run_form_keys_missing = @("EoF"/L)
     match Configure[#attribute/id="RuntimeServer"]\
     /Call[#attribute/name="setAttribute"]\
-    /Arg[#text="org.eclipse.jetty.server.Request.maxFormKeys"] size == 0
+    /Arg[#text="pf.admin.http.maxFormKeys"] size == 0
     |-EoF
   $run_set_form_keys1 = @("EoF"/L)
     set Configure[#attribute/id="RuntimeServer"]\
     /Call[#attribute/name="setAttribute"][last()]\
-    /Arg/#text "org.eclipse.jetty.server.Request.maxFormKeys"
+    /Arg/#text "pf.admin.http.maxFormKeys"
     |-EoF
   # set the first arg (org....) only if it's missing
   augeas{"${jetty_run_file}_max_form_keys_missing":
@@ -455,7 +456,7 @@ class pingfederate::config inherits ::pingfederate {
   $run_set_form_keys2 = @("EoF"/L)
     set Configure[#attribute/id="RuntimeServer"]\
     /Call[#attribute/name="setAttribute"]\
-    /Arg[#text="org.eclipse.jetty.server.Request.maxFormKeys"]\
+    /Arg[#text="pf.admin.http.maxFormKeys"]\
     /../Arg[2]/#text ${::pingfederate::jetty_max_form_keys}
     |-EoF
   augeas{"${jetty_run_file}_set_max_form_keys":
