@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.6.6 [October 19, 2022]
+- Correct spelling of pf.runtime.http.maxRequestBodySize.
+
 ## 0.6.5 [October 18, 2022]
 - Update some configuration parameter names for Pingfederate 11.
 
