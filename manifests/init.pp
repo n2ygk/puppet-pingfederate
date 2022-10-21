@@ -73,6 +73,7 @@ class pingfederate (
   $cluster_diagnostics_enabled         = $::pingfederate::params::cluster_diagnostics_enabled,
   $cluster_diagnostics_addr            = $::pingfederate::params::cluster_diagnostics_addr,
   $cluster_diagnostics_port            = $::pingfederate::params::cluster_diagnostics_port,
+  $runtime_http_maxRequestBodySize     = $::pingfederate::params::runtime_http_maxRequestBodySize,
   # administration
   $adm_user                            = $::pingfederate::params::adm_user,
   $adm_pass                            = $::pingfederate::params::adm_pass,

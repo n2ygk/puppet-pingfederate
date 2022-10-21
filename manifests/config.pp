@@ -46,7 +46,7 @@ class pingfederate::config inherits ::pingfederate {
       'pf.cluster.diagnostics.enabled'         => $::pingfederate::cluster_diagnostics_enabled,
       'pf.cluster.diagnostics.addr'            => $::pingfederate::cluster_diagnostics_addr,
       'pf.cluster.diagnostics.port'            => $::pingfederate::cluster_diagnostics_port,
-      'pf.runtime.http.maxRequestBodySize'     => $::pingfederate::max_request_bodysize,
+      'pf.runtime.http.maxRequestBodySize'     => $::pingfederate::runtime_http_maxRequestBodySize,
     }
   }
   create_ini_settings($settings, $defaults)
