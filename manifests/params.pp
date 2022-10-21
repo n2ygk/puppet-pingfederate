@@ -51,6 +51,7 @@ class pingfederate::params {
   $cluster_diagnostics_enabled         = false
   $cluster_diagnostics_addr            = '224.0.75.75'
   $cluster_diagnostics_port            = 7500
+  $runtime_http_maxRequestBodySize     = 200000
   $adm_user                            = 'Administrator'
   $adm_pass                            = 'p@Ssw0rd'
   $adm_hash                            = 'k1H1o2jc66sgkDjJKq85Sr22QNk143S20oR2Yyt2kqo.5Cu-mnqB.2'

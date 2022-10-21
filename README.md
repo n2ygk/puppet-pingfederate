@@ -358,7 +358,7 @@ for an explanation. The defaults are as distributed by PingIdentity.
 ##### `cluster_diagnostics_port`
   (integer) Default `7500`
 
-##### `max_request_bodysize`
+##### `runtime_http_maxRequestBodySize`
   (integer) Default `200000`
 
 #### Cross-Origin Resource Sharing (CORS)
