@@ -34,7 +34,7 @@ class pingfederate::install inherits ::pingfederate {
     }
   }
   # python and augeas scripts are in templates/
-  ensure_packages(['python','python-requests','python-libs','augeas'],{'ensure' => 'installed'})
+  ensure_packages(['python3','python3-requests','python3-libs','python3-augeas'],{'ensure' => 'installed'})
 
   # Also install some local configuration tools
   file { "${::pingfederate::install_dir}/local":
