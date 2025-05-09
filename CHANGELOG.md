@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.6.8 [May 9, 2025]
+- Update package names for python and libs to python3.
+
 ## 0.6.7 [October 21, 2022]
 - Be more consistent with use of pf.runtime.http.maxRequestBodySize.
 
